@@ -31,7 +31,6 @@
       background: #1a1a1a;
     }
 
-    /* 问题4：独立fixed背景层，彻底解决移动端背景随滑动漂移 */
     #bgLayer {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -56,7 +55,6 @@
       width: 100%;
     }
 
-    /* 标题区域 */
     .header-area {
       display: flex;
       align-items: center;
@@ -121,7 +119,6 @@
       font-weight: 400;
     }
 
-    /* 搜索区域 */
     .search-wrapper {
       display: flex;
       flex-direction: column;
@@ -131,7 +128,6 @@
       width: 100%;
     }
 
-    /* 问题3核心修复：搜索框不超出屏幕 */
     .search-box {
       display: flex;
       align-items: center;
@@ -166,7 +162,6 @@
       flex: 1;
       background: transparent; border: none;
       padding: 0 8px; height: 42px; font-size: 1rem; color: #fff;
-      /* 允许input被压缩，不撑出去 */
       min-width: 0;
       width: 0;
     }
@@ -190,11 +185,15 @@
     }
     .local-search::placeholder { color: rgba(255, 255, 255, 0.85); }
 
-    /* 卡片区域 */
     .section {
       background: var(--glass-bg); backdrop-filter: blur(10px);
       border: 1px solid var(--glass-border); border-radius: 20px;
       padding: 1.2rem; margin-bottom: 2rem;
+    }
+
+    /* 分区隐藏时不占空间 */
+    .section.section-hidden {
+      display: none;
     }
 
     .link-container {
@@ -238,7 +237,18 @@
     .card:hover .info-popup { opacity: 1; transform: translateX(-50%) translateY(0); }
     .card.hidden { display: none; }
 
-    /* 响应式 */
+    /* 无结果提示 */
+    .no-result-tip {
+      display: none;
+      text-align: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem;
+      padding: 1.5rem 0 0.5rem;
+    }
+    .no-result-tip.visible {
+      display: block;
+    }
+
     @media (max-width: 1200px) {
       .link-container { grid-template-columns: repeat(5, 1fr); }
     }
@@ -1499,11 +1509,30 @@
   });
 
   function filterLinks() {
-    const query = document.getElementById("localFilter").value.toLowerCase();
+    const query = document.getElementById("localFilter").value.toLowerCase().trim();
+
+    // 遍历所有卡片，先根据关键词决定显示/隐藏
     document.querySelectorAll('.card').forEach(card => {
-      const title = card.querySelector('.title').innerText.toLowerCase();
-      const desc = card.getAttribute('data-desc').toLowerCase();
-      card.classList.toggle('hidden', !title.includes(query) && !desc.includes(query));
+      if (!query) {
+        // 搜索框清空时恢复所有卡片
+        card.classList.remove('hidden');
+      } else {
+        const title = card.querySelector('.title').innerText.toLowerCase();
+        const desc = (card.getAttribute('data-desc') || '').toLowerCase();
+        const matched = title.includes(query) || desc.includes(query);
+        card.classList.toggle('hidden', !matched);
+      }
+    });
+
+    // 遍历每个分区，判断其内部是否有可见卡片，没有则隐藏整个分区
+    document.querySelectorAll('.section').forEach(section => {
+      if (!query) {
+        // 搜索框清空时恢复所有分区
+        section.classList.remove('section-hidden');
+      } else {
+        const visibleCards = section.querySelectorAll('.card:not(.hidden)');
+        section.classList.toggle('section-hidden', visibleCards.length === 0);
+      }
     });
   }
 
