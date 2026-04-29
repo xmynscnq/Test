@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>王五导航</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -18,20 +18,21 @@
 
     * { box-sizing: border-box; outline: none; }
 
-    /* 问题4修复：用伪元素固定背景，避免移动端背景随滚动漂移 */
-    body {
+    html, body {
       margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #1a1a1a;
-      color: var(--text-main);
-      min-height: 100vh;
-      /* 问题3修复：禁止横向溢出 */
       overflow-x: hidden;
       width: 100%;
     }
 
-    /* 用fixed伪元素承载背景图，彻底解决移动端背景漂移 */
-    .bg-fixed {
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      background: #1a1a1a;
+    }
+
+    /* 问题4：独立fixed背景层，彻底解决移动端背景随滑动漂移 */
+    #bgLayer {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       z-index: -2;
@@ -40,42 +41,43 @@
       background-repeat: no-repeat;
     }
 
-    body::before {
-      content: '';
+    #bgOverlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.35);
-      z-index: -1;
       backdrop-filter: blur(3px);
+      z-index: -1;
     }
 
-    .container { max-width: 1400px; margin: 0 auto; padding: 1.2rem; width: 100%; }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.2rem;
+      width: 100%;
+    }
 
-    /* ===== 美化标题区域 ===== */
+    /* 标题区域 */
     .header-area {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 18px;
-      margin-bottom: 2rem;
-      position: relative;
+      gap: 14px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      width: 100%;
     }
 
-    /* 标题两侧装饰图标 */
     .header-icon {
-      width: 52px;
-      height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 2rem;
+      flex-shrink: 0;
       filter: drop-shadow(0 0 12px rgba(76, 175, 80, 0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.6));
       animation: float 3s ease-in-out infinite;
       user-select: none;
     }
-    .header-icon:last-child {
-      animation-delay: 1.5s;
-    }
+    .header-icon:last-child { animation-delay: 1.5s; }
 
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
@@ -84,125 +86,159 @@
 
     h1 {
       text-align: center;
-      font-size: 3.8rem;
+      font-size: 3.2rem;
       margin: 0;
       font-weight: 900;
       letter-spacing: 0.05em;
-      position: relative;
-      
-      /* 多层渐变文字 */
-      background: linear-gradient(
-        135deg,
-        #ffffff 0%,
-        #a8f5ab 30%,
-        #4CAF50 55%,
-        #81e085 75%,
-        #ffffff 100%
-      );
+      white-space: nowrap;
+      background: linear-gradient(135deg, #ffffff 0%, #a8f5ab 30%, #4CAF50 55%, #81e085 75%, #ffffff 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-
-      /* 立体感：文字描边+发光 */
       filter: 
         drop-shadow(0 0 20px rgba(76, 175, 80, 0.7))
         drop-shadow(0 0 40px rgba(76, 175, 80, 0.35))
         drop-shadow(0 6px 16px rgba(0, 0, 0, 0.8));
     }
 
-    /* 标题下方装饰横线 */
     h1::after {
       content: '';
       display: block;
-      margin: 10px auto 0;
+      margin: 8px auto 0;
       width: 60%;
       height: 2px;
       background: linear-gradient(90deg, transparent, #4CAF50, rgba(76,175,80,0.5), transparent);
       border-radius: 2px;
-      filter: blur(0.5px);
     }
 
-    /* 副标题装饰文字 */
     .header-subtitle {
       text-align: center;
-      font-size: 0.85rem;
-      letter-spacing: 0.35em;
+      font-size: 0.78rem;
+      letter-spacing: 0.3em;
       color: rgba(255,255,255,0.45);
       text-transform: uppercase;
-      margin-top: 6px;
-      margin-bottom: 0;
+      margin: 5px 0 0;
       font-weight: 400;
     }
 
     /* 搜索区域 */
-    .search-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 3rem; gap: 20px; }
-    
+    .search-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+      gap: 14px;
+      width: 100%;
+    }
+
+    /* 问题3核心修复：搜索框不超出屏幕 */
     .search-box {
-      display: flex; align-items: center; 
-      background: rgba(0, 0, 0, 0.55); 
-      backdrop-filter: blur(20px); 
-      border: 2px solid var(--glass-border); 
-      border-radius: 50px; padding: 6px 15px; 
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(20px);
+      border: 2px solid var(--glass-border);
+      border-radius: 50px;
+      padding: 5px 10px;
       box-shadow: var(--glass-shadow);
-      width: 100%; max-width: 700px;
+      width: 100%;
+      max-width: 700px;
+      min-width: 0;
     }
 
     #search-engine-icon {
-      width: 20px;
-      height: 20px;
-      margin-left: 5px;
+      width: 18px; height: 18px;
+      margin-left: 4px;
       border-radius: 4px;
       object-fit: contain;
+      flex-shrink: 0;
     }
 
-    .search-box select { 
-      background: transparent; color: #fff; border: none; 
-      padding: 0 5px; cursor: pointer; font-weight: bold; font-size: 1rem;
+    .search-box select {
+      background: transparent; color: #fff; border: none;
+      padding: 0 3px; cursor: pointer; font-weight: bold; font-size: 0.88rem;
+      flex-shrink: 0;
+      max-width: 58px;
     }
-    .search-box select option {
-      background: #222; 
-      color: #fff;
-    }
+    .search-box select option { background: #222; color: #fff; }
 
-    .search-box input { 
-      flex: 1; background: transparent; border: none; 
-      padding: 0 15px; height: 48px; font-size: 1.1rem; color: #fff; 
+    .search-box input {
+      flex: 1;
+      background: transparent; border: none;
+      padding: 0 8px; height: 42px; font-size: 1rem; color: #fff;
+      /* 允许input被压缩，不撑出去 */
+      min-width: 0;
+      width: 0;
     }
     .search-box input::placeholder { color: rgba(255, 255, 255, 0.7); }
 
-    .search-box button { 
-      background: var(--primary-color); border: none; 
-      width: 44px; height: 44px; border-radius: 50%; cursor: pointer; color: #fff;
+    .search-box button {
+      background: var(--primary-color); border: none;
+      width: 38px; height: 38px; border-radius: 50%;
+      cursor: pointer; color: #fff;
       display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
 
     .local-search {
-      width: 100%; max-width: 450px; 
-      background: rgba(0, 0, 0, 0.65); 
-      border: 2px solid var(--primary-color); 
-      border-radius: 25px; padding: 12px 25px; 
-      color: #fff; font-size: 1rem;
+      width: 100%; max-width: 450px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 2px solid var(--primary-color);
+      border-radius: 25px; padding: 10px 20px;
+      color: #fff; font-size: 0.95rem;
       text-align: center;
     }
     .local-search::placeholder { color: rgba(255, 255, 255, 0.85); }
 
-    /* 卡片部分 */
+    /* 卡片区域 */
     .section {
       background: var(--glass-bg); backdrop-filter: blur(10px);
       border: 1px solid var(--glass-border); border-radius: 20px;
-      padding: 1.5rem; margin-bottom: 2.5rem;
+      padding: 1.2rem; margin-bottom: 2rem;
     }
 
-    /* ===== 每行6个卡片 ===== */
     .link-container {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 1rem;
-      /* 问题2修复：让所有卡片等高 */
+      gap: 0.9rem;
       align-items: stretch;
     }
 
-    /* 响应式：屏幕变窄时自动适配 */
+    .card {
+      background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border);
+      border-radius: 12px; transition: all 0.3s ease; position: relative;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+      padding: 11px; gap: 5px;
+      height: 100%;
+    }
+
+    .card-top { display: flex; align-items: center; gap: 7px; min-width: 0; }
+    .card img.favicon { width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0; }
+    .card .title {
+      font-weight: 600; font-size: 0.9rem; color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      min-width: 0;
+    }
+    .card .desc {
+      font-size: 0.75rem; color: var(--text-dim); line-height: 1.4;
+      overflow: hidden; text-overflow: ellipsis;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      flex: 1;
+    }
+
+    .card:hover { background: rgba(255,255,255,0.2); transform: translateY(-4px); border-color: var(--primary-color); }
+
+    .card .info-popup {
+      position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%) translateY(10px);
+      width: 190px; background: rgba(0,0,0,0.9); border: 1px solid var(--primary-color);
+      padding: 9px; border-radius: 8px; font-size: 0.75rem;
+      opacity: 0; transition: 0.3s; pointer-events: none; z-index: 10;
+    }
+    .card:hover .info-popup { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .card.hidden { display: none; }
+
+    /* 响应式 */
     @media (max-width: 1200px) {
       .link-container { grid-template-columns: repeat(5, 1fr); }
     }
@@ -210,67 +246,34 @@
       .link-container { grid-template-columns: repeat(4, 1fr); }
     }
     @media (max-width: 720px) {
-      /* 问题1修复：手机端每行3个 */
-      .link-container { grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
+      .link-container { grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+      .card { padding: 8px; }
+      .card .desc { -webkit-line-clamp: 1; font-size: 0.68rem; }
     }
     @media (max-width: 480px) {
-      /* 问题1修复：极小屏每行3个，不再降到2个 */
-      .link-container { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-      h1 { font-size: 2rem; }
-      .header-icon { font-size: 1.2rem; width: 30px; height: 30px; }
+      h1 { font-size: 1.9rem; letter-spacing: 0.02em; }
+      .header-icon { font-size: 1.2rem; }
+      .header-area { gap: 8px; margin-bottom: 1rem; }
+      .header-subtitle { font-size: 0.65rem; letter-spacing: 0.2em; }
       .container { padding: 0.8rem; }
-      .section { padding: 1rem; border-radius: 14px; }
+      .section { padding: 0.9rem; border-radius: 14px; }
+      .link-container { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+      .card { padding: 7px 5px; border-radius: 9px; }
+      .card .title { font-size: 0.74rem; }
+      .card img.favicon { width: 15px; height: 15px; }
+      .local-search { font-size: 0.82rem; padding: 9px 14px; }
+      .search-box select { font-size: 0.8rem; max-width: 50px; }
+      .search-box input { font-size: 0.9rem; }
     }
-
-    .card {
-      background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border);
-      border-radius: 12px; transition: all 0.3s ease; position: relative;
-      text-decoration: none; color: inherit; display: flex; flex-direction: column;
-      padding: 12px; gap: 6px;
-      /* 问题2修复：卡片高度一致 */
-      height: 100%;
-      min-height: 0;
-    }
-
-    .card-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    .card img.favicon { width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0; }
-    .card .title { font-weight: 600; font-size: 0.9rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-
-    .card .desc { 
-      font-size: 0.75rem; color: var(--text-dim); line-height: 1.4;
-      overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-      flex: 1;
-    }
-
-    @media (max-width: 720px) {
-      .card { padding: 9px; gap: 4px; border-radius: 10px; }
-      .card .title { font-size: 0.82rem; }
-      .card .desc { font-size: 0.7rem; -webkit-line-clamp: 1; }
-      .card img.favicon { width: 18px; height: 18px; }
-    }
-    @media (max-width: 480px) {
-      .card { padding: 8px 6px; }
-      .card .title { font-size: 0.78rem; }
-    }
-
-    .card:hover { background: rgba(255,255,255,0.2); transform: translateY(-5px); border-color: var(--primary-color); }
-
-    .card .info-popup {
-      position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%) translateY(10px);
-      width: 200px; background: rgba(0,0,0,0.9); border: 1px solid var(--primary-color);
-      padding: 10px; border-radius: 8px; font-size: 0.78rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 10;
-    }
-    .card:hover .info-popup { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    .card.hidden { display: none; }
   </style>
 </head>
 <body>
 
-<div class="bg-fixed" id="bgLayer"></div>
+<div id="bgLayer"></div>
+<div id="bgOverlay"></div>
+
 <div class="container">
 
-  <!-- ===== 美化后的标题区域 ===== -->
   <div class="header-area">
     <span class="header-icon">🧭</span>
     <div>
@@ -296,7 +299,6 @@
       <input type="text" id="searchInput" placeholder="请输入搜索内容..." autocomplete="off" />
       <button onclick="doSearch()">🔍</button>
     </div>
-
     <input type="text" id="localFilter" class="local-search" placeholder="⚡ 快速定位站内网站 (名称/介绍)..." oninput="filterLinks()">
   </div>
 
@@ -304,158 +306,50 @@
     <h2 style="color:var(--primary-color); margin-top:0;">快速访问</h2>
     <div class="link-container">
       <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
+        <div class="card-top"><span class="title">DeepSeek</span></div>
         <div class="desc">国产最强AI</div>
         <div class="info-popup">chat.deepseek.com</div>
       </a>
-
       <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
-        <div class="card-top">
-          <span class="title">哔哩哔哩</span>
-        </div>
-        <div class="desc">视频、动漫、弹幕</div>
-        <div class="info-popup">bilibili.com</div>
-      </a>
-      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
-        <div class="desc">国产最强AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-
-      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
-        <div class="card-top">
-          <span class="title">哔哩哔哩</span>
-        </div>
-        <div class="desc">视频、动漫、弹幕</div>
-        <div class="info-popup">bilibili.com</div>
-      </a>
-      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
-        <div class="desc">国产最强AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-
-      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
-        <div class="card-top">
-          <span class="title">哔哩哔哩</span>
-        </div>
-        <div class="desc">视频、动漫、弹幕</div>
-        <div class="info-popup">bilibili.com</div>
-      </a>
-      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
-        <div class="desc">国产最强AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-
-      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
-        <div class="card-top">
-          <span class="title">哔哩哔哩</span>
-        </div>
+        <div class="card-top"><span class="title">哔哩哔哩</span></div>
         <div class="desc">视频、动漫、弹幕</div>
         <div class="info-popup">bilibili.com</div>
       </a>
     </div>
   </div>
-  
+
   <div class="section">
     <h2 style="color:var(--primary-color); margin-top:0;">工具</h2>
     <div class="link-container">
       <a href="https://www.doubao.com/chat" target="_blank" class="card" data-desc="国产，人性化 AI 大模型，灵活思考">
-        <div class="card-top">
-          <span class="title">豆包</span>
-        </div>
+        <div class="card-top"><span class="title">豆包</span></div>
         <div class="desc">国产AI 灵活全面</div>
-        <div class="info-popup">chat.deepseek.com</div>
+        <div class="info-popup">doubao.com</div>
       </a>
       <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
-        <div class="desc">国产最强AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-
-      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
-        <div class="card-top">
-          <span class="title">哔哩哔哩</span>
-        </div>
-        <div class="desc">视频、动漫、弹幕</div>
-        <div class="info-popup">bilibili.com</div>
-      </a>
-      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
-        <div class="desc">国产最强AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-
-      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
-        <div class="card-top">
-          <span class="title">哔哩哔哩</span>
-        </div>
-        <div class="desc">视频、动漫、弹幕</div>
-        <div class="info-popup">bilibili.com</div>
-      </a>
-      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
-        <div class="desc">国产最强AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-
-      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
-        <div class="card-top">
-          <span class="title">哔哩哔哩</span>
-        </div>
-        <div class="desc">视频、动漫、弹幕</div>
-        <div class="info-popup">bilibili.com</div>
-      </a>
-
-      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
+        <div class="card-top"><span class="title">DeepSeek</span></div>
         <div class="desc">国产最强 AI</div>
         <div class="info-popup">chat.deepseek.com</div>
       </a>
     </div>
   </div>
+
 </div>
 
 <script>
   const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
-  function getDomain(url) { try { return new URL(url).hostname; } catch (e) { return null; } }
+  function getDomain(url) { try { return new URL(url).hostname; } catch(e) { return null; } }
 
   function updateSearchIcon() {
-    const select = document.getElementById('engine');
-    const selectedUrl = select.value;
-    const domain = getDomain(selectedUrl);
+    const domain = getDomain(document.getElementById('engine').value);
     const iconImg = document.getElementById('search-engine-icon');
-    
     iconImg.onerror = function() { this.src = DEFAULT_ICON; this.onerror = null; };
-    
-    if (domain) {
-      iconImg.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-    } else {
-      iconImg.src = DEFAULT_ICON;
-    }
+    iconImg.src = domain ? `https://www.google.com/s2/favicons?sz=64&domain=${domain}` : DEFAULT_ICON;
   }
 
   document.addEventListener("DOMContentLoaded", function() {
     updateSearchIcon();
-
     document.querySelectorAll('.card').forEach(link => {
       const domain = getDomain(link.href);
       const img = document.createElement('img');
@@ -464,7 +358,6 @@
       img.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
       link.querySelector('.card-top').prepend(img);
     });
-
     changeBackground();
   });
 
@@ -488,7 +381,7 @@
     document.getElementById('bgLayer').style.backgroundImage = `url('${url}')`;
   }
 
-  document.getElementById("searchInput").addEventListener("keydown", (e) => { if (e.key === "Enter") doSearch(); });
+  document.getElementById("searchInput").addEventListener("keydown", e => { if (e.key === "Enter") doSearch(); });
 </script>
 
 </body>
