@@ -17,15 +17,27 @@
     }
 
     * { box-sizing: border-box; outline: none; }
-    
+
+    /* 问题4修复：用伪元素固定背景，避免移动端背景随滚动漂移 */
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
       background: #1a1a1a;
-      background-attachment: fixed;
-      background-size: cover;
       color: var(--text-main);
       min-height: 100vh;
+      /* 问题3修复：禁止横向溢出 */
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* 用fixed伪元素承载背景图，彻底解决移动端背景漂移 */
+    .bg-fixed {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: -2;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     body::before {
@@ -37,7 +49,7 @@
       backdrop-filter: blur(3px);
     }
 
-    .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 1.2rem; width: 100%; }
 
     /* ===== 美化标题区域 ===== */
     .header-area {
@@ -186,6 +198,8 @@
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 1rem;
+      /* 问题2修复：让所有卡片等高 */
+      align-items: stretch;
     }
 
     /* 响应式：屏幕变窄时自动适配 */
@@ -196,12 +210,16 @@
       .link-container { grid-template-columns: repeat(4, 1fr); }
     }
     @media (max-width: 720px) {
-      .link-container { grid-template-columns: repeat(3, 1fr); }
+      /* 问题1修复：手机端每行3个 */
+      .link-container { grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
     }
     @media (max-width: 480px) {
-      .link-container { grid-template-columns: repeat(2, 1fr); }
-      h1 { font-size: 2.4rem; }
-      .header-icon { font-size: 1.4rem; width: 36px; height: 36px; }
+      /* 问题1修复：极小屏每行3个，不再降到2个 */
+      .link-container { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+      h1 { font-size: 2rem; }
+      .header-icon { font-size: 1.2rem; width: 30px; height: 30px; }
+      .container { padding: 0.8rem; }
+      .section { padding: 1rem; border-radius: 14px; }
     }
 
     .card {
@@ -209,15 +227,30 @@
       border-radius: 12px; transition: all 0.3s ease; position: relative;
       text-decoration: none; color: inherit; display: flex; flex-direction: column;
       padding: 12px; gap: 6px;
+      /* 问题2修复：卡片高度一致 */
+      height: 100%;
+      min-height: 0;
     }
 
-    .card-top { display: flex; align-items: center; gap: 8px; }
-    .card img.favicon { width: 22px; height: 22px; border-radius: 4px; flex-shrink: 0; }
-    .card .title { font-weight: 600; font-size: 0.95rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .card img.favicon { width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0; }
+    .card .title { font-weight: 600; font-size: 0.9rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 
     .card .desc { 
-      font-size: 0.78rem; color: var(--text-dim); line-height: 1.4;
+      font-size: 0.75rem; color: var(--text-dim); line-height: 1.4;
       overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      flex: 1;
+    }
+
+    @media (max-width: 720px) {
+      .card { padding: 9px; gap: 4px; border-radius: 10px; }
+      .card .title { font-size: 0.82rem; }
+      .card .desc { font-size: 0.7rem; -webkit-line-clamp: 1; }
+      .card img.favicon { width: 18px; height: 18px; }
+    }
+    @media (max-width: 480px) {
+      .card { padding: 8px 6px; }
+      .card .title { font-size: 0.78rem; }
     }
 
     .card:hover { background: rgba(255,255,255,0.2); transform: translateY(-5px); border-color: var(--primary-color); }
@@ -234,6 +267,7 @@
 </head>
 <body>
 
+<div class="bg-fixed" id="bgLayer"></div>
 <div class="container">
 
   <!-- ===== 美化后的标题区域 ===== -->
@@ -283,7 +317,8 @@
         </div>
         <div class="desc">视频、动漫、弹幕</div>
         <div class="info-popup">bilibili.com</div>
-        <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
+      </a>
+      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
         <div class="card-top">
           <span class="title">DeepSeek</span>
         </div>
@@ -298,7 +333,7 @@
         <div class="desc">视频、动漫、弹幕</div>
         <div class="info-popup">bilibili.com</div>
       </a>
-        <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
+      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
         <div class="card-top">
           <span class="title">DeepSeek</span>
         </div>
@@ -313,7 +348,7 @@
         <div class="desc">视频、动漫、弹幕</div>
         <div class="info-popup">bilibili.com</div>
       </a>
-        <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
+      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
         <div class="card-top">
           <span class="title">DeepSeek</span>
         </div>
@@ -327,22 +362,6 @@
         </div>
         <div class="desc">视频、动漫、弹幕</div>
         <div class="info-popup">bilibili.com</div>
-      </a>
-        <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
-        <div class="card-top">
-          <span class="title">DeepSeek</span>
-        </div>
-        <div class="desc">国产最强AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-
-      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
-        <div class="card-top">
-          <span class="title">哔哩哔哩</span>
-        </div>
-        <div class="desc">视频、动漫、弹幕</div>
-        <div class="info-popup">bilibili.com</div>
-      </a>
       </a>
     </div>
   </div>
@@ -357,50 +376,50 @@
         <div class="desc">国产AI 灵活全面</div>
         <div class="info-popup">chat.deepseek.com</div>
       </a>
-
       <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
         <div class="card-top">
           <span class="title">DeepSeek</span>
         </div>
-        <div class="desc">国产最强 AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-      <a href="https://www.doubao.com/chat" target="_blank" class="card" data-desc="国产，人性化 AI 大模型，灵活思考">
-        <div class="card-top">
-          <span class="title">豆包</span>
-        </div>
-        <div class="desc">国产AI 灵活全面</div>
+        <div class="desc">国产最强AI</div>
         <div class="info-popup">chat.deepseek.com</div>
       </a>
 
+      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
+        <div class="card-top">
+          <span class="title">哔哩哔哩</span>
+        </div>
+        <div class="desc">视频、动漫、弹幕</div>
+        <div class="info-popup">bilibili.com</div>
+      </a>
       <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
         <div class="card-top">
           <span class="title">DeepSeek</span>
         </div>
-        <div class="desc">国产最强 AI</div>
-        <div class="info-popup">chat.deepseek.com</div>
-      </a>
-      <a href="https://www.doubao.com/chat" target="_blank" class="card" data-desc="国产，人性化 AI 大模型，灵活思考">
-        <div class="card-top">
-          <span class="title">豆包</span>
-        </div>
-        <div class="desc">国产AI 灵活全面</div>
+        <div class="desc">国产最强AI</div>
         <div class="info-popup">chat.deepseek.com</div>
       </a>
 
+      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
+        <div class="card-top">
+          <span class="title">哔哩哔哩</span>
+        </div>
+        <div class="desc">视频、动漫、弹幕</div>
+        <div class="info-popup">bilibili.com</div>
+      </a>
       <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
         <div class="card-top">
           <span class="title">DeepSeek</span>
         </div>
-        <div class="desc">国产最强 AI</div>
+        <div class="desc">国产最强AI</div>
         <div class="info-popup">chat.deepseek.com</div>
       </a>
-      <a href="https://www.doubao.com/chat" target="_blank" class="card" data-desc="国产，人性化 AI 大模型，灵活思考">
+
+      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="视频弹幕网站，涵盖动漫、学习与娱乐">
         <div class="card-top">
-          <span class="title">豆包</span>
+          <span class="title">哔哩哔哩</span>
         </div>
-        <div class="desc">国产AI 灵活全面</div>
-        <div class="info-popup">chat.deepseek.com</div>
+        <div class="desc">视频、动漫、弹幕</div>
+        <div class="info-popup">bilibili.com</div>
       </a>
 
       <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，深度思考与代码辅助">
@@ -466,7 +485,7 @@
 
   function changeBackground() {
     const url = "https://wz9818.xmynscnq.dpdns.org/bing.img.run/rand.php?t=" + Date.now();
-    document.body.style.backgroundImage = `url('${url}')`;
+    document.getElementById('bgLayer').style.backgroundImage = `url('${url}')`;
   }
 
   document.getElementById("searchInput").addEventListener("keydown", (e) => { if (e.key === "Enter") doSearch(); });
