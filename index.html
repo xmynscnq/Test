@@ -5,30 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>王五导航</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --glass-bg: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.15);
-      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      /* 加深了背景色和边框色 */
+      --glass-bg: rgba(0, 0, 0, 0.4); 
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
       --primary-color: #4CAF50;
-      --hover-bg: rgba(255, 255, 255, 0.2);
-      --text-dim: rgba(255, 255, 255, 0.6);
+      --text-main: #ffffff;
+      --text-dim: rgba(255, 255, 255, 0.85); /* 显著加深了暗色文字 */
     }
 
     * { box-sizing: border-box; outline: none; }
     
     body {
       margin: 0;
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Inter', sans-serif;
       background: #1a1a1a;
       background-attachment: fixed;
       background-size: cover;
-      color: #fff;
+      color: var(--text-main);
       min-height: 100vh;
-      transition: background-image 1s ease-in-out;
     }
 
     body::before {
@@ -37,94 +35,110 @@
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.3);
       z-index: -1;
-      backdrop-filter: blur(2px);
+      backdrop-filter: blur(3px);
     }
 
     .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
 
-    /* --- 1. 美化标题 --- */
+    /* 标题美化 */
     h1 {
       text-align: center;
       font-size: 3.5rem;
       margin-bottom: 2rem;
-      letter-spacing: 4px;
-      font-weight: 600;
-      background: linear-gradient(to bottom, #fff, var(--primary-color));
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, var(--primary-color));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 2px 10px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
     }
 
-    /* --- 搜索框区域 --- */
-    .search-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 4rem; gap: 15px; }
+    /* --- 搜索框加深改进 --- */
+    .search-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 4rem; gap: 20px; }
+    
     .search-box {
-      display: flex; align-items: center; background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(15px); border: 1px solid var(--glass-border);
-      border-radius: 50px; padding: 5px; box-shadow: var(--glass-shadow);
-      width: 100%; max-width: 700px; transition: all 0.3s ease;
+      display: flex; align-items: center; 
+      background: rgba(0, 0, 0, 0.5); /* 显著加深搜索框背景 */
+      backdrop-filter: blur(20px); 
+      border: 2px solid var(--glass-border); /* 加粗边框 */
+      border-radius: 50px; padding: 6px 15px; 
+      box-shadow: var(--glass-shadow);
+      width: 100%; max-width: 700px;
     }
-    .search-box:focus-within { transform: scale(1.02); border-color: var(--primary-color); }
-    .search-box select { background: transparent; color: #fff; border: none; padding: 0 10px; cursor: pointer; font-weight: bold; }
-    .search-box input { flex: 1; background: transparent; border: none; padding: 0 20px; height: 48px; font-size: 1.1rem; color: #fff; }
-    .search-box button { background: var(--primary-color); color: white; border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; }
 
-    /* --- 3. 站内快速过滤功能 --- */
+    /* 解决下拉菜单显示不正常 */
+    .search-box select { 
+      background: transparent; color: #fff; border: none; 
+      padding: 0 10px; cursor: pointer; font-weight: bold; font-size: 1rem;
+    }
+    .search-box select option {
+      background: #222; /* 强制指定下拉菜单背景色 */
+      color: #fff;
+    }
+
+    .search-box input { 
+      flex: 1; background: transparent; border: none; 
+      padding: 0 15px; height: 48px; font-size: 1.1rem; color: #fff; 
+    }
+    /* 加深占位符文字 */
+    .search-box input::placeholder { color: rgba(255, 255, 255, 0.7); }
+
+    .search-box button { 
+      background: var(--primary-color); border: none; 
+      width: 44px; height: 44px; border-radius: 50%; cursor: pointer; color: #fff;
+    }
+
+    /* 快速定位搜索框加深 */
     .local-search {
-      width: 100%; max-width: 400px; background: rgba(255,255,255,0.08);
-      border: 1px solid var(--glass-border); border-radius: 20px;
-      padding: 8px 15px; color: #fff; text-align: center; font-size: 0.9rem;
+      width: 100%; max-width: 450px; 
+      background: rgba(0, 0, 0, 0.6); 
+      border: 2px solid var(--primary-color); /* 用主色调强调 */
+      border-radius: 25px; padding: 12px 25px; 
+      color: #fff; font-size: 1rem;
     }
+    .local-search::placeholder { color: rgba(255, 255, 255, 0.8); }
 
-    /* 区块样式 */
+    /* 卡片布局改进 */
     .section {
       background: var(--glass-bg); backdrop-filter: blur(10px);
       border: 1px solid var(--glass-border); border-radius: 20px;
       padding: 1.5rem; margin-bottom: 2.5rem;
     }
-    .section h2 { font-size: 1.2rem; margin: 0 0 1.2rem 0; color: var(--primary-color); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
 
-    /* --- 2. 改进卡片格式 (两行式) --- */
     .link-container {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.2rem;
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border);
       border-radius: 12px; transition: all 0.3s ease; position: relative;
       text-decoration: none; color: inherit; display: flex; flex-direction: column;
-      padding: 12px; gap: 8px;
+      padding: 15px; gap: 10px;
     }
 
-    /* 第一行：图标 + 名称 */
-    .card-top { display: flex; align-items: center; gap: 10px; }
-    .card img.favicon { width: 20px; height: 20px; border-radius: 4px; object-fit: contain; }
-    .card .title { font-weight: 600; font-size: 1rem; color: #fff; }
+    /* 行1：图标 + 名称 */
+    .card-top { display: flex; align-items: center; gap: 12px; }
+    .card img.favicon { width: 24px; height: 24px; border-radius: 4px; }
+    .card .title { font-weight: 600; font-size: 1.05rem; color: #fff; }
 
-    /* 第二行：简介 */
-    .card .desc { font-size: 0.8rem; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-    /* 悬停呼应效果 + 弹出反馈 */
-    .card:hover {
-      background-color: var(--hover-bg); transform: translateY(-3px);
-      border-color: var(--primary-color);
+    /* 行2：简介 */
+    .card .desc { 
+      font-size: 0.85rem; 
+      color: var(--text-dim); /* 使用更亮的文字色 */
+      line-height: 1.4;
+      overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     }
 
-    /* 悬停弹出的提示框 (Tooltip) */
+    .card:hover { background: var(--hover-bg); transform: translateY(-5px); border-color: var(--primary-color); }
+
+    /* 悬停弹出详细信息 */
     .card .info-popup {
       position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%) translateY(10px);
-      width: 200px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-      padding: 10px; border-radius: 8px; border: 1px solid var(--primary-color);
-      font-size: 0.75rem; color: #eee; z-index: 100; pointer-events: none;
-      opacity: 0; transition: all 0.3s ease;
+      width: 220px; background: rgba(0,0,0,0.9); border: 1px solid var(--primary-color);
+      padding: 12px; border-radius: 8px; font-size: 0.8rem; opacity: 0; transition: 0.3s; pointer-events: none;
     }
     .card:hover .info-popup { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .card.hidden { display: none; }
-
-    @media (max-width: 600px) {
-      .link-container { grid-template-columns: 1fr 1fr; }
-      h1 { font-size: 2rem; }
-    }
   </style>
 </head>
 <body>
@@ -133,131 +147,93 @@
   <h1>王五导航</h1>
 
   <div class="search-wrapper">
-    <!-- 原有搜索引擎 -->
     <div class="search-box">
-      <img id="search-engine-icon" src="" alt="" style="width:20px; margin-left:10px;">
       <select id="engine" onchange="updateSearchIcon()">
-        <option value="https://www.baidu.com/s?wd=" selected>百度</option>
-        <option value="https://www.google.com/search?q=">Google</option>
+        <option value="https://www.baidu.com/s?wd=">百度</option>
+        <option value="https://www.google.com/search?q=" selected>Google</option>
         <option value="https://www.bing.com/search?q=">Bing</option>
       </select>
-      <input type="text" id="searchInput" placeholder="搜索互联网..." autocomplete="off" />
+      <input type="text" id="searchInput" placeholder="请输入搜索内容..." autocomplete="off" />
       <button onclick="doSearch()">🔍</button>
     </div>
 
-    <!-- 站内快速定位 -->
     <input type="text" id="localFilter" class="local-search" placeholder="⚡ 输入关键字快速定位站内网站..." oninput="filterLinks()">
   </div>
 
-  <!-- 网站卡片部分 -->
-  <!-- 注意：我在 a 标签里加了 data-desc，这是为了让搜索和悬停能读到简介 -->
   <div class="section">
-    <h2>常用推荐</h2>
+    <h2 style="color:var(--primary-color); margin-top:0;">常用推荐</h2>
     <div class="link-container">
-      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产最强 AI 大模型，支持深度思考与代码编写">
+      <!-- 示例卡片 -->
+      <a href="https://chat.deepseek.com/" target="_blank" class="card" data-desc="国产强大 AI 大模型">
         <div class="card-top">
           <span class="title">DeepSeek</span>
         </div>
-        <div class="desc">国产最强 AI 大模型</div>
-        <div class="info-popup">网址：chat.deepseek.com<br><br>简介：支持深度思考与代码编写，响应极快。</div>
+        <div class="desc">国产最强 AI 人工智能大模型</div>
+        <div class="info-popup">网址：chat.deepseek.com<br><br>功能：深度思考、代码编写、智能对话。</div>
       </a>
 
-      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="国内知名的视频弹幕网站，涵盖动漫、学习与娱乐">
+      <a href="https://www.bilibili.com/" target="_blank" class="card" data-desc="国内知名的视频弹幕网站">
         <div class="card-top">
           <span class="title">哔哩哔哩</span>
         </div>
         <div class="desc">国内知名的视频弹幕网站</div>
-        <div class="info-popup">网址：bilibili.com<br><br>简介：涵盖动漫、学习与娱乐的年轻人社区。</div>
+        <div class="info-popup">网址：bilibili.com<br><br>功能：追番、学习、鬼畜、娱乐视频社区。</div>
       </a>
 
-      <a href="https://wwdy.ccwu.cc" target="_blank" class="card" data-desc="王五的个人博客，分享技术与生活记录">
+      <a href="https://wwdy.ccwu.cc" target="_blank" class="card" data-desc="技术分享与生活记录">
         <div class="card-top">
           <span class="title">王五博客</span>
         </div>
         <div class="desc">技术分享与生活记录</div>
-        <div class="info-popup">网址：wwdy.ccwu.cc<br><br>简介：导航页主人的个人地盘。</div>
+        <div class="info-popup">网址：wwdy.ccwu.cc<br><br>介绍：分享各类实用技术教程。</div>
       </a>
     </div>
   </div>
-
-  <!-- 更多 section ... -->
-
 </div>
 
 <script>
-  // --- 保底图标 ---
   const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
-  function getDomain(url) {
-    try { return new URL(url).hostname; } catch (e) { return null; }
-  }
+  function getDomain(url) { try { return new URL(url).hostname; } catch (e) { return null; } }
 
-  // --- 核心逻辑：自动填充图标 (保留你原来的逻辑) ---
   document.addEventListener("DOMContentLoaded", function() {
-    const links = document.querySelectorAll('.card');
-    
-    links.forEach(link => {
-      const url = link.href;
-      const domain = getDomain(url);
+    // 自动获取图标逻辑 (保留原有逻辑)
+    document.querySelectorAll('.card').forEach(link => {
+      const domain = getDomain(link.href);
       const img = document.createElement('img');
       img.className = 'favicon';
-      
-      img.onerror = function() {
-        this.src = DEFAULT_ICON;
-        this.onerror = null; 
-      };
-
-      if (domain) {
-        // 使用谷歌接口（可根据需要换成 Yandex）
-        img.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-      } else {
-        img.src = DEFAULT_ICON;
-      }
-      
-      // 将图标插入到 card-top 的最前面
+      img.onerror = function() { this.src = DEFAULT_ICON; this.onerror = null; };
+      // 使用 Google Favicon 接口
+      img.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
       link.querySelector('.card-top').prepend(img);
     });
 
-    updateSearchIcon();
     changeBackground();
   });
 
-  // --- 站内快速过滤 ---
+  // 站内过滤
   function filterLinks() {
     const query = document.getElementById("localFilter").value.toLowerCase();
-    const cards = document.querySelectorAll('.card');
-    
-    cards.forEach(card => {
+    document.querySelectorAll('.card').forEach(card => {
       const title = card.querySelector('.title').innerText.toLowerCase();
       const desc = card.getAttribute('data-desc').toLowerCase();
-      
-      if (title.includes(query) || desc.includes(query)) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
-      }
+      card.classList.toggle('hidden', !title.includes(query) && !desc.includes(query));
     });
   }
 
-  // --- 搜索引擎功能 ---
-  function updateSearchIcon() {
-    const select = document.getElementById('engine');
-    const domain = getDomain(select.value);
-    const iconImg = document.getElementById('search-engine-icon');
-    if(domain) iconImg.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-  }
-
-  function doSearch() {
-    const engine = document.getElementById("engine").value;
-    const keyword = document.getElementById("searchInput").value.trim();
-    if (keyword) window.open(engine + encodeURIComponent(keyword), '_blank');
-  }
-
-  // 背景切换逻辑 (保留)
+  // 背景切换 (保留)
   function changeBackground() {
     const url = "https://wz9818.xmynscnq.dpdns.org/bing.img.run/rand.php?t=" + Date.now();
     document.body.style.backgroundImage = `url('${url}')`;
   }
+
+  function doSearch() {
+    const engine = document.getElementById("engine").value;
+    const kw = document.getElementById("searchInput").value.trim();
+    if (kw) window.open(engine + encodeURIComponent(kw), '_blank');
+  }
+
+  document.getElementById("searchInput").addEventListener("keydown", (e) => { if (e.key === "Enter") doSearch(); });
 </script>
 
 </body>
