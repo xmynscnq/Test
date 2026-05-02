@@ -22,7 +22,7 @@ function buildFaviconUrl(domain) {
   if (FAVICON_PROVIDER === 'google')
     return withProxy(`https://www.google.com/s2/favicons?sz=64&domain=${domain}`);
   if (FAVICON_PROVIDER === 'duckduckgo')
-    return withProxy(`https://icons.duckduckgo.com/ip3/${domain}.png`); // .png 代理兼容性更好
+    return withProxy(`https://icons.duckduckgo.com/ip3/${domain}.ico`); 
   return DEFAULT_ICON;
 }
 // ────────────────────────────────────────────────────────────
