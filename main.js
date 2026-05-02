@@ -2,14 +2,32 @@
    王五导航 · main.js
    =========================== */
 
-// ── 图标 API 配置 ──────────────────────────────────────────
-// 切换图标源：改这一行即可
-//   'google'     → https://www.google.com/s2/favicons?sz=64&domain=
-//   'duckduckgo' → https://icons.duckduckgo.com/ip3/
-const FAVICON_PROVIDER = 'duckduckgo'; // ← 只改这里
+// ── 图标 & 背景 配置 ────────────────────────────────────────
+// 【1】切换图标源：'google' 或 'duckduckgo'
+const FAVICON_PROVIDER = 'duckduckgo';
+
+// 【2】代理前缀：不需要代理就留空 ''，需要就填你的代理地址（末尾不加斜杠）
+const PROXY = 'https://3564.xmyq.org';
+// const PROXY = ''; // ← 不走代理时改成这行
+
+// ── 内部：拼接带代理的完整 URL ──
+function withProxy(originUrl) {
+  if (!PROXY) return originUrl;
+  // 去掉协议头，拼在代理后面
+  return PROXY + '/' + originUrl.replace(/^https?:\/\//, '');
+}
+
+function buildFaviconUrl(domain) {
+  if (!domain) return DEFAULT_ICON;
+  if (FAVICON_PROVIDER === 'google')
+    return withProxy(`https://www.google.com/s2/favicons?sz=64&domain=${domain}`);
+  if (FAVICON_PROVIDER === 'duckduckgo')
+    return withProxy(`https://icons.duckduckgo.com/ip3/${domain}.png`); // .png 代理兼容性更好
+  return DEFAULT_ICON;
+}
 // ────────────────────────────────────────────────────────────
 
-const BG_API     = 'https://bing.img.run/rand.php?t=';
+const BG_API     = withProxy('https://bing.img.run/rand.php') + '?t=';
 const LINKS_FILE = 'links.json';
 
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
@@ -36,12 +54,12 @@ const SEARCH_CATEGORIES = [
     label: '社区',
     icon: '💬',
     engines: [
-      { name: 'GitHub', icon: '🐱', url: 'https://github.com/search?q=',            domain: 'github.com' },
-      { name: '微博',   icon: '🌊', url: 'https://s.weibo.com/weibo?q=',             domain: 'weibo.com' },
-      { name: '知乎',   icon: '🔵', url: 'https://www.zhihu.com/search?q=',          domain: 'zhihu.com' },
-      { name: '豆瓣',   icon: '🟢', url: 'https://www.douban.com/search?q=',         domain: 'douban.com' },
-      { name: '贴吧',   icon: '🟠', url: 'https://tieba.baidu.com/f/search/res?qw=', domain: 'tieba.baidu.com' },
-      { name: 'Reddit', icon: '🔴', url: 'https://www.reddit.com/search/?q=',        domain: 'reddit.com' },
+      { name: 'GitHub', icon: '🐱', url: 'https://github.com/search?q=',             domain: 'github.com' },
+      { name: '微博',   icon: '🌊', url: 'https://s.weibo.com/weibo?q=',              domain: 'weibo.com' },
+      { name: '知乎',   icon: '🔵', url: 'https://www.zhihu.com/search?q=',           domain: 'zhihu.com' },
+      { name: '豆瓣',   icon: '🟢', url: 'https://www.douban.com/search?q=',          domain: 'douban.com' },
+      { name: '贴吧',   icon: '🟠', url: 'https://tieba.baidu.com/f/search/res?qw=',  domain: 'tieba.baidu.com' },
+      { name: 'Reddit', icon: '🔴', url: 'https://www.reddit.com/search/?q=',         domain: 'reddit.com' },
     ]
   },
   {
@@ -70,11 +88,11 @@ const SEARCH_CATEGORIES = [
     label: '生活',
     icon: '🛒',
     engines: [
-      { name: '淘宝',   icon: '🟠', url: 'https://s.taobao.com/search?q=',                             domain: 'taobao.com' },
-      { name: '京东',   icon: '🔴', url: 'https://search.jd.com/Search?keyword=',                      domain: 'jd.com' },
-      { name: '拼多多', icon: '🟣', url: 'https://mobile.yangkeduo.com/search_result.html?search_key=', domain: 'pinduoduo.com' },
-      { name: '做菜',   icon: '🍳', url: 'https://www.xiachufang.com/search/?keyword=',                 domain: 'xiachufang.com' },
-      { name: '翻译',   icon: '🌐', url: 'https://fanyi.baidu.com/#zh/en/',                            domain: 'fanyi.baidu.com' },
+      { name: '淘宝',   icon: '🟠', url: 'https://s.taobao.com/search?q=',                              domain: 'taobao.com' },
+      { name: '京东',   icon: '🔴', url: 'https://search.jd.com/Search?keyword=',                       domain: 'jd.com' },
+      { name: '拼多多', icon: '🟣', url: 'https://mobile.yangkeduo.com/search_result.html?search_key=',  domain: 'pinduoduo.com' },
+      { name: '做菜',   icon: '🍳', url: 'https://www.xiachufang.com/search/?keyword=',                  domain: 'xiachufang.com' },
+      { name: '翻译',   icon: '🌐', url: 'https://fanyi.baidu.com/#zh/en/',                             domain: 'fanyi.baidu.com' },
     ]
   },
   {
@@ -82,11 +100,11 @@ const SEARCH_CATEGORIES = [
     label: '求职',
     icon: '💼',
     engines: [
-      { name: '智联招聘', icon: '🔵', url: 'https://sou.zhaopin.com/?jl=530&kw=',                                    domain: 'zhaopin.com' },
-      { name: 'BOSS直聘', icon: '🟡', url: 'https://www.zhipin.com/web/geek/job?query=',                             domain: 'zhipin.com' },
-      { name: '猎聘',     icon: '🟠', url: 'https://www.liepin.com/zhaopin/?key=',                                   domain: 'liepin.com' },
-      { name: '前程无忧', icon: '🔴', url: 'https://search.51job.com/list/000000,000000,0000,00,9,99,',              domain: '51job.com' },
-      { name: '拉勾网',   icon: '🟢', url: 'https://www.lagou.com/wn/jobs?kd=',                                      domain: 'lagou.com' },
+      { name: '智联招聘', icon: '🔵', url: 'https://sou.zhaopin.com/?jl=530&kw=',                         domain: 'zhaopin.com' },
+      { name: 'BOSS直聘', icon: '🟡', url: 'https://www.zhipin.com/web/geek/job?query=',                  domain: 'zhipin.com' },
+      { name: '猎聘',     icon: '🟠', url: 'https://www.liepin.com/zhaopin/?key=',                        domain: 'liepin.com' },
+      { name: '前程无忧', icon: '🔴', url: 'https://search.51job.com/list/000000,000000,0000,00,9,99,',   domain: '51job.com' },
+      { name: '拉勾网',   icon: '🟢', url: 'https://www.lagou.com/wn/jobs?kd=',                           domain: 'lagou.com' },
     ]
   },
 ];
@@ -98,14 +116,6 @@ let currentEngine     = SEARCH_CATEGORIES[0].engines[0];
 /* ── 工具：获取域名 ── */
 function getDomain(url) {
   try { return new URL(url).hostname; } catch { return null; }
-}
-
-/* ── 工具：根据域名拼接 Favicon URL ── */
-function buildFaviconUrl(domain) {
-  if (!domain) return DEFAULT_ICON;
-  if (FAVICON_PROVIDER === 'google')     return `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
-  if (FAVICON_PROVIDER === 'duckduckgo') return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-  return DEFAULT_ICON;
 }
 
 /* ── 工具：卡片 Favicon ── */
