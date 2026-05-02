@@ -7,7 +7,7 @@
 const FAVICON_PROVIDER = 'duckduckgo';
 
 // 【2】代理前缀：不需要代理就留空 ''，需要就填你的代理地址（末尾不加斜杠）
-const PROXY = 'https://3564.xmyq.org';
+const PROXY = '';
 // const PROXY = ''; // ← 不走代理时改成这行
 
 // ── 内部：拼接带代理的完整 URL ──
