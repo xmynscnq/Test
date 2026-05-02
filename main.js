@@ -6,7 +6,7 @@
 // 切换图标源：改这一行即可
 //   'google'     → https://www.google.com/s2/favicons?sz=64&domain=
 //   'duckduckgo' → https://icons.duckduckgo.com/ip3/
-const FAVICON_PROVIDER = 'google'; // ← 只改这里
+const FAVICON_PROVIDER = 'duckduckgo'; // ← 只改这里
 // ────────────────────────────────────────────────────────────
 
 const BG_API     = 'https://bing.img.run/rand.php?t=';
