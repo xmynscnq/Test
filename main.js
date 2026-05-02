@@ -4,7 +4,7 @@
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
 // 【1】切换图标源：'google' 或 'duckduckgo'
-const FAVICON_PROVIDER = 'duckduckgo';
+const FAVICON_PROVIDER = 'google';
 
 // 【2】代理前缀：不需要代理就留空 ''，需要就填你的代理地址（末尾不加斜杠）
 const PROXY = '';
