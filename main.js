@@ -13,7 +13,6 @@ const PROXY = '';
 // ── 内部：拼接带代理的完整 URL ──
 function withProxy(originUrl) {
   if (!PROXY) return originUrl;
-  // 去掉协议头，拼在代理后面
   return PROXY + '/' + originUrl.replace(/^https?:\/\//, '');
 }
 
@@ -22,8 +21,88 @@ function buildFaviconUrl(domain) {
   if (FAVICON_PROVIDER === 'google')
     return withProxy(`https://www.google.com/s2/favicons?sz=64&domain=${domain}`);
   if (FAVICON_PROVIDER === 'duckduckgo')
-    return withProxy(`https://icons.duckduckgo.com/ip3/${domain}.ico`); 
+    return withProxy(`https://icons.duckduckgo.com/ip3/${domain}.ico`);
   return DEFAULT_ICON;
+}
+// ────────────────────────────────────────────────────────────
+
+// ── 内外网切换 ────────────────────────────────────────────────
+// 【说明】在 links.json 中给需要双地址的卡片加 "intranet" 字段即可，例如：
+// { "title": "GitLab", "url": "https://gitlab.com", "intranet": "http://192.168.1.100", "desc": "..." }
+// 没有 intranet 字段的卡片不受影响。
+
+let isIntranet = localStorage.getItem('netMode') === 'intranet';
+
+function getCardUrl(item) {
+  return (isIntranet && item.intranet) ? item.intranet : item.url;
+}
+
+function toggleNetMode() {
+  isIntranet = !isIntranet;
+  localStorage.setItem('netMode', isIntranet ? 'intranet' : 'internet');
+  updateNetToggleBtn();
+  if (window._linksData) renderCards(window._linksData);
+}
+window.toggleNetMode = toggleNetMode;
+
+function updateNetToggleBtn() {
+  const btn = document.getElementById('netToggleBtn');
+  if (!btn) return;
+  btn.textContent = isIntranet ? '🏠 内网' : '🌐 外网';
+  btn.classList.toggle('intranet-active', isIntranet);
+}
+
+function injectNetToggleBtn() {
+  if (document.getElementById('netToggleBtn')) return;
+  const btn = document.createElement('button');
+  btn.id        = 'netToggleBtn';
+  btn.className = 'net-toggle-btn';
+  btn.onclick   = toggleNetMode;
+  // 注入样式
+  const style = document.createElement('style');
+  style.textContent = `
+    .net-toggle-btn {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 999;
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      font-size: 0.85rem;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: background 0.25s, border-color 0.25s;
+      user-select: none;
+    }
+    .net-toggle-btn:hover {
+      background: rgba(0,0,0,0.6);
+    }
+    .net-toggle-btn.intranet-active {
+      background: rgba(210, 90, 20, 0.65);
+      border-color: rgba(255,150,70,0.5);
+    }
+    .net-toggle-btn.intranet-active:hover {
+      background: rgba(210, 90, 20, 0.85);
+    }
+    .net-badge {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 0.58rem;
+      padding: 1px 4px;
+      border-radius: 4px;
+      background: rgba(210, 90, 20, 0.75);
+      color: #fff;
+      line-height: 1.5;
+      pointer-events: none;
+    }
+  `;
+  document.head.appendChild(style);
+  document.body.appendChild(btn);
 }
 // ────────────────────────────────────────────────────────────
 
@@ -254,7 +333,8 @@ function renderCards(sections) {
 
     items.forEach(item => {
       const a = document.createElement('a');
-      a.href         = item.url;
+      // ── 内外网：根据当前模式选择地址 ──
+      a.href         = getCardUrl(item);
       a.target       = '_blank';
       a.className    = 'card';
       a.dataset.desc = item['data-desc'] ?? item.desc ?? '';
@@ -263,6 +343,7 @@ function renderCards(sections) {
       const img = document.createElement('img');
       img.className = 'favicon';
       img.loading   = 'lazy';
+      // 图标始终用外网地址（内网地址通常拿不到 favicon）
       img.src       = faviconSrc(item.url);
       img.onerror   = function () {
         const domain = getDomain(item.url);
@@ -289,11 +370,20 @@ function renderCards(sections) {
 
       const popup = document.createElement('div');
       popup.className = 'info-popup';
-      popup.textContent = getDomain(item.url) ?? item.url;
+      popup.textContent = getDomain(getCardUrl(item)) ?? getCardUrl(item);
 
       a.appendChild(top);
       a.appendChild(desc);
       a.appendChild(popup);
+
+      // ── 内外网：有双地址的卡片显示角标 ──
+      if (item.intranet) {
+        const badge = document.createElement('span');
+        badge.className   = 'net-badge';
+        badge.textContent = isIntranet ? '内' : '外';
+        a.appendChild(badge);
+      }
+
       grid.appendChild(a);
     });
 
@@ -349,6 +439,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEngineList();
   updateSearchBoxEngine();
 
+  // 注入内外网切换按钮
+  injectNetToggleBtn();
+  updateNetToggleBtn();
+
   document.getElementById('searchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') doSearch();
   });
@@ -356,6 +450,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const res  = await fetch(LINKS_FILE);
     const data = await res.json();
+    window._linksData = data;   // 缓存，供切换时重渲染
     renderCards(data);
   } catch (err) {
     console.error('加载 links.json 失败：', err);
