@@ -347,14 +347,6 @@ function renderCards(sections) {
       a.appendChild(desc);
       a.appendChild(popup);
 
-      // ── 内外网：有双地址的卡片显示角标 ──
-      if (item.intranet) {
-        const badge = document.createElement('span');
-        badge.className   = 'net-badge';
-        badge.textContent = isIntranet ? '内' : '外';
-        a.appendChild(badge);
-      }
-
       grid.appendChild(a);
     });
 
