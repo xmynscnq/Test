@@ -31,32 +31,7 @@ const BG_API     = withProxy('https://bing.img.run/rand.php') + '?t=';
 const LINKS_FILE = 'links.json';
 
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
-function generateLetterIcon(domain) {
-  const letter = domain?.[0]?.toUpperCase() || '?';
 
-  const colors = [
-    '#5A67D8','#ED8936','#38A169','#D53F8C',
-    '#3182CE','#DD6B20','#319795','#805AD5'
-  ];
-
-  let hash = 0;
-  for (let i = 0; i < domain.length; i++) {
-    hash = domain.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const color = colors[Math.abs(hash) % colors.length];
-
-  return `data:image/svg+xml;utf8,
-    <svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'>
-      <rect width='100%' height='100%' rx='12' fill='${color}'/>
-      <text x='50%' y='50%' dy='.35em'
-        text-anchor='middle'
-        font-size='28'
-        fill='white'
-        font-family='Arial'>
-        ${letter}
-      </text>
-    </svg>`;
-}
 /* ── 搜索分类数据 ── */
 const SEARCH_CATEGORIES = [
   {
@@ -206,10 +181,7 @@ function updateSearchBoxEngine() {
   const icon   = document.getElementById('search-engine-icon');
   const nameEl = document.getElementById('engineName');
   icon.src = engineFavicon(currentEngine);
-  icon.onerror = () => {
-  icon.src = generateLetterIcon(currentEngine.domain);
-  icon.onerror = null;
-};
+  icon.onerror = () => { icon.src = DEFAULT_ICON; icon.onerror = null; };
   nameEl.textContent = currentEngine.name;
 }
 
@@ -291,34 +263,17 @@ function renderCards(sections) {
       const img = document.createElement('img');
       img.className = 'favicon';
       img.loading   = 'lazy';
-const domain = getDomain(item.url);
-
-img.src = faviconSrc(item.url);
-
-// ✅ 加：加载成功也要检查（干掉假图标）
-img.onload = function () {
-  // 很多占位图是 16x16
-  if (this.naturalWidth <= 16 && !this.dataset.checked) {
-    this.dataset.checked = '1';
-
-    // 👉 直接换成你自己的图标
-    this.src = generateLetterIcon(domain);
-  }
-};
-
-// ✅ 原来的 fallback 也改掉
-img.onerror = function () {
-  if (!this.dataset.fallbackTried) {
-    this.dataset.fallbackTried = '1';
-
-    // 尝试网站自己的 favicon
-    this.src = `https://${domain}/favicon.ico`;
-  } else {
-    // 👉 最终 fallback 也换成你自己的
-    this.src = generateLetterIcon(domain);
-    this.onerror = null;
-  }
-};
+      img.src       = faviconSrc(item.url);
+      img.onerror   = function () {
+        const domain = getDomain(item.url);
+        if (domain && !this.dataset.fallbackTried) {
+          this.dataset.fallbackTried = '1';
+          this.src = `https://${domain}/favicon.ico`;
+        } else {
+          this.src = DEFAULT_ICON;
+          this.onerror = null;
+        }
+      };
 
       const top = document.createElement('div');
       top.className = 'card-top';
