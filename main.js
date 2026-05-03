@@ -32,6 +32,7 @@ function buildFaviconUrl(domain) {
 // 没有 intranet 字段的卡片不受影响。
 
 let isIntranet = localStorage.getItem('netMode') === 'intranet';
+let _linksData = null;  // 缓存 links.json 数据，供切换时重渲染
 
 function getCardUrl(item) {
   return (isIntranet && item.intranet) ? item.intranet : item.url;
@@ -41,7 +42,13 @@ function toggleNetMode() {
   isIntranet = !isIntranet;
   localStorage.setItem('netMode', isIntranet ? 'intranet' : 'internet');
   updateNetToggleBtn();
-  if (window._linksData) renderCards(window._linksData);
+
+  // 直接更新已渲染的卡片 href，无需重新渲染
+  document.querySelectorAll('.card[data-url][data-intranet]').forEach(a => {
+    a.href = isIntranet ? a.dataset.intranet : a.dataset.url;
+    const badge = a.querySelector('.net-badge');
+    if (badge) badge.textContent = isIntranet ? '内' : '外';
+  });
 }
 window.toggleNetMode = toggleNetMode;
 
@@ -57,51 +64,10 @@ function injectNetToggleBtn() {
   const btn = document.createElement('button');
   btn.id        = 'netToggleBtn';
   btn.className = 'net-toggle-btn';
-  btn.onclick   = toggleNetMode;
-  // 注入样式
-  const style = document.createElement('style');
-  style.textContent = `
-    .net-toggle-btn {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      z-index: 999;
-      padding: 0.35rem 0.85rem;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.3);
-      background: rgba(0,0,0,0.4);
-      color: #fff;
-      font-size: 0.85rem;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      transition: background 0.25s, border-color 0.25s;
-      user-select: none;
-    }
-    .net-toggle-btn:hover {
-      background: rgba(0,0,0,0.6);
-    }
-    .net-toggle-btn.intranet-active {
-      background: rgba(210, 90, 20, 0.65);
-      border-color: rgba(255,150,70,0.5);
-    }
-    .net-toggle-btn.intranet-active:hover {
-      background: rgba(210, 90, 20, 0.85);
-    }
-    .net-badge {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      font-size: 0.58rem;
-      padding: 1px 4px;
-      border-radius: 4px;
-      background: rgba(210, 90, 20, 0.75);
-      color: #fff;
-      line-height: 1.5;
-      pointer-events: none;
-    }
-  `;
-  document.head.appendChild(style);
+  // 用 addEventListener 代替 onclick，更可靠
+  btn.addEventListener('click', function () {
+    toggleNetMode();
+  });
   document.body.appendChild(btn);
 }
 // ────────────────────────────────────────────────────────────
@@ -339,6 +305,11 @@ function renderCards(sections) {
       a.className    = 'card';
       a.dataset.desc = item['data-desc'] ?? item.desc ?? '';
       a.rel          = 'noopener noreferrer';
+      // 存储双地址供切换时直接更新
+      if (item.intranet) {
+        a.dataset.url      = item.url;
+        a.dataset.intranet = item.intranet;
+      }
 
       const img = document.createElement('img');
       img.className = 'favicon';
@@ -450,7 +421,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const res  = await fetch(LINKS_FILE);
     const data = await res.json();
-    window._linksData = data;   // 缓存，供切换时重渲染
+    _linksData = data;   // 缓存，供切换时重渲染
     renderCards(data);
   } catch (err) {
     console.error('加载 links.json 失败：', err);
