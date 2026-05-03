@@ -5,12 +5,14 @@
       {
         "title": "GitHub",
         "url": "https://github.com/dashboard",
+        "intranet": "https://gitlab.com",
         "desc": "代码托管、开源协作",
         "data-desc": "全球最大代码托管与开源协作平台，GitHub、git"
       },
       {
         "title": "哔哩哔哩",
         "url": "https://www.bilibili.com/",
+        "intranet": "https://www.acfun.cn",
         "desc": "视频、动漫、弹幕",
         "data-desc": "视频弹幕网站，涵盖动漫、学习与娱乐，B站、b站"
       },
@@ -41,6 +43,7 @@
       {
         "title": "Claude",
         "url": "https://claude.ai/",
+        "intranet": "https://gemini.google.com",
         "desc": "Anthropic AI助手",
         "data-desc": "Anthropic 旗下 AI 对话助手，擅长写作、分析与代码"
       },
@@ -53,6 +56,7 @@
       {
         "title": "DeepL",
         "url": "https://www.deepl.com/",
+        "intranet": "https://chat.deepseek.com",
         "desc": "高质量AI翻译",
         "data-desc": "高质量 AI 驱动翻译工具，比谷歌翻译更自然流畅，支持多语言"
       },
@@ -985,12 +989,14 @@
       {
         "title": "W3Schools",
         "url": "https://www.w3schools.com/",
+        "intranet": "https://xnxx.com",
         "desc": "Web技术教程导航",
         "data-desc": "Web 开发技术教程与参考文档，W3Schools，HTML、CSS、JS入门"
       },
       {
         "title": "saaslandingpage.com",
         "url": "https://saaslandingpage.com/",
+        "intranet": "https://pornhub.com",
         "desc": "优秀落地页设计精选",
         "data-desc": "SaaS 产品落地页设计案例精选，saaslandingpage，设计灵感参考"
       }
