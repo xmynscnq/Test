@@ -45,7 +45,10 @@ function toggleNetMode() {
 
   // 直接更新已渲染的卡片 href，无需重新渲染
   document.querySelectorAll('.card[data-url][data-intranet]').forEach(a => {
-    a.href = isIntranet ? a.dataset.intranet : a.dataset.url;
+    const url = isIntranet ? a.dataset.intranet : a.dataset.url;
+    a.href = url;
+    const popup = a.querySelector('.info-popup');
+    if (popup) popup.textContent = getDomain(url) ?? url;
     const badge = a.querySelector('.net-badge');
     if (badge) badge.textContent = isIntranet ? '内' : '外';
   });
