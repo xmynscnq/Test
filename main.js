@@ -131,7 +131,7 @@ const SEARCH_CATEGORIES = [
 
 let currentCategoryId = 'engine';
 let currentEngine     = SEARCH_CATEGORIES[0].engines[0];
-let enginePopupOpen   = false;
+let enginePanelOpen   = false;
 
 /* ── 工具 ── */
 function getDomain(url) {
@@ -150,8 +150,8 @@ function renderSearchTabs() {
     btn.innerHTML = `<span class="tab-icon">${cat.icon}</span><span class="tab-label">${cat.label}</span>`;
     btn.onclick = () => {
       selectCategory(cat.id);
-      // 切换分类时同步刷新浮层（如果已打开）
-      if (enginePopupOpen) renderEnginePopup();
+      // 切换分类时若面板已开，刷新内容
+      if (enginePanelOpen) renderEnginePanel();
     };
     tabsEl.appendChild(btn);
   });
@@ -166,7 +166,7 @@ function updateSearchBoxEngine() {
   nameEl.textContent = currentEngine.name;
 }
 
-/* ── 切换分类（不打开浮层） ── */
+/* ── 切换分类 ── */
 function selectCategory(catId) {
   currentCategoryId = catId;
   const cat = SEARCH_CATEGORIES.find(c => c.id === catId);
@@ -179,108 +179,63 @@ function selectCategory(catId) {
 function selectEngine(engine) {
   currentEngine = engine;
   updateSearchBoxEngine();
-  closeEnginePopup();
+  renderEnginePanel(); // 刷新高亮
   document.getElementById('searchInput').focus();
 }
 
-/* ── 引擎浮层渲染 ── */
-function renderEnginePopup() {
-  const inner = document.getElementById('enginePopupInner');
-  inner.innerHTML = '';
+/* ── 渲染内联引擎面板（只显示当前分类） ── */
+function renderEnginePanel() {
+  const panel = document.getElementById('enginePanel');
+  panel.innerHTML = '';
+  const cat = SEARCH_CATEGORIES.find(c => c.id === currentCategoryId);
+  if (!cat) return;
 
-  SEARCH_CATEGORIES.forEach(cat => {
-    // 分类标题行
-    const header = document.createElement('div');
-    header.className = 'popup-cat-header' + (cat.id === currentCategoryId ? ' active' : '');
-    header.innerHTML = `<span class="popup-cat-icon">${cat.icon}</span><span class="popup-cat-label">${cat.label}</span>`;
-    header.onclick = () => {
-      selectCategory(cat.id);
-      renderEnginePopup(); // 刷新高亮
+  cat.engines.forEach(engine => {
+    const btn = document.createElement('button');
+    btn.className = 'engine-btn' + (engine === currentEngine ? ' active' : '');
+
+    const img = document.createElement('img');
+    img.src = engineFavicon(engine);
+    img.alt = engine.name;
+    img.onerror = function () {
+      const d = engine.domain;
+      if (d && !this.dataset.fallbackTried) {
+        this.dataset.fallbackTried = '1';
+        this.src = `https://${d}/favicon.ico`;
+      } else {
+        this.src = DEFAULT_ICON;
+        this.onerror = null;
+      }
     };
-    inner.appendChild(header);
 
-    // 引擎按钮行
-    const row = document.createElement('div');
-    row.className = 'popup-engine-row';
+    const label = document.createElement('span');
+    label.textContent = engine.name;
 
-    cat.engines.forEach(engine => {
-      const btn = document.createElement('button');
-      btn.className = 'popup-engine-btn' + (engine === currentEngine ? ' active' : '');
-
-      const img = document.createElement('img');
-      img.src = engineFavicon(engine);
-      img.alt = engine.name;
-      img.onerror = function () {
-        const d = engine.domain;
-        if (d && !this.dataset.fallbackTried) {
-          this.dataset.fallbackTried = '1';
-          this.src = `https://${d}/favicon.ico`;
-        } else {
-          this.src = DEFAULT_ICON;
-          this.onerror = null;
-        }
-      };
-
-      const label = document.createElement('span');
-      label.textContent = engine.name;
-
-      btn.appendChild(img);
-      btn.appendChild(label);
-      btn.onclick = () => selectEngine(engine);
-      row.appendChild(btn);
-    });
-
-    inner.appendChild(row);
+    btn.appendChild(img);
+    btn.appendChild(label);
+    btn.onclick = () => selectEngine(engine);
+    panel.appendChild(btn);
   });
 }
 
-/* ── 开关浮层 ── */
-function toggleEnginePopup() {
-  enginePopupOpen ? closeEnginePopup() : openEnginePopup();
+/* ── 开关内联面板 ── */
+function toggleEnginePanel() {
+  enginePanelOpen ? closeEnginePanel() : openEnginePanel();
 }
 
-function openEnginePopup() {
-  enginePopupOpen = true;
-  const popup = document.getElementById('enginePopup');
-  renderEnginePopup();
-  popup.style.display = 'block';
-  // 定位：贴着搜索框下方
-  positionPopup();
+function openEnginePanel() {
+  enginePanelOpen = true;
+  renderEnginePanel();
+  const panel = document.getElementById('enginePanel');
+  panel.style.display = 'flex';
   document.getElementById('engineArrow').style.transform = 'rotate(180deg)';
-  // 短暂延迟后监听全局点击关闭
-  setTimeout(() => {
-    document.addEventListener('click', outsideClickHandler);
-  }, 10);
 }
 
-function closeEnginePopup() {
-  enginePopupOpen = false;
-  document.getElementById('enginePopup').style.display = 'none';
+function closeEnginePanel() {
+  enginePanelOpen = false;
+  document.getElementById('enginePanel').style.display = 'none';
   document.getElementById('engineArrow').style.transform = '';
-  document.removeEventListener('click', outsideClickHandler);
 }
-
-function outsideClickHandler(e) {
-  const popup   = document.getElementById('enginePopup');
-  const trigger = document.getElementById('engineTrigger');
-  if (!popup.contains(e.target) && !trigger.contains(e.target)) {
-    closeEnginePopup();
-  }
-}
-
-function positionPopup() {
-  const popup   = document.getElementById('enginePopup');
-  const box     = document.querySelector('.search-box');
-  const rect    = box.getBoundingClientRect();
-  const scrollY = window.scrollY || window.pageYOffset;
-  popup.style.top   = (rect.bottom + scrollY + 8) + 'px';
-  popup.style.left  = rect.left + 'px';
-  popup.style.width = rect.width + 'px';
-}
-
-window.addEventListener('resize', () => {
-  if (enginePopupOpen) positionPopup();
-});
 
 /* ── 清空搜索框 ── */
 function clearSearch() {
@@ -454,15 +409,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateNetToggleBtn();
 
   // 引擎触发器点击
-  document.getElementById('engineTrigger').addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleEnginePopup();
+  document.getElementById('engineTrigger').addEventListener('click', () => {
+    toggleEnginePanel();
   });
 
   // 搜索框键盘事件
   document.getElementById('searchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') doSearch();
-    if (e.key === 'Escape') closeEnginePopup();
+    if (e.key === 'Escape') closeEnginePanel();
   });
 
   try {
