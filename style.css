@@ -312,8 +312,8 @@ h1::after {
   gap: 6px;
   flex-wrap: nowrap;
   justify-content: center;
-  max-width: 700px;
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
