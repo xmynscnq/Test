@@ -26,7 +26,6 @@
     <div class="search-tabs" id="searchTabs"></div>
     <!-- 搜索框 -->
     <div class="search-box">
-      <!-- 左侧引擎图标，点击弹出选择浮层 -->
       <button class="engine-trigger" id="engineTrigger" aria-label="切换搜索引擎">
         <img id="search-engine-icon" src="" alt="搜索引擎图标">
         <span class="engine-name" id="engineName"></span>
@@ -34,15 +33,11 @@
       </button>
       <div class="search-divider"></div>
       <input type="text" id="searchInput" placeholder="搜索网页 / 定位站内网站" autocomplete="off" oninput="filterLinks()" />
-      <!-- 清空按钮 -->
       <button class="clear-btn" id="clearBtn" aria-label="清空" style="display:none;" onclick="clearSearch()">✕</button>
       <button class="search-submit-btn" onclick="doSearch()" aria-label="搜索">🔍</button>
     </div>
-  </div>
-
-  <!-- 引擎选择浮层 -->
-  <div id="enginePopup" class="engine-popup" style="display:none;">
-    <div class="engine-popup-inner" id="enginePopupInner"></div>
+    <!-- 内联引擎面板（展开时出现在搜索框正下方，撑开布局） -->
+    <div class="engine-list" id="enginePanel" style="display:none;"></div>
   </div>
 
   <!-- 链接分区（由 main.js 动态渲染） -->
