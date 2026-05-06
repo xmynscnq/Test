@@ -321,37 +321,6 @@ h1::after {
 }
 .engine-list::-webkit-scrollbar { display: none; }
 
-@media (max-width: 480px) {
-  .search-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    justify-content: flex-start;
-    width: 100%;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-bottom: 2px;
-  }
-  .search-tabs::-webkit-scrollbar { display: none; }
-  .search-tab {
-    flex-shrink: 0;
-  }
-
-  .engine-list {
-    flex-wrap: wrap;
-    overflow-x: unset;
-    justify-content: center;
-  }
-  .engine-btn {
-    padding: 4px 10px;
-    font-size: 0.78rem;
-    gap: 4px;
-  }
-  .engine-btn img {
-    width: 13px;
-    height: 13px;
-  }
-}
-
 @keyframes panelIn {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -577,20 +546,47 @@ h1::after {
 }
 
 @media (max-width: 480px) {
+  .search-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    width: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+  }
+  .search-tabs::-webkit-scrollbar { display: none; }
+  .search-tab {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+  }
+  .tab-icon { font-size: 0.82rem; }
+  .tab-label { font-size: 0.78rem; }
+
+  .engine-list {
+    flex-wrap: wrap;
+    overflow-x: unset;
+    justify-content: center;
+  }
+  .engine-btn {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    gap: 3px;
+  }
+  .engine-btn img {
+    width: 12px;
+    height: 12px;
+  }
+
   .container { padding: 0.75rem; }
   .header-area { gap: 8px; margin-bottom: 1rem; }
   .header-icon { font-size: 1.3rem; }
 
-  .search-box {
-    padding: 4px 8px 4px 6px;
-    gap: 4px;
-  }
+  .search-box { padding: 4px 8px 4px 6px; gap: 4px; }
   .engine-name { font-size: 0.78rem; }
   .search-box input[type="text"] { font-size: 0.9rem; height: 38px; }
   .search-submit-btn { width: 34px; height: 34px; font-size: 0.9rem; }
-
-  .search-tab { padding: 4px 10px; font-size: 0.78rem; }
-  .tab-icon { font-size: 0.82rem; }
 
   .section { padding: 0.9rem 0.75rem; border-radius: 14px; }
   .link-container { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
@@ -599,9 +595,6 @@ h1::after {
   .card .title { font-size: 0.75rem; }
   .card img.favicon { width: 16px; height: 16px; }
   .card .desc { font-size: 0.67rem; }
-
-  .engine-popup { border-radius: 12px; }
-  .popup-engine-btn { padding: 5px 10px; font-size: 0.82rem; }
 }
 
 @media (max-width: 360px) {
