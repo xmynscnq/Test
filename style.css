@@ -305,115 +305,61 @@ h1::after {
 }
 .search-submit-btn:active { transform: scale(0.93); background: #388E3C; }
 
-/* ===== 引擎选择浮层 ===== */
-.engine-popup {
-  position: absolute;
-  z-index: 500;
-  background: rgba(10, 14, 10, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(76,175,80,0.35);
-  border-radius: 16px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05);
-  overflow: hidden;
-  animation: popupIn 0.18s ease;
-}
-
-@keyframes popupIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.engine-popup-inner {
-  padding: 10px 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-height: 70vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(76,175,80,0.3) transparent;
-}
-
-/* 分类标题 */
-.popup-cat-header {
+/* ===== 引擎内联面板 ===== */
+.engine-list {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 7px 10px 4px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.15s;
-  margin-top: 4px;
-}
-.popup-cat-header:first-child { margin-top: 0; }
-.popup-cat-header:hover { background: rgba(255,255,255,0.06); }
-.popup-cat-header.active .popup-cat-label { color: var(--primary); }
-
-.popup-cat-icon { font-size: 0.95rem; }
-.popup-cat-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.55);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  transition: color 0.15s;
-}
-
-/* 引擎按钮行 */
-.popup-engine-row {
-  display: flex;
-  flex-wrap: wrap;
   gap: 6px;
-  padding: 4px 6px 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 700px;
+  width: 100%;
+  animation: panelIn 0.18s ease;
 }
 
-.popup-engine-btn {
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.engine-btn {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 13px;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.75);
+  padding: 7px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.22);
+  color: rgba(255,255,255,0.7);
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: 0.93rem;
   font-weight: 600;
-  transition: all 0.16s;
+  transition: all 0.18s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   white-space: nowrap;
 }
 
-.popup-engine-btn img {
-  width: 15px;
-  height: 15px;
+.engine-btn img {
+  width: 16px;
+  height: 16px;
   border-radius: 3px;
   object-fit: contain;
   flex-shrink: 0;
 }
 
-.popup-engine-btn:hover {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.22);
+.engine-btn:hover {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.25);
   color: #fff;
 }
 
-.popup-engine-btn.active {
-  background: rgba(76,175,80,0.22);
+.engine-btn.active {
+  background: rgba(76,175,80,0.18);
   border-color: var(--primary);
   color: #fff;
-  box-shadow: 0 0 8px rgba(76,175,80,0.25);
-}
-
-/* 浮层内滚动条美化 */
-.engine-popup-inner::-webkit-scrollbar { width: 4px; }
-.engine-popup-inner::-webkit-scrollbar-track { background: transparent; }
-.engine-popup-inner::-webkit-scrollbar-thumb { background: rgba(76,175,80,0.35); border-radius: 2px; }
-
-/* 浮层分隔线 */
-.popup-cat-header + .popup-cat-header {
-  border-top: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 0 6px rgba(76,175,80,0.2);
 }
 
 /* ===== 分区 ===== */
