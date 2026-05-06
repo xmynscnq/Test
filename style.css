@@ -179,29 +179,66 @@ h1::after {
   -webkit-backdrop-filter: blur(20px);
   border: 2px solid var(--glass-border);
   border-radius: 50px;
-  padding: 5px 8px 5px 14px;
+  padding: 5px 8px 5px 6px;
   box-shadow: var(--glass-shadow);
   width: 100%;
   max-width: 700px;
   min-width: 0;
   gap: 8px;
+  position: relative;
+}
+
+/* ===== 引擎触发器（左侧可点击区域） ===== */
+.engine-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.18s, border-color 0.18s;
+  flex-shrink: 0;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.engine-trigger:hover {
+  background: rgba(76,175,80,0.18);
+  border-color: rgba(76,175,80,0.5);
+}
+
+.engine-trigger:active {
+  background: rgba(76,175,80,0.28);
 }
 
 #search-engine-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
   object-fit: contain;
   flex-shrink: 0;
 }
 
 .engine-name {
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   font-weight: 600;
   color: #fff;
   white-space: nowrap;
   flex-shrink: 0;
-  min-width: 36px;
+}
+
+.engine-arrow {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.6);
+  transition: transform 0.22s ease;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .search-divider {
@@ -225,7 +262,33 @@ h1::after {
 }
 .search-box input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.65); }
 
-.search-box button {
+/* ===== 清空按钮 ===== */
+.clear-btn {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+  line-height: 1;
+  padding: 0;
+}
+.clear-btn:hover {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+}
+.clear-btn:active { transform: scale(0.9); }
+
+/* ===== 搜索提交按钮 ===== */
+.search-submit-btn {
   background: var(--primary);
   border: none;
   width: 38px;
@@ -240,61 +303,117 @@ h1::after {
   transition: background 0.2s, transform 0.15s;
   font-size: 1rem;
 }
-.search-box button:active { transform: scale(0.93); background: #388E3C; }
+.search-submit-btn:active { transform: scale(0.93); background: #388E3C; }
 
-/* ===== 引擎快捷按钮 ===== */
-.engine-list {
+/* ===== 引擎选择浮层 ===== */
+.engine-popup {
+  position: absolute;
+  z-index: 500;
+  background: rgba(10, 14, 10, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(76,175,80,0.35);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05);
+  overflow: hidden;
+  animation: popupIn 0.18s ease;
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.engine-popup-inner {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(76,175,80,0.3) transparent;
+}
+
+/* 分类标题 */
+.popup-cat-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: nowrap;          /* ← 改这里：禁止换行 */
-  justify-content: center;
-  max-width: 100%;
-  width: 100%;
-  overflow-x: auto;           /* ← 新增：按钮过多时横向滚动 */
-  scrollbar-width: none;      /* Firefox 隐藏滚动条 */
-  -ms-overflow-style: none;   /* IE 隐藏滚动条 */
+  gap: 7px;
+  padding: 7px 10px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 4px;
 }
-.engine-list::-webkit-scrollbar { display: none; } /* Chrome/Safari 隐藏滚动条 */
+.popup-cat-header:first-child { margin-top: 0; }
+.popup-cat-header:hover { background: rgba(255,255,255,0.06); }
+.popup-cat-header.active .popup-cat-label { color: var(--primary); }
 
-.engine-btn {
+.popup-cat-icon { font-size: 0.95rem; }
+.popup-cat-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color 0.15s;
+}
+
+/* 引擎按钮行 */
+.popup-engine-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 6px 6px;
+}
+
+.popup-engine-btn {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 7px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.22);
-  color: rgba(255,255,255,0.7);
+  padding: 6px 13px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.75);
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.93rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  transition: all 0.18s;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.16s;
   white-space: nowrap;
 }
 
-.engine-btn img {
-  width: 16px;
-  height: 16px;
+.popup-engine-btn img {
+  width: 15px;
+  height: 15px;
   border-radius: 3px;
   object-fit: contain;
   flex-shrink: 0;
 }
 
-.engine-btn:hover {
-  background: rgba(255,255,255,0.10);
-  border-color: rgba(255,255,255,0.25);
+.popup-engine-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.22);
   color: #fff;
 }
 
-.engine-btn.active {
-  background: rgba(76,175,80,0.18);
+.popup-engine-btn.active {
+  background: rgba(76,175,80,0.22);
   border-color: var(--primary);
   color: #fff;
-  box-shadow: 0 0 6px rgba(76,175,80,0.2);
+  box-shadow: 0 0 8px rgba(76,175,80,0.25);
+}
+
+/* 浮层内滚动条美化 */
+.engine-popup-inner::-webkit-scrollbar { width: 4px; }
+.engine-popup-inner::-webkit-scrollbar-track { background: transparent; }
+.engine-popup-inner::-webkit-scrollbar-thumb { background: rgba(76,175,80,0.35); border-radius: 2px; }
+
+/* 浮层分隔线 */
+.popup-cat-header + .popup-cat-header {
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 
 /* ===== 分区 ===== */
@@ -332,7 +451,7 @@ h1::after {
 /* ===== 卡片网格 ===== */
 .link-container {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr)); /* ✅ 修复：minmax(0,1fr) 防止内容撑破列宽 */
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 0.9rem;
   align-items: stretch;
 }
@@ -351,7 +470,7 @@ h1::after {
   padding: 11px;
   gap: 5px;
   height: 100%;
-  min-width: 0; /* ✅ 修复：防止 grid 子项被内容撑开 */
+  min-width: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -376,8 +495,8 @@ h1::after {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0; /* ✅ 修复：flex 子项必须设置才能让 ellipsis 生效 */
-  flex: 1;      /* ✅ 修复：撑满剩余空间，不会溢出 */
+  min-width: 0;
+  flex: 1;
 }
 
 .card .desc {
@@ -477,25 +596,20 @@ h1::after {
 }
 
 @media (max-width: 480px) {
-  .engine-list {
-    flex-wrap: wrap;
-    overflow-x: unset;
-  }
   .container { padding: 0.75rem; }
   .header-area { gap: 8px; margin-bottom: 1rem; }
   .header-icon { font-size: 1.3rem; }
 
   .search-box {
-    padding: 4px 8px 4px 10px;
+    padding: 4px 8px 4px 6px;
     gap: 4px;
   }
-  .engine-name { font-size: 0.78rem; min-width: 28px; }
+  .engine-name { font-size: 0.78rem; }
   .search-box input[type="text"] { font-size: 0.9rem; height: 38px; }
-  .search-box button { width: 34px; height: 34px; font-size: 0.9rem; }
+  .search-submit-btn { width: 34px; height: 34px; font-size: 0.9rem; }
 
   .search-tab { padding: 4px 10px; font-size: 0.78rem; }
   .tab-icon { font-size: 0.82rem; }
-  .engine-btn { padding: 4px 9px; font-size: 0.75rem; }
 
   .section { padding: 0.9rem 0.75rem; border-radius: 14px; }
   .link-container { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
@@ -504,6 +618,9 @@ h1::after {
   .card .title { font-size: 0.75rem; }
   .card img.favicon { width: 16px; height: 16px; }
   .card .desc { font-size: 0.67rem; }
+
+  .engine-popup { border-radius: 12px; }
+  .popup-engine-btn { padding: 5px 10px; font-size: 0.82rem; }
 }
 
 @media (max-width: 360px) {
@@ -512,6 +629,7 @@ h1::after {
   .card .title { font-size: 0.7rem; }
   .search-tab { padding: 3px 8px; }
 }
+
 /* ===== 内外网切换按钮 ===== */
 .net-toggle-btn {
   position: fixed;
@@ -533,15 +651,11 @@ h1::after {
   user-select: none;
 }
 
-.net-toggle-btn:hover {
-  background: rgba(0, 0, 0, 0.6);
-}
+.net-toggle-btn:hover { background: rgba(0, 0, 0, 0.6); }
 
 .net-toggle-btn.intranet-active {
   background: rgba(210, 90, 20, 0.65);
   border-color: rgba(255, 150, 70, 0.5);
 }
 
-.net-toggle-btn.intranet-active:hover {
-  background: rgba(210, 90, 20, 0.85);
-}
+.net-toggle-btn.intranet-active:hover { background: rgba(210, 90, 20, 0.85); }
