@@ -310,11 +310,23 @@ h1::after {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   max-width: 700px;
   width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   animation: panelIn 0.18s ease;
+}
+.engine-list::-webkit-scrollbar { display: none; }
+
+@media (max-width: 480px) {
+  .engine-list {
+    flex-wrap: wrap;
+    overflow-x: unset;
+    justify-content: center;
+  }
 }
 
 @keyframes panelIn {
