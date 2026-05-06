@@ -558,11 +558,11 @@ h1::after {
   .search-tabs::-webkit-scrollbar { display: none; }
   .search-tab {
     flex-shrink: 0;
-    padding: 4px 10px;
-    font-size: 0.78rem;
+    padding: 6px 13px;
+    font-size: 0.85rem;
   }
-  .tab-icon { font-size: 0.82rem; }
-  .tab-label { font-size: 0.78rem; }
+  .tab-icon { font-size: 0.9rem; }
+  .tab-label { font-size: 0.85rem; }
 
   .engine-list {
     flex-wrap: wrap;
@@ -570,8 +570,8 @@ h1::after {
     justify-content: center;
   }
   .engine-btn {
-    padding: 3px 8px;
-    font-size: 0.7rem;
+    padding: 4px 9px;
+    font-size: 0.74rem;
     gap: 3px;
   }
   .engine-btn img {
@@ -584,7 +584,11 @@ h1::after {
   .header-icon { font-size: 1.3rem; }
 
   .search-box { padding: 4px 8px 4px 6px; gap: 4px; }
-  .engine-name { font-size: 0.78rem; }
+  /* 搜索框内触发器：比引擎气泡略小或相当 */
+  .engine-trigger { padding: 3px 6px; gap: 4px; }
+  .engine-name { font-size: 0.7rem; }
+  #search-engine-icon { width: 13px; height: 13px; }
+  .engine-arrow { font-size: 0.6rem; }
   .search-box input[type="text"] { font-size: 0.9rem; height: 38px; }
   .search-submit-btn { width: 34px; height: 34px; font-size: 0.9rem; }
 
