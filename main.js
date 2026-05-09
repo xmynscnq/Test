@@ -33,12 +33,10 @@ async function loadDailyQuote() {
   const el = document.getElementById('daily-quote');
   if (!el) return;
   try {
-    const res   = await fetch('quotes.json');
-    const data  = await res.json();
-    // 每次刷新取下一条
-    let idx = parseInt(localStorage.getItem('quoteIdx') || '0');
-    const q = data[idx % data.length];
-    localStorage.setItem('quoteIdx', (idx + 1) % data.length);
+    const res  = await fetch('quotes.json');
+    const data = await res.json();
+    // 随机取一条
+    const q    = data[Math.floor(Math.random() * data.length)];
     const text = q.text ?? '';
     const from = q.from ?? '';
     el.textContent = from ? `${text}　——${from}` : text;
@@ -82,9 +80,13 @@ function injectNetToggleBtn() {
 
 // ────────────────────────────────────────────────────────────
 const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-const BG_API = isMobile
-  ? 'https://imgapi.cn/api.php?zd=mobile&fl=fengjing&gs=images&t='
-  : 'https://imgapi.cn/api.php?fl=suiji&gs=images&t=';
+function changeBackground() {
+  const folder = isMobile ? 'mobile' : 'pc';
+  const total  = 675;
+  const idx    = Math.floor(Math.random() * total) + 1;
+  const url    = withProxy(`https://raw.githubusercontent.com/xmynscnq/wallpaper-webp/main/${folder}/${idx}.webp`);
+  document.getElementById('bgLayer').style.backgroundImage = `url('${url}')`;
+}
 const LINKS_FILE = 'links.json';
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
