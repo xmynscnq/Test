@@ -420,6 +420,7 @@ function changeBackground() {
 /* ── 入口 ── */
 document.addEventListener('DOMContentLoaded', async () => {
   changeBackground();
+  loadDailyQuote();   // ← 加这一行
 
   renderSearchTabs();
   updateSearchBoxEngine();
