@@ -3,9 +3,9 @@
    =========================== */
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
-const FAVICON_PROVIDER = 'duckduckgo';
-const PROXY = '';
+const WORKER_URL = 'https://shy-truth-b171.2554408713.workers.dev';
 
+const PROXY = '';
 function withProxy(originUrl) {
   if (!PROXY) return originUrl;
   return PROXY + '/' + originUrl.replace(/^https?:\/\//, '');
@@ -13,13 +13,7 @@ function withProxy(originUrl) {
 
 function buildFaviconUrl(domain) {
   if (!domain) return DEFAULT_ICON;
-  if (FAVICON_PROVIDER === 'google')
-    return withProxy(`https://www.google.com/s2/favicons?sz=64&domain=${domain}`);
-  if (FAVICON_PROVIDER === 'duckduckgo')
-    return withProxy(`https://icons.duckduckgo.com/ip3/${domain}.ico`);
-  if (FAVICON_PROVIDER === 'yandex')
-    return withProxy(`https://favicon.yandex.net/favicon/${domain}`);
-  return DEFAULT_ICON;
+  return `${WORKER_URL}/?domain=${domain}`;
 }
 
 // ── 内外网切换 ────────────────────────────────────────────────
@@ -37,7 +31,6 @@ async function loadDailyQuote() {
   try {
     const res  = await fetch('quotes.json');
     const data = await res.json();
-    // 随机取一条
     const q    = data[Math.floor(Math.random() * data.length)];
     const text = q.text ?? '';
     const from = q.from ?? '';
@@ -89,6 +82,7 @@ function changeBackground() {
   const url    = withProxy(`https://raw.githubusercontent.com/xmynscnq/wallpaper-webp/main/${folder}/${idx}.webp`);
   document.getElementById('bgLayer').style.backgroundImage = `url('${url}')`;
 }
+
 const LINKS_FILE = 'links.json';
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
@@ -178,7 +172,6 @@ function renderSearchTabs() {
     btn.innerHTML = `<span class="tab-icon">${cat.icon}</span><span class="tab-label">${cat.label}</span>`;
     btn.onclick = () => {
       selectCategory(cat.id);
-      // 切换分类时若面板已开，刷新内容
       if (enginePanelOpen) renderEnginePanel();
     };
     tabsEl.appendChild(btn);
@@ -207,7 +200,7 @@ function selectCategory(catId) {
 function selectEngine(engine) {
   currentEngine = engine;
   updateSearchBoxEngine();
-  renderEnginePanel(); // 刷新高亮
+  renderEnginePanel();
   document.getElementById('searchInput').focus();
 }
 
@@ -225,15 +218,10 @@ function renderEnginePanel() {
     const img = document.createElement('img');
     img.src = engineFavicon(engine);
     img.alt = engine.name;
+    // Worker 保证永远返回图，onerror 仅在 Worker 本身挂掉时兜底
     img.onerror = function () {
-      const d = engine.domain;
-      if (d && !this.dataset.fallbackTried) {
-        this.dataset.fallbackTried = '1';
-        this.src = `https://${d}/favicon.ico`;
-      } else {
-        this.src = DEFAULT_ICON;
-        this.onerror = null;
-      }
+      this.src = DEFAULT_ICON;
+      this.onerror = null;
     };
 
     const label = document.createElement('span');
@@ -267,9 +255,9 @@ function closeEnginePanel() {
 
 /* ── 清空搜索框 ── */
 function clearSearch() {
-  const input   = document.getElementById('searchInput');
+  const input    = document.getElementById('searchInput');
   const clearBtn = document.getElementById('clearBtn');
-  input.value   = '';
+  input.value    = '';
   clearBtn.style.display = 'none';
   input.focus();
   filterLinks();
@@ -349,15 +337,10 @@ function renderCards(sections) {
       img.className = 'favicon';
       img.loading   = 'lazy';
       img.src       = faviconSrc(item.url);
-      img.onerror   = function () {
-        const domain = getDomain(item.url);
-        if (domain && !this.dataset.fallbackTried) {
-          this.dataset.fallbackTried = '1';
-          this.src = `https://${domain}/favicon.ico`;
-        } else {
-          this.src = DEFAULT_ICON;
-          this.onerror = null;
-        }
+      // Worker 保证永远返回图，onerror 仅在 Worker 本身挂掉时兜底
+      img.onerror = function () {
+        this.src = DEFAULT_ICON;
+        this.onerror = null;
       };
 
       const top = document.createElement('div');
@@ -423,7 +406,7 @@ function bindTouchTooltip() {
 /* ── 入口 ── */
 document.addEventListener('DOMContentLoaded', async () => {
   changeBackground();
-  loadDailyQuote();   // ← 加这一行
+  loadDailyQuote();
 
   renderSearchTabs();
   updateSearchBoxEngine();
