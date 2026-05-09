@@ -33,14 +33,15 @@ async function loadDailyQuote() {
   const el = document.getElementById('daily-quote');
   if (!el) return;
   try {
-    // c=i 取古诗文类；也可去掉 ?c=i 获取全类型
-    const res  = await fetch('https://v1.hitokoto.cn');
+    const res  = await fetch('https://v1.hitokoto.cn?c=i');
     const data = await res.json();
     const text = data.hitokoto ?? '';
     const from = data.from   ?? '';
     el.textContent = from ? `${text}　——《${from}》` : text;
   } catch {
-    // 加载失败保留原文
+    // 失败时保留原文，同样淡入
+  } finally {
+    el.style.opacity = '1';  // ← 无论成功失败都显示
   }
 }
 
