@@ -418,12 +418,6 @@ function bindTouchTooltip() {
   }
 }
 
-/* ── 随机背景 ── */
-function changeBackground() {
-  const url = `${BG_API}${Date.now()}`;
-  document.getElementById('bgLayer').style.backgroundImage = `url('${url}')`;
-}
-
 /* ── 入口 ── */
 document.addEventListener('DOMContentLoaded', async () => {
   changeBackground();
