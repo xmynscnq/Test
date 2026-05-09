@@ -1,9 +1,10 @@
 /* ===========================
-   王五导航 · main.js
+   王五导航 · main.js (图标配置修改)
    =========================== */
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
-const FAVICON_PROVIDER = 'duckduckgo';
+// 可选值: 'google', 'duckduckgo', 'iconhorse', 'yandex'
+const FAVICON_PROVIDER = 'iconhorse'; 
 const PROXY = '';
 
 function withProxy(originUrl) {
@@ -13,10 +14,23 @@ function withProxy(originUrl) {
 
 function buildFaviconUrl(domain) {
   if (!domain) return DEFAULT_ICON;
+  
+  // 原有逻辑：Google
   if (FAVICON_PROVIDER === 'google')
     return withProxy(`https://www.google.com/s2/favicons?sz=64&domain=${domain}`);
+  
+  // 原有逻辑：DuckDuckGo
   if (FAVICON_PROVIDER === 'duckduckgo')
     return withProxy(`https://icons.duckduckgo.com/ip3/${domain}.ico`);
+
+  // 新增逻辑：IconHorse (抓取能力强)
+  if (FAVICON_PROVIDER === 'iconhorse')
+    return withProxy(`https://icon.horse/icon/${domain}`);
+
+  // 新增逻辑：Yandex (对子域名支持好)
+  if (FAVICON_PROVIDER === 'yandex')
+    return withProxy(`https://favicon.yandex.net/favicon/${domain}`);
+
   return DEFAULT_ICON;
 }
 
