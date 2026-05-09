@@ -28,6 +28,22 @@ function getCardUrl(item) {
   return (isIntranet && item.intranet) ? item.intranet : item.url;
 }
 
+// ── 每日一言 ────────────────────────────────────────────────
+async function loadDailyQuote() {
+  const el = document.getElementById('daily-quote');
+  if (!el) return;
+  try {
+    // c=i 取古诗文类；也可去掉 ?c=i 获取全类型
+    const res  = await fetch('https://v1.hitokoto.cn');
+    const data = await res.json();
+    const text = data.hitokoto ?? '';
+    const from = data.from   ?? '';
+    el.textContent = from ? `${text}　——《${from}》` : text;
+  } catch {
+    // 加载失败保留原文
+  }
+}
+
 function toggleNetMode() {
   isIntranet = !isIntranet;
   localStorage.setItem('netMode', isIntranet ? 'intranet' : 'internet');
