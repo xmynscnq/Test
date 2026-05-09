@@ -4,7 +4,7 @@
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
 // 可选值: 'google', 'duckduckgo', 'iconhorse', 'yandex'
-const FAVICON_PROVIDER = 'iconhorse'; 
+const FAVICON_PROVIDER = 'yandex'; 
 const PROXY = '';
 
 function withProxy(originUrl) {
