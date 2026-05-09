@@ -1,0 +1,482 @@
+[
+  {
+    "text": "长风破浪会有时，直挂云帆济沧海。",
+    "from": "李白·行路难",
+    "type": "poetry"
+  },
+  {
+    "text": "The only way to do great work is to love what you do.",
+    "from": "Steve Jobs",
+    "type": "en"
+  },
+  {
+    "text": "不经一番寒彻骨，怎得梅花扑鼻香。",
+    "from": "黄蘖禅师",
+    "type": "zh"
+  },
+  {
+    "text": "It does not matter how slowly you go as long as you do not stop.",
+    "from": "Confucius",
+    "type": "en"
+  },
+  {
+    "text": "会当凌绝顶，一览众山小。",
+    "from": "杜甫·望岳",
+    "type": "poetry"
+  },
+  {
+    "text": "To be yourself in a world that is constantly trying to make you something else is the greatest accomplishment.",
+    "from": "Ralph Waldo Emerson",
+    "type": "en"
+  },
+  {
+    "text": "人生如逆旅，我亦是行人。",
+    "from": "苏轼·临江仙",
+    "type": "zh"
+  },
+  {
+    "text": "We accept the love we think we deserve.",
+    "from": "The Perks of Being a Wallflower",
+    "type": "en"
+  },
+  {
+    "text": "问君能有几多愁，恰似一江春水向东流。",
+    "from": "李煜·虞美人",
+    "type": "poetry"
+  },
+  {
+    "text": "In the middle of every difficulty lies opportunity.",
+    "from": "Albert Einstein",
+    "type": "en"
+  },
+  {
+    "text": "你若盛开，清风自来。",
+    "from": "仓央嘉措",
+    "type": "zh"
+  },
+  {
+    "text": "Get busy living, or get busy dying.",
+    "from": "The Shawshank Redemption",
+    "type": "en"
+  },
+  {
+    "text": "落红不是无情物，化作春泥更护花。",
+    "from": "龚自珍·己亥杂诗",
+    "type": "poetry"
+  },
+  {
+    "text": "The purpose of our lives is to be happy.",
+    "from": "Dalai Lama",
+    "type": "en"
+  },
+  {
+    "text": "走得最急的，都是最美的风景。",
+    "from": "三毛",
+    "type": "zh"
+  },
+  {
+    "text": "Life is what happens when you're busy making other plans.",
+    "from": "John Lennon",
+    "type": "en"
+  },
+  {
+    "text": "采菊东篱下，悠然见南山。",
+    "from": "陶渊明·饮酒",
+    "type": "poetry"
+  },
+  {
+    "text": "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+    "from": "Nelson Mandela",
+    "type": "en"
+  },
+  {
+    "text": "有些事情不是看到了希望才去坚持，而是坚持了才会看到希望。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "Do not go gentle into that good night.",
+    "from": "Dylan Thomas",
+    "type": "en"
+  },
+  {
+    "text": "春蚕到死丝方尽，蜡炬成灰泪始干。",
+    "from": "李商隐·无题",
+    "type": "poetry"
+  },
+  {
+    "text": "You only live once, but if you do it right, once is enough.",
+    "from": "Mae West",
+    "type": "en"
+  },
+  {
+    "text": "愿你出走半生，归来仍是少年。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "To infinity and beyond.",
+    "from": "Toy Story",
+    "type": "en"
+  },
+  {
+    "text": "抽刀断水水更流，举杯消愁愁更愁。",
+    "from": "李白·宣州谢朓楼饯别",
+    "type": "poetry"
+  },
+  {
+    "text": "The unexamined life is not worth living.",
+    "from": "Socrates",
+    "type": "en"
+  },
+  {
+    "text": "人间烟火气，最抚凡人心。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "Hope is a good thing, maybe the best of things.",
+    "from": "The Shawshank Redemption",
+    "type": "en"
+  },
+  {
+    "text": "身无彩凤双飞翼，心有灵犀一点通。",
+    "from": "李商隐·无题",
+    "type": "poetry"
+  },
+  {
+    "text": "Not all those who wander are lost.",
+    "from": "J.R.R. Tolkien",
+    "type": "en"
+  },
+  {
+    "text": "生活不止眼前的苟且，还有诗和远方。",
+    "from": "高晓松",
+    "type": "zh"
+  },
+  {
+    "text": "After all, tomorrow is another day.",
+    "from": "Gone with the Wind",
+    "type": "en"
+  },
+  {
+    "text": "莫道桑榆晚，为霞尚满天。",
+    "from": "刘禹锡·酬乐天咏老见示",
+    "type": "poetry"
+  },
+  {
+    "text": "It always seems impossible until it's done.",
+    "from": "Nelson Mandela",
+    "type": "en"
+  },
+  {
+    "text": "这个世界上没有不带伤的人，重要的是带伤奔跑。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "Why so serious?",
+    "from": "The Dark Knight",
+    "type": "en"
+  },
+  {
+    "text": "东风不与周郎便，铜雀春深锁二乔。",
+    "from": "杜牧·赤壁",
+    "type": "poetry"
+  },
+  {
+    "text": "Happiness is not something ready-made. It comes from your own actions.",
+    "from": "Dalai Lama",
+    "type": "en"
+  },
+  {
+    "text": "时间会告诉你，简单的喜欢，最长久。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "To be or not to be, that is the question.",
+    "from": "Shakespeare·Hamlet",
+    "type": "en"
+  },
+  {
+    "text": "人生自古谁无死，留取丹心照汗青。",
+    "from": "文天祥·过零丁洋",
+    "type": "poetry"
+  },
+  {
+    "text": "The best time to plant a tree was 20 years ago. The second best time is now.",
+    "from": "Chinese Proverb",
+    "type": "en"
+  },
+  {
+    "text": "人生三件事：说人话，做人事，当个人。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "Elementary, my dear Watson.",
+    "from": "Sherlock Holmes",
+    "type": "en"
+  },
+  {
+    "text": "欲穷千里目，更上一层楼。",
+    "from": "王之涣·登鹳雀楼",
+    "type": "poetry"
+  },
+  {
+    "text": "We are all in the gutter, but some of us are looking at the stars.",
+    "from": "Oscar Wilde",
+    "type": "en"
+  },
+  {
+    "text": "种一棵树最好的时间是十年前，其次是现在。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "May the Force be with you.",
+    "from": "Star Wars",
+    "type": "en"
+  },
+  {
+    "text": "此情可待成追忆，只是当时已惘然。",
+    "from": "李商隐·锦瑟",
+    "type": "poetry"
+  },
+  {
+    "text": "Two roads diverged in a wood, and I took the one less traveled by.",
+    "from": "Robert Frost",
+    "type": "en"
+  },
+  {
+    "text": "真正的平静，不是避开车马喧嚣，而是在心中修篱种菊。",
+    "from": "林徽因",
+    "type": "zh"
+  },
+  {
+    "text": "Keep your friends close, but your enemies closer.",
+    "from": "The Godfather",
+    "type": "en"
+  },
+  {
+    "text": "青山遮不住，毕竟东流去。",
+    "from": "辛弃疾·菩萨蛮",
+    "type": "poetry"
+  },
+  {
+    "text": "All we have to decide is what to do with the time that is given us.",
+    "from": "J.R.R. Tolkien",
+    "type": "en"
+  },
+  {
+    "text": "风过留声，雁过留影，人过留名。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "I am the master of my fate, I am the captain of my soul.",
+    "from": "William Ernest Henley",
+    "type": "en"
+  },
+  {
+    "text": "衣带渐宽终不悔，为伊消得人憔悴。",
+    "from": "柳永·蝶恋花",
+    "type": "poetry"
+  },
+  {
+    "text": "You miss 100% of the shots you don't take.",
+    "from": "Wayne Gretzky",
+    "type": "en"
+  },
+  {
+    "text": "不要因为走得太远，忘了我们为什么出发。",
+    "from": "纪伯伦",
+    "type": "zh"
+  },
+  {
+    "text": "That's what she said.",
+    "from": "The Office",
+    "type": "en"
+  },
+  {
+    "text": "浮云游子意，落日故人情。",
+    "from": "李白·送友人",
+    "type": "poetry"
+  },
+  {
+    "text": "In three words I can sum up everything I've learned about life: it goes on.",
+    "from": "Robert Frost",
+    "type": "en"
+  },
+  {
+    "text": "有时候，沉默是最好的回答。",
+    "from": "达赖喇嘛",
+    "type": "zh"
+  },
+  {
+    "text": "Just keep swimming.",
+    "from": "Finding Nemo",
+    "type": "en"
+  },
+  {
+    "text": "天生我材必有用，千金散尽还复来。",
+    "from": "李白·将进酒",
+    "type": "poetry"
+  },
+  {
+    "text": "Imagination is more important than knowledge.",
+    "from": "Albert Einstein",
+    "type": "en"
+  },
+  {
+    "text": "把每一个平凡的日子，过成不平凡的日子。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "To infinity and beyond.",
+    "from": "Toy Story",
+    "type": "en"
+  },
+  {
+    "text": "千里江山寒色远，芦花深处泊孤舟。",
+    "from": "李煜",
+    "type": "poetry"
+  },
+  {
+    "text": "The only impossible journey is the one you never begin.",
+    "from": "Tony Robbins",
+    "type": "en"
+  },
+  {
+    "text": "心若没有栖息的地方，到哪里都是流浪。",
+    "from": "三毛",
+    "type": "zh"
+  },
+  {
+    "text": "With great power comes great responsibility.",
+    "from": "Spider-Man",
+    "type": "en"
+  },
+  {
+    "text": "大漠孤烟直，长河落日圆。",
+    "from": "王维·使至塞上",
+    "type": "poetry"
+  },
+  {
+    "text": "We make a living by what we get, but we make a life by what we give.",
+    "from": "Winston Churchill",
+    "type": "en"
+  },
+  {
+    "text": "人生没有白走的路，每一步都算数。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "Life is like a box of chocolates, you never know what you're gonna get.",
+    "from": "Forrest Gump",
+    "type": "en"
+  },
+  {
+    "text": "露从今夜白，月是故乡明。",
+    "from": "杜甫·月夜忆舍弟",
+    "type": "poetry"
+  },
+  {
+    "text": "Be the change you wish to see in the world.",
+    "from": "Mahatma Gandhi",
+    "type": "en"
+  },
+  {
+    "text": "山河远阔，人间烟火，无一是你，无一不是你。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "You had me at hello.",
+    "from": "Jerry Maguire",
+    "type": "en"
+  },
+  {
+    "text": "黑云压城城欲摧，甲光向日金鳞开。",
+    "from": "李贺·雁门太守行",
+    "type": "poetry"
+  },
+  {
+    "text": "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+    "from": "Winston Churchill",
+    "type": "en"
+  },
+  {
+    "text": "凡是过去，皆为序章。",
+    "from": "莎士比亚",
+    "type": "zh"
+  },
+  {
+    "text": "I'll be back.",
+    "from": "The Terminator",
+    "type": "en"
+  },
+  {
+    "text": "今宵酒醒何处，杨柳岸晓风残月。",
+    "from": "柳永·雨霖铃",
+    "type": "poetry"
+  },
+  {
+    "text": "The measure of intelligence is the ability to change.",
+    "from": "Albert Einstein",
+    "type": "en"
+  },
+  {
+    "text": "不是所有坚持都有结果，但总有一些坚持，能从一寸一寸的量变中，带来意想不到的质变。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "Go ahead, make my day.",
+    "from": "Sudden Impact",
+    "type": "en"
+  },
+  {
+    "text": "曾经沧海难为水，除却巫山不是云。",
+    "from": "元稹·离思",
+    "type": "poetry"
+  },
+  {
+    "text": "Courage is not the absence of fear, but the triumph over it.",
+    "from": "Nelson Mandela",
+    "type": "en"
+  },
+  {
+    "text": "无论多么艰难的日子，都要阳光地去面对，笑着泪流。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "You can't handle the truth!",
+    "from": "A Few Good Men",
+    "type": "en"
+  },
+  {
+    "text": "剪不断，理还乱，是离愁，别是一般滋味在心头。",
+    "from": "李煜·相见欢",
+    "type": "poetry"
+  },
+  {
+    "text": "In the end, it's not the years in your life that count. It's the life in your years.",
+    "from": "Abraham Lincoln",
+    "type": "en"
+  },
+  {
+    "text": "生活虐我千百遍，我待生活如初恋。",
+    "from": "无名",
+    "type": "zh"
+  },
+  {
+    "text": "Hasta la vista, baby.",
+    "from": "Terminator 2",
+    "type": "en"
+  }
+]
