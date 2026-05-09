@@ -28,20 +28,24 @@ function getCardUrl(item) {
   return (isIntranet && item.intranet) ? item.intranet : item.url;
 }
 
-// ── 每日一言 ────────────────────────────────────────────────
+// ── 标题下方句子 ────────────────────────────────────────────────
 async function loadDailyQuote() {
   const el = document.getElementById('daily-quote');
   if (!el) return;
   try {
-    const res  = await fetch('https://v1.hitokoto.cn?c=i');
-    const data = await res.json();
-    const text = data.hitokoto ?? '';
-    const from = data.from   ?? '';
-    el.textContent = from ? `${text}　——《${from}》` : text;
+    const res   = await fetch('quotes.json');
+    const data  = await res.json();
+    // 每次刷新取下一条
+    let idx = parseInt(localStorage.getItem('quoteIdx') || '0');
+    const q = data[idx % data.length];
+    localStorage.setItem('quoteIdx', (idx + 1) % data.length);
+    const text = q.text ?? '';
+    const from = q.from ?? '';
+    el.textContent = from ? `${text}　——${from}` : text;
   } catch {
-    // 失败时保留原文，同样淡入
+    // 失败保留原文
   } finally {
-    el.style.opacity = '1';  // ← 无论成功失败都显示
+    el.style.opacity = '1';
   }
 }
 
