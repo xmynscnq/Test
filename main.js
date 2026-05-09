@@ -3,8 +3,8 @@
    =========================== */
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
-const FAVICON_PROVIDER = 'google';
-const PROXY = 'https://xin88.xmynscnq.dpdns.org';
+const FAVICON_PROVIDER = 'yandex';
+const PROXY = '';
 
 function withProxy(originUrl) {
   if (!PROXY) return originUrl;
