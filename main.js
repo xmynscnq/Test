@@ -1,26 +1,24 @@
 /* ===========================
-   王五导航 · main.js (图标配置修改)
+   王五导航 · main.js
    =========================== */
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
-// 可选值: 'google', 'duckduckgo', 'iconhorse', 'yandex'
-const FAVICON_PROVIDER = 'yandex'; 
-const PROXY = ''; // 如果有反代地址请填写
+const FAVICON_PROVIDER = 'google';
+const PROXY = 'https://xin88.xmynscnq.dpdns.org';
 
-// ... withProxy 函数保持不变 ...
+function withProxy(originUrl) {
+  if (!PROXY) return originUrl;
+  return PROXY + '/' + originUrl.replace(/^https?:\/\//, '');
+}
 
 function buildFaviconUrl(domain) {
   if (!domain) return DEFAULT_ICON;
-  
   if (FAVICON_PROVIDER === 'google')
     return withProxy(`https://www.google.com/s2/favicons?sz=64&domain=${domain}`);
-  
   if (FAVICON_PROVIDER === 'duckduckgo')
     return withProxy(`https://icons.duckduckgo.com/ip3/${domain}.ico`);
-
   if (FAVICON_PROVIDER === 'yandex')
     return withProxy(`https://favicon.yandex.net/favicon/${domain}`);
-
   return DEFAULT_ICON;
 }
 
