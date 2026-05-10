@@ -3,7 +3,7 @@
    =========================== */
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
-const WORKER_URL = 'https://shy-truth-b171.2554408713.workers.dev';
+const WORKER_URL = 'https://frosty-dust-e757.2554408713.workers.dev';
 
 const PROXY = '';
 function withProxy(originUrl) {
