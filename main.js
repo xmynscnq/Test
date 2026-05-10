@@ -336,7 +336,7 @@ function renderCards(sections) {
       const img = document.createElement('img');
       img.className = 'favicon';
       img.loading   = 'lazy';
-      img.src       = faviconSrc(item.url);
+      img.src = item.icon ? item.icon : faviconSrc(item.url);
       // Worker 保证永远返回图，onerror 仅在 Worker 本身挂掉时兜底
       img.onerror = function () {
         this.src = DEFAULT_ICON;
