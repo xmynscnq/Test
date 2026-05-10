@@ -76,11 +76,9 @@ function injectNetToggleBtn() {
 // ────────────────────────────────────────────────────────────
 const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 function changeBackground() {
-  const folder = isMobile ? 'mobile' : 'pc';
-  const total  = 675;
-  const idx    = Math.floor(Math.random() * total) + 1;
-  const url    = withProxy(`https://raw.githubusercontent.com/xmynscnq/wallpaper-webp/main/${folder}/${idx}.webp`);
-  document.getElementById('bgLayer').style.backgroundImage = `url('${url}')`;
+  const video = document.getElementById('bgLayer');
+  video.src = 'https://pan.baidu.re/view.php/3e89c4d6d87b041dca6899efd4da7b21.mp4';
+  video.play().catch(() => {});
 }
 
 const LINKS_FILE = 'links.json';
