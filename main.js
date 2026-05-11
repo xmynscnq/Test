@@ -79,7 +79,7 @@ function changeBackground() {
   const video  = document.getElementById('bgLayer');
   const folder = isMobile ? 'phmoving' : 'pcmoving';
   const prefix = isMobile ? 'ph' : 'pc';
-  const total  = isMobile ? 8 : 19;
+  const total  = isMobile ? 8 : 20;
   const idx    = String(Math.floor(Math.random() * total) + 1).padStart(3, '0');
   const rawUrl = `https://raw.githubusercontent.com/xmynscnq/Test/main/${folder}/${prefix}${idx}.webm`;
   const url    = withProxy(rawUrl);
