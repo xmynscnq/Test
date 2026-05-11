@@ -46,5 +46,44 @@
   <div id="main-content"></div>
 </div>
 <script src="main.js"></script>
+<script>
+  const cursor = document.createElement('div');
+  cursor.style.cssText = `
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    background: radial-gradient(circle, rgba(76,175,80,0.25) 0%, rgba(76,175,80,0.08) 50%, transparent 70%);
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+  `;
+  document.body.appendChild(cursor);
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let glowX = mouseX;
+  let glowY = mouseY;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    cursor.style.display = 'none';
+  }
+
+  function animateCursor() {
+    const ease = 0.06;
+    glowX += (mouseX - glowX) * ease;
+    glowY += (mouseY - glowY) * ease;
+    cursor.style.left = glowX + 'px';
+    cursor.style.top  = glowY + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+</script>
 </body>
 </html>
