@@ -29,12 +29,11 @@ body {
 /* ===== 背景层 ===== */
 #bgLayer {
   position: fixed;
-  inset: 0;
   z-index: -2;
   width: 100vw;
-  height: 56.25vw; /* 16:9 */
+  height: 56.25vw;
   min-height: 100vh;
-  min-width: 177.78vh; /* 16:9 */
+  min-width: 177.78vh;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
