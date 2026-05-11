@@ -378,14 +378,6 @@ h1::after {
   gap: 8px;
   text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 20px rgba(76,175,80,0.5);
 }
-.section-title::before {
-  content: '';
-  display: inline-block;
-  width: 4px;
-  height: 1em;
-  background: var(--primary);
-  border-radius: 1px;
-}
 
 /* ===== 卡片网格 ===== */
 .link-container {
