@@ -67,6 +67,7 @@ body {
   width: 100%;
   overflow: hidden;
   flex-wrap: nowrap;
+  position: relative;
 }
 
 .header-area h1 {
@@ -81,8 +82,20 @@ body {
   user-select: none;
   display: flex;
   align-items: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 }
-.header-icon:last-child { animation-delay: 1.5s; }
+
+.header-icon:first-child {
+  left: 0;
+}
+
+.header-icon:last-child {
+  animation-delay: 1.5s;
+  right: 0;
+  left: auto;
+}
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
