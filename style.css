@@ -74,7 +74,7 @@ body {
 }
 
 .header-icon {
-  font-size: 2rem;
+  font-size: 1.2rem;
   flex-shrink: 0;
   filter: drop-shadow(0 0 12px rgba(76, 175, 80, 0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.6));
   animation: float 3s ease-in-out infinite;
@@ -479,32 +479,7 @@ h1::after {
   }
 
   .card .info-popup {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%) translateY(6px);
-    width: 200px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(32px);
-    -webkit-backdrop-filter: blur(32px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    padding: 9px 12px;
-    border-radius: 10px;
-    font-size: 0.74rem;
-    color: #fff;
-    opacity: 0;
-    transition: opacity 0.25s, transform 0.25s;
-    pointer-events: none;
-    z-index: 100;
-    word-break: break-all;
-    white-space: normal;
-    max-width: calc(100vw - 24px);
-    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-  }
-
-  .card:hover .info-popup {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    display: none;
   }
 }
 
