@@ -362,7 +362,7 @@ h1::after {
   border: none;
   border-radius: var(--radius-section);
   padding: 1.3rem;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.4rem;
 }
 
 .section.section-hidden { display: none; }
