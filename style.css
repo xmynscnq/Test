@@ -62,7 +62,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.6rem;
   width: 100%;
   overflow: hidden;
 }
@@ -114,7 +114,7 @@ h1::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 0.8rem;
   gap: 10px;
   width: 100%;
 }
@@ -362,7 +362,7 @@ h1::after {
   border: none;
   border-radius: var(--radius-section);
   padding: 1.3rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.8rem;
 }
 
 .section.section-hidden { display: none; }
@@ -377,6 +377,14 @@ h1::after {
   align-items: center;
   gap: 8px;
   text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 20px rgba(76,175,80,0.5);
+}
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 1em;
+  background: var(--primary);
+  border-radius: 1px;
 }
 
 /* ===== 卡片网格 ===== */
