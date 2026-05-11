@@ -40,6 +40,16 @@ body {
   object-fit: fill;
 }
 
+@media (max-width: 768px) {
+  #bgLayer {
+    width: 100vw;
+    height: 100vh;
+    min-height: unset;
+    min-width: unset;
+    object-fit: cover;
+  }
+}
+
 #bgOverlay {
   position: fixed;
   inset: 0;
@@ -377,6 +387,14 @@ h1::after {
   align-items: center;
   gap: 8px;
   text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 20px rgba(76,175,80,0.5);
+}
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 1em;
+  background: var(--primary);
+  border-radius: 1px;
 }
 
 /* ===== 卡片网格 ===== */
