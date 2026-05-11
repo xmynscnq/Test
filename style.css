@@ -3,8 +3,8 @@
 
 /* ===== CSS 变量 ===== */
 :root {
-  --glass-bg: rgba(0, 0, 0, 0.35);
-  --glass-border: rgba(255, 255, 255, 0.25);
+--glass-bg: rgba(0, 0, 0, 0.05);
+--glass-border: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   --primary: #4CAF50;
   --primary-dim: rgba(76, 175, 80, 0.35);
@@ -146,7 +146,7 @@ h1::after {
   padding: 7px 18px;
   border-radius: 24px;
   border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(0,0,0,0.25);
+  background: rgba(0, 0, 0, 0.08);
   color: rgba(255,255,255,0.7);
   cursor: pointer;
   font-family: inherit;
@@ -178,7 +178,7 @@ h1::after {
 .search-box {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.35);
+ background: rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 2px solid var(--glass-border);
@@ -337,7 +337,7 @@ h1::after {
   padding: 7px 16px;
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.22);
+  background: rgba(0, 0, 0, 0.08);
   color: rgba(255,255,255,0.7);
   cursor: pointer;
   font-family: inherit;
@@ -412,7 +412,7 @@ h1::after {
 
 /* ===== 卡片 ===== */
 .card {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
   transition: background 0.25s, transform 0.25s, border-color 0.25s;
