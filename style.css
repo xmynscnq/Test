@@ -86,7 +86,7 @@ body {
 
 h1 {
   text-align: center;
-  font-size: clamp(1.8rem, 5vw, 3.2rem);
+  font-size: clamp(1.2rem, 3vw, 2rem);
   font-weight: 900;
   letter-spacing: 0.05em;
   white-space: nowrap;
@@ -114,7 +114,7 @@ h1::after {
   text-align: center;
   font-size: clamp(0.6rem, 1.5vw, 0.78rem);
   letter-spacing: 0.25em;
-  color: rgba(255,255,255,0.68);
+  color: rgba(255,255,255,0.95);
   text-transform: uppercase;
   margin-top: 5px;
   font-weight: 400;
@@ -478,8 +478,10 @@ h1::after {
     left: 50%;
     transform: translateX(-50%) translateY(6px);
     width: 200px;
-    background: rgba(10, 10, 10, 0.92);
-    border: 1px solid var(--primary);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 9px 12px;
     border-radius: 10px;
     font-size: 0.74rem;
