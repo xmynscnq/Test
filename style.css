@@ -62,39 +62,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
   margin-bottom: 1.5rem;
   width: 100%;
   overflow: hidden;
-  flex-wrap: nowrap;
-  position: relative;
-}
-
-.header-area h1 {
-  flex: 0 1 auto;
-}
-
-.header-icon {
-  font-size: 1.2rem;
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 12px rgba(76, 175, 80, 0.8)) drop-shadow(0 4px 8px rgba(0,0,0,0.6));
-  animation: float 3s ease-in-out infinite;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.header-icon:first-child {
-  left: 0;
-}
-
-.header-icon:last-child {
-  animation-delay: 1.5s;
-  right: 0;
-  left: auto;
 }
 
 @keyframes float {
