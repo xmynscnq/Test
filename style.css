@@ -173,11 +173,9 @@ h1::after {
 .search-box {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.03);      /* 与卡片预设一致 */
-  backdrop-filter: blur(4px);                 /* 与卡片预设一致 */
-  -webkit-backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.04); /* 与卡片预设一致 */
-  border-radius: 14px;                         /* 圆角 */
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
   padding: 5px 8px 5px 6px;
   box-shadow: none;
   width: 100%;
@@ -397,9 +395,7 @@ h1::after {
 /* ===== 卡片 ===== */
 .card {
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-card);
   transition: background 0.25s, transform 0.25s, border-color 0.25s, backdrop-filter 0.25s;
   position: relative;
