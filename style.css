@@ -173,10 +173,10 @@ h1::after {
 .search-box {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.12);      /* 与卡片预设一致 */
-  backdrop-filter: blur(16px);                /* 与卡片预设一致 */
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08); /* 与卡片预设一致 */
+  background: rgba(255, 255, 255, 0.06);      /* 与卡片预设一致 */
+  backdrop-filter: blur(8px);                 /* 与卡片预设一致 */
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06); /* 与卡片预设一致 */
   border-radius: 14px;                         /* 圆角 */
   padding: 5px 8px 5px 6px;
   box-shadow: none;
@@ -396,10 +396,10 @@ h1::after {
 
 /* ===== 卡片 ===== */
 .card {
-  background: rgba(255, 255, 255, 0.12);      /* 预设改为原悬停效果 */
-  backdrop-filter: blur(16px);                 /* 预设加模糊 */
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08); /* 细边框增加层次 */
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-card);
   transition: background 0.25s, transform 0.25s, border-color 0.25s, backdrop-filter 0.25s;
   position: relative;
