@@ -386,10 +386,10 @@ h1::after {
   align-items: stretch;
 }
 
-/* ===== 卡片：全透明 + 圆角边框 ===== */
+/* ===== 卡片：全透明无边框 ===== */
 .card {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: none;
   border-radius: var(--radius-card);
   transition: background 0.25s, transform 0.25s, border-color 0.25s, backdrop-filter 0.25s;
   position: relative;
@@ -584,7 +584,7 @@ h1::after {
     top: 0.4rem;
     right: 0.4rem;
     padding: 0.15rem 0.45rem;
-    font-size: 0.72rem;
+    font-size: 0.65rem;
     border-radius: 10px;
   }
 }
