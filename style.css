@@ -363,8 +363,8 @@ h1::after {
 
 /* ===== 分区 ===== */
 .section {
-  background: rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--radius-section);
   padding: 1.3rem;
   margin-bottom: 0.4rem;
