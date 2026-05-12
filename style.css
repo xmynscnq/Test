@@ -9,7 +9,7 @@
   --primary: #4CAF50;
   --primary-dim: rgba(76, 175, 80, 0.35);
   --text-main: #ffffff;
-  --text-dim: rgba(255, 255, 255, 0.95);  /* 提升暗色文字对比度 */
+  --text-dim: rgba(255, 255, 255, 0.80);
   --radius-card: 14px;
   --radius-section: 20px;
 }
@@ -173,9 +173,12 @@ h1::after {
 .search-box {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  border-radius: 0;
   padding: 5px 8px 5px 6px;
   box-shadow: none;
   width: 100%;
@@ -259,7 +262,7 @@ h1::after {
   font-family: inherit;
   text-shadow: 0 2px 8px rgba(0,0,0,0.9);
 }
-.search-box input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.65); }
+.search-box input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.55); }
 
 /* ===== 清空按钮 ===== */
 .clear-btn {
@@ -363,8 +366,10 @@ h1::after {
 
 /* ===== 分区 ===== */
 .section {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border: none;
   border-radius: var(--radius-section);
   padding: 1.3rem;
   margin-bottom: 0.4rem;
@@ -394,10 +399,10 @@ h1::after {
 
 /* ===== 卡片 ===== */
 .card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0);
+  border: none;
   border-radius: var(--radius-card);
-  transition: background 0.25s, transform 0.25s, border-color 0.25s, backdrop-filter 0.25s;
+  transition: background 0.25s, transform 0.25s;
   position: relative;
   text-decoration: none;
   color: inherit;
@@ -439,7 +444,7 @@ h1::after {
 
 .card .desc {
   font-size: 0.73rem;
-  color: var(--text-dim);                      /* 使用提升后的 --text-dim */
+  color: var(--text-dim);
   line-height: 1.45;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -447,15 +452,14 @@ h1::after {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   flex: 1;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.8); /* 加强阴影 */
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
 }
 
 @media (hover: hover) {
   .card:hover {
-    background: rgba(255, 255, 255, 0.22);     /* 悬停比预设再加深一层 */
-    backdrop-filter: blur(28px);               /* 悬停模糊更强 */
-    -webkit-backdrop-filter: blur(28px);
-    border-color: rgba(255, 255, 255, 0.18);   /* 悬停边框更亮 */
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     transform: translateY(-4px);
   }
 
@@ -467,7 +471,7 @@ h1::after {
 /* ===== 触屏：长按弹出 tooltip ===== */
 @media (hover: none) {
   .card:active {
-    background: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.08);
   }
 
   .card .info-popup {
