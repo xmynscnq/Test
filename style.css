@@ -9,7 +9,7 @@
   --primary: #4CAF50;
   --primary-dim: rgba(76, 175, 80, 0.35);
   --text-main: #ffffff;
-  --text-dim: rgba(255, 255, 255, 0.80);
+  --text-dim: rgba(255, 255, 255, 0.95);  /* 提升暗色文字对比度 */
   --radius-card: 14px;
   --radius-section: 20px;
 }
@@ -173,9 +173,9 @@ h1::after {
 .search-box {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0);
-  backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
+  background: rgba(0, 0, 0, 0.15);           /* 加深背景 */
+  backdrop-filter: blur(16px);                /* 同步卡片预设模糊度 */
+  -webkit-backdrop-filter: blur(16px);
   border: none;
   border-bottom: 1px solid rgba(255,255,255,0.3);
   border-radius: 0;
@@ -262,7 +262,7 @@ h1::after {
   font-family: inherit;
   text-shadow: 0 2px 8px rgba(0,0,0,0.9);
 }
-.search-box input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.55); }
+.search-box input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.65); }
 
 /* ===== 清空按钮 ===== */
 .clear-btn {
@@ -399,10 +399,12 @@ h1::after {
 
 /* ===== 卡片 ===== */
 .card {
-  background: rgba(0, 0, 0, 0);
-  border: none;
+  background: rgba(255, 255, 255, 0.12);      /* 预设改为原悬停效果 */
+  backdrop-filter: blur(16px);                 /* 预设加模糊 */
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* 细边框增加层次 */
   border-radius: var(--radius-card);
-  transition: background 0.25s, transform 0.25s;
+  transition: background 0.25s, transform 0.25s, border-color 0.25s, backdrop-filter 0.25s;
   position: relative;
   text-decoration: none;
   color: inherit;
@@ -444,7 +446,7 @@ h1::after {
 
 .card .desc {
   font-size: 0.73rem;
-  color: var(--text-dim);
+  color: var(--text-dim);                      /* 使用提升后的 --text-dim */
   line-height: 1.45;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -452,14 +454,15 @@ h1::after {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   flex: 1;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.8); /* 加强阴影 */
 }
 
 @media (hover: hover) {
   .card:hover {
-    background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.22);     /* 悬停比预设再加深一层 */
+    backdrop-filter: blur(28px);               /* 悬停模糊更强 */
+    -webkit-backdrop-filter: blur(28px);
+    border-color: rgba(255, 255, 255, 0.18);   /* 悬停边框更亮 */
     transform: translateY(-4px);
   }
 
@@ -471,7 +474,7 @@ h1::after {
 /* ===== 触屏：长按弹出 tooltip ===== */
 @media (hover: none) {
   .card:active {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.18);
   }
 
   .card .info-popup {
