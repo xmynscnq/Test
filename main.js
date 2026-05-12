@@ -54,7 +54,7 @@ function getWeatherIcon(iconCode) {
 }
 
 async function loadWeather(el) {
-  el.textContent = '📍 定位中…';
+  el.textContent = '📍 长春';
   el.style.opacity = '1';
 
   // 检查缓存（5分钟内不重复请求）
@@ -69,128 +69,18 @@ async function loadWeather(el) {
     } catch {}
   }
 
-  // 获取定位
-  if (!navigator.geolocation) {
-    showWeatherFallback(el);
-    return;
-  }
+  // 长春固定坐标
+  const lon = 125.3245;
+  const lat = 43.8868;
 
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const { latitude: lat, longitude: lon } = pos.coords;
-      try {
-        // 并发请求：实时天气 + 逐日预报
-        const [nowRes, dailyRes] = await Promise.all([
-          fetch(`https://devapi.qweather.com/v7/weather/now?location=${lon},${lat}&key=${QWEATHER_KEY}&lang=zh`),
-          fetch(`https://devapi.qweather.com/v7/weather/3d?location=${lon},${lat}&key=${QWEATHER_KEY}&lang=zh`)
-        ]);
-        const [nowData, dailyData] = await Promise.all([nowRes.json(), dailyRes.json()]);
-
-        if (nowData.code !== '200') throw new Error('天气请求失败');
-
-        const now   = nowData.now;
-        const today = dailyData.daily?.[0];
-        const icon  = getWeatherIcon(now.icon);
-        const temp  = parseInt(now.temp);
-        const feels = parseInt(now.feelsLike);
-        const advice = getClothingAdvice(feels);
-        const range = today ? `${today.tempMin}~${today.tempMax}°C` : '';
-
-        // 用 Nominatim 获取城市名
-        let cityName = '';
-        try {
-          const geoRes = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=zh`,
-            { headers: { 'Accept-Language': 'zh' } }
-          );
-          const geoData = await geoRes.json();
-          cityName = geoData.address?.city
-            || geoData.address?.town
-            || geoData.address?.county
-            || geoData.address?.state
-            || '';
-        } catch {}
-
-        const text = `📍${cityName ? ' ' + cityName : ''}  ${icon} ${now.text}  ${temp}°C${range ? '（今日 ' + range + '）' : ''}  💧${now.humidity}%  ${advice}`;
-
-        sessionStorage.setItem('weather_cache', JSON.stringify({ text, ts: Date.now() }));
-        el.textContent = text;
-
-      } catch {
-        el.textContent = '⚠️ 天气获取失败';
-      }
-    },
-    () => showWeatherFallback(el),
-    { timeout: 8000 }
-  );
-}
-
-// 定位失败：显示手动输入城市
-function showWeatherFallback(el) {
-  el.innerHTML = '';
-  el.style.opacity = '1';
-
-  const wrapper = document.createElement('span');
-  wrapper.style.cssText = 'display:inline-flex;align-items:center;gap:6px;';
-
-  const hint = document.createElement('span');
-  hint.textContent = '📍';
-
-  const input = document.createElement('input');
-  input.placeholder = '输入城市名';
-  input.style.cssText = `
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid rgba(255,255,255,0.4);
-    color: #fff;
-    font-family: inherit;
-    font-size: inherit;
-    letter-spacing: inherit;
-    width: 80px;
-    outline: none;
-    text-align: center;
-  `;
-
-  const btn = document.createElement('button');
-  btn.textContent = '查询';
-  btn.style.cssText = `
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.35);
-    border-radius: 10px;
-    color: rgba(255,255,255,0.8);
-    font-family: inherit;
-    font-size: 0.72rem;
-    padding: 1px 8px;
-    cursor: pointer;
-  `;
-
-  btn.onclick = () => fetchWeatherByCity(input.value.trim(), el);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') fetchWeatherByCity(input.value.trim(), el); });
-
-  wrapper.appendChild(hint);
-  wrapper.appendChild(input);
-  wrapper.appendChild(btn);
-  el.appendChild(wrapper);
-}
-
-async function fetchWeatherByCity(city, el) {
-  if (!city) return;
-  el.textContent = '⏳ 查询中…';
   try {
-    // 先查城市 ID
-    const lookupRes = await fetch(
-      `https://geoapi.qweather.com/v2/city/lookup?location=${encodeURIComponent(city)}&key=${QWEATHER_KEY}&lang=zh`
-    );
-    const lookupData = await lookupRes.json();
-    if (lookupData.code !== '200' || !lookupData.location?.length) throw new Error();
-
-    const loc = lookupData.location[0];
     const [nowRes, dailyRes] = await Promise.all([
-      fetch(`https://devapi.qweather.com/v7/weather/now?location=${loc.id}&key=${QWEATHER_KEY}&lang=zh`),
-      fetch(`https://devapi.qweather.com/v7/weather/3d?location=${loc.id}&key=${QWEATHER_KEY}&lang=zh`)
+      fetch(`https://devapi.qweather.com/v7/weather/now?location=${lon},${lat}&key=${QWEATHER_KEY}&lang=zh`),
+      fetch(`https://devapi.qweather.com/v7/weather/3d?location=${lon},${lat}&key=${QWEATHER_KEY}&lang=zh`)
     ]);
     const [nowData, dailyData] = await Promise.all([nowRes.json(), dailyRes.json()]);
-    if (nowData.code !== '200') throw new Error();
+
+    if (nowData.code !== '200') throw new Error('天气请求失败');
 
     const now    = nowData.now;
     const today  = dailyData.daily?.[0];
@@ -200,12 +90,13 @@ async function fetchWeatherByCity(city, el) {
     const advice = getClothingAdvice(feels);
     const range  = today ? `${today.tempMin}~${today.tempMax}°C` : '';
 
-    const text = `📍 ${loc.name}  ${icon} ${now.text}  ${temp}°C${range ? '（今日 ' + range + '）' : ''}  💧${now.humidity}%  ${advice}`;
+    const text = `📍 长春  ${icon} ${now.text}  ${temp}°C${range ? '（今日 ' + range + '）' : ''}  💧${now.humidity}%  ${advice}`;
+
     sessionStorage.setItem('weather_cache', JSON.stringify({ text, ts: Date.now() }));
     el.textContent = text;
+
   } catch {
-    el.textContent = '⚠️ 城市未找到，请重试';
-    setTimeout(() => showWeatherFallback(el), 1500);
+    el.textContent = '⚠️ 天气获取失败，请稍后刷新';
   }
 }
 
