@@ -24,8 +24,7 @@ function getCardUrl(item) {
   return (isIntranet && item.intranet) ? item.intranet : item.url;
 }
 
-// ── 和风天气 ────────────────────────────────────────────────
-const QWEATHER_KEY = '93b664bc31274f2d8ec29d005bda49ef';
+// ── Open-Meteo 天气 ────────────────────────────────────────
 
 // 穿衣指数（根据体感温度自动判断）
 function getClothingAdvice(temp) {
@@ -38,26 +37,39 @@ function getClothingAdvice(temp) {
   return '❄️ 严寒，穿羽绒服';
 }
 
-// 天气图标映射（和风天气图标代码）
-function getWeatherIcon(iconCode) {
-  const code = parseInt(iconCode);
-  if (code === 100) return '☀️';
-  if (code === 101) return '⛅';
-  if (code === 102 || code === 103) return '🌤';
-  if (code === 104) return '☁️';
-  if ([150,151,152,153].includes(code)) return '🌙';
-  if ([300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,350,351,399].includes(code)) return '🌧';
-  if ([400,401,402,403,404,405,406,407,408,409,410,456,457,499].includes(code)) return '❄️';
-  if ([500,501,502,503,504,507,508,509,510,511,512,513,514,515].includes(code)) return '🌫';
-  if ([900,901].includes(code)) return '🌡';
+// WMO 天气代码转图标
+function getWeatherIcon(code) {
+  if (code === 0) return '☀️';
+  if (code <= 2)  return '🌤';
+  if (code === 3) return '☁️';
+  if (code <= 49) return '🌫';
+  if (code <= 59) return '🌦';
+  if (code <= 69) return '🌧';
+  if (code <= 79) return '❄️';
+  if (code <= 84) return '🌧';
+  if (code <= 99) return '⛈';
   return '🌈';
+}
+
+// WMO 代码转文字
+function getWeatherText(code) {
+  if (code === 0) return '晴';
+  if (code <= 2)  return '少云';
+  if (code === 3) return '阴';
+  if (code <= 49) return '雾';
+  if (code <= 59) return '毛毛雨';
+  if (code <= 69) return '雨';
+  if (code <= 79) return '雪';
+  if (code <= 84) return '阵雨';
+  if (code <= 99) return '雷雨';
+  return '未知';
 }
 
 async function loadWeather(el) {
   el.textContent = '📍 长春';
   el.style.opacity = '1';
 
-  // 检查缓存（5分钟内不重复请求）
+  // 5分钟缓存
   const cached = sessionStorage.getItem('weather_cache');
   if (cached) {
     try {
@@ -69,33 +81,31 @@ async function loadWeather(el) {
     } catch {}
   }
 
-  // 长春固定坐标
   const lon = 125.3245;
   const lat = 43.8868;
 
   try {
-    const [nowRes, dailyRes] = await Promise.all([
-      fetch(`https://devapi.qweather.com/v7/weather/now?location=${lon},${lat}&key=${QWEATHER_KEY}&lang=zh`),
-      fetch(`https://devapi.qweather.com/v7/weather/3d?location=${lon},${lat}&key=${QWEATHER_KEY}&lang=zh`)
-    ]);
-    const [nowData, dailyData] = await Promise.all([nowRes.json(), dailyRes.json()]);
+    const res = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weathercode,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FShanghai&forecast_days=1`
+    );
+    const data = await res.json();
 
-    if (nowData.code !== '200') throw new Error('天气请求失败');
-
-    const now    = nowData.now;
-    const today  = dailyData.daily?.[0];
-    const icon   = getWeatherIcon(now.icon);
-    const temp   = parseInt(now.temp);
-    const feels  = parseInt(now.feelsLike);
+    const temp   = Math.round(data.current.temperature_2m);
+    const feels  = Math.round(data.current.apparent_temperature);
+    const code   = data.current.weathercode;
+    const humid  = data.current.relative_humidity_2m;
+    const tmax   = Math.round(data.daily.temperature_2m_max[0]);
+    const tmin   = Math.round(data.daily.temperature_2m_min[0]);
+    const icon   = getWeatherIcon(code);
+    const wtxt   = getWeatherText(code);
     const advice = getClothingAdvice(feels);
-    const range  = today ? `${today.tempMin}~${today.tempMax}°C` : '';
 
-    const text = `📍 长春  ${icon} ${now.text}  ${temp}°C${range ? '（今日 ' + range + '）' : ''}  💧${now.humidity}%  ${advice}`;
-
+    const text = `📍 长春  ${icon} ${wtxt}  ${temp}°C（今日 ${tmin}~${tmax}°C）  💧${humid}%  ${advice}`;
     sessionStorage.setItem('weather_cache', JSON.stringify({ text, ts: Date.now() }));
     el.textContent = text;
 
-  } catch {
+  } catch (e) {
+    console.error('天气错误:', e);
     el.textContent = '⚠️ 天气获取失败，请稍后刷新';
   }
 }
