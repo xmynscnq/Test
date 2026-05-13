@@ -4,6 +4,7 @@
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
 const WORKER_URL = 'https://frosty-dust-e757.2554408713.workers.dev';
+const BG_WORKER_URL = 'https://xin88.xmynscnq.dpdns.org';  
 
 function buildFaviconUrl(domain) {
   if (!domain) return DEFAULT_ICON;
@@ -160,10 +161,8 @@ function injectNetToggleBtn() {
 
 // ────────────────────────────────────────────────────────────
 async function changeBackground() {
-  const video  = document.getElementById('bgLayer');
-  // Worker 通过 UA 自动判断设备，无需传参
-  // 加时间戳只是保险，防止极少数浏览器本地缓存 Worker 响应
-  video.src = `${WORKER_URL}/bg?_=${Date.now()}`;
+  const video = document.getElementById('bgLayer');
+  video.src = `${BG_WORKER_URL}/bg?_=${Date.now()}`;
   video.load();
   video.play().catch(() => {});
 }
