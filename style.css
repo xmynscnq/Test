@@ -578,6 +578,16 @@ h1::after {
 
 .net-toggle-btn.intranet-active:hover { background: rgba(210, 90, 20, 0.85); }
 
+@media (max-width: 768px) {
+  .net-toggle-btn {
+    top: 0.4rem;
+    right: 0.4rem;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.65rem;
+    border-radius: 10px;
+  }
+}
+
 /* ===== 手机端内外网按钮缩小 ===== */
 @media (max-width: 768px) {
   .net-toggle-btn {
