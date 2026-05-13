@@ -169,13 +169,16 @@ h1::after {
 .tab-icon { font-size: 1.1rem; }
 .tab-label { font-size: 1rem; }
 
-/* ===== 搜索框：全透明 + 圆角边框 ===== */
+/* ===== 搜索框 ===== */
 .search-box {
   display: flex;
   align-items: center;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 14px;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  border-radius: 0;
   padding: 5px 8px 5px 6px;
   box-shadow: none;
   width: 100%;
@@ -578,17 +581,6 @@ h1::after {
 
 .net-toggle-btn.intranet-active:hover { background: rgba(210, 90, 20, 0.85); }
 
-@media (max-width: 768px) {
-  .net-toggle-btn {
-    top: 0.4rem;
-    right: 0.4rem;
-    padding: 0.15rem 0.45rem;
-    font-size: 0.65rem;
-    border-radius: 10px;
-  }
-}
-
-/* ===== 手机端内外网按钮缩小 ===== */
 @media (max-width: 768px) {
   .net-toggle-btn {
     top: 0.4rem;
