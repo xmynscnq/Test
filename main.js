@@ -5,12 +5,6 @@
 // ── 图标 & 背景 配置 ────────────────────────────────────────
 const WORKER_URL = 'https://frosty-dust-e757.2554408713.workers.dev';
 
-const PROXY = '';
-function withProxy(originUrl) {
-  if (!PROXY) return originUrl;
-  return PROXY + '/' + originUrl.replace(/^https?:\/\//, '');
-}
-
 function buildFaviconUrl(domain) {
   if (!domain) return DEFAULT_ICON;
   return `${WORKER_URL}/?domain=${domain}`;
@@ -165,23 +159,12 @@ function injectNetToggleBtn() {
 }
 
 // ────────────────────────────────────────────────────────────
-const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-function changeBackground() {
+async function changeBackground() {
   const video  = document.getElementById('bgLayer');
-  const folder = isMobile ? 'phmoving' : 'pcmoving';
-  const prefix = isMobile ? 'ph' : 'pc';
-  const total  = isMobile ? 7 : 20;
-  const idx    = String(Math.floor(Math.random() * total) + 1).padStart(3, '0');
-  const rawUrl = `https://raw.githubusercontent.com/xmynscnq/Test/main/${folder}/${prefix}${idx}.webm`;
-  const url    = withProxy(rawUrl);
-
-  video.src = url;
-  video.onerror = function() {
-    if (video.src !== rawUrl) {
-      video.src = rawUrl;
-      video.play().catch(() => {});
-    }
-  };
+  // Worker 通过 UA 自动判断设备，无需传参
+  // 加时间戳只是保险，防止极少数浏览器本地缓存 Worker 响应
+  video.src = `${WORKER_URL}/bg?_=${Date.now()}`;
+  video.load();
   video.play().catch(() => {});
 }
 
