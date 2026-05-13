@@ -3,7 +3,7 @@
    =========================== */
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
-const WORKER_URL = 'https://frosty-dust-e757.2554408713.workers.dev';
+const WORKER_URL = 'https://ico.xmynscnq.dpdns.org';
 const BG_WORKER_URL = 'https://xin88.xmynscnq.dpdns.org';  
 
 function buildFaviconUrl(domain) {
