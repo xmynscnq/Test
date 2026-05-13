@@ -26,17 +26,6 @@ function getCardUrl(item) {
 
 // ── Open-Meteo 天气 ────────────────────────────────────────
 
-// 穿衣指数（根据体感温度自动判断）
-function getClothingAdvice(temp) {
-  if (temp >= 30) return '🌞 炎热，穿短袖短裤';
-  if (temp >= 25) return '😊 温暖，薄衬衫即可';
-  if (temp >= 20) return '🙂 舒适，可穿长袖';
-  if (temp >= 15) return '🧥 微凉，建议加外套';
-  if (temp >= 10) return '🧣 较冷，穿厚外套';
-  if (temp >= 5)  return '🥶 寒冷，注意保暖';
-  return '❄️ 严寒，穿羽绒服';
-}
-
 // WMO 天气代码转图标
 function getWeatherIcon(code) {
   if (code === 0) return '☀️';
@@ -65,6 +54,12 @@ function getWeatherText(code) {
   return '未知';
 }
 
+// 风向角度转文字
+function getWindDirection(deg) {
+  const dirs = ['北','东北','东','东南','南','西南','西','西北'];
+  return dirs[Math.round(deg / 45) % 8];
+}
+
 async function loadWeather(el) {
   el.textContent = '📍 长春';
   el.style.opacity = '1';
@@ -86,21 +81,20 @@ async function loadWeather(el) {
 
   try {
     const res = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weathercode,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FShanghai&forecast_days=1`
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,relative_humidity_2m,winddirection_10m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FShanghai&forecast_days=1`
     );
     const data = await res.json();
 
-    const temp   = Math.round(data.current.temperature_2m);
-    const feels  = Math.round(data.current.apparent_temperature);
-    const code   = data.current.weathercode;
-    const humid  = data.current.relative_humidity_2m;
-    const tmax   = Math.round(data.daily.temperature_2m_max[0]);
-    const tmin   = Math.round(data.daily.temperature_2m_min[0]);
-    const icon   = getWeatherIcon(code);
-    const wtxt   = getWeatherText(code);
-    const advice = getClothingAdvice(feels);
+    const temp    = Math.round(data.current.temperature_2m);
+    const code    = data.current.weathercode;
+    const humid   = data.current.relative_humidity_2m;
+    const tmax    = Math.round(data.daily.temperature_2m_max[0]);
+    const tmin    = Math.round(data.daily.temperature_2m_min[0]);
+    const winddir = getWindDirection(data.current.winddirection_10m);
+    const icon    = getWeatherIcon(code);
+    const wtxt    = getWeatherText(code);
 
-    const text = `📍 长春  ${icon} ${wtxt}  ${temp}°C（今日 ${tmin}~${tmax}°C）  💧${humid}%  ${advice}`;
+    const text = `📍 长春  ${icon} ${wtxt}  ${temp}°C（今日 ${tmin}~${tmax}°C）  💧${humid}%  💨 ${winddir}风`;
     sessionStorage.setItem('weather_cache', JSON.stringify({ text, ts: Date.now() }));
     el.textContent = text;
 
