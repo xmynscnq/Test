@@ -490,6 +490,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   changeBackground();
   loadHeaderSubtitle();
 
+     // ── 视频背景健壮性处理 ──────────────────────────────
+  const video = document.getElementById('bgLayer');
+  if (video) {
+    video.addEventListener('error', () => {
+      setTimeout(changeBackground, 500);
+    });
+    let stallTimer = null;
+    video.addEventListener('waiting', () => {
+      stallTimer = setTimeout(() => {
+        if (video.readyState < 3) changeBackground();
+      }, 3000);
+    });
+    video.addEventListener('playing', () => clearTimeout(stallTimer));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        video.pause();
+      } else {
+        setTimeout(() => {
+          if (video.ended || video.error) {
+            changeBackground();
+          } else {
+            video.play().catch(() => changeBackground());
+          }
+        }, 300);
+      }
+    });
+  }
+
   renderSearchTabs();
   updateSearchBoxEngine();
 
