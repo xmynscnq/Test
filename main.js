@@ -33,7 +33,7 @@ function getWeatherIcon(code) {
   return '🌈';
 }
 
-function getWeatherText(code) {
+function getrText(code) {
   if (code === 0) return '晴';
   if (code <= 2)  return '少云';
   if (code === 3) return '阴';
@@ -51,10 +51,10 @@ function getWindDirection(deg) {
   return dirs[Math.round(deg / 45) % 8];
 }
 
-function makeWeatherLink(text) {
+function makerLink(text) {
   const a = document.createElement('a');
   a.textContent = text;
-  a.href = 'https://www.weather.com.cn/weather/101060101.shtml';
+  a.href = 'https://www.weather.com.cn/weather1d/101060101.shtml';
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
   a.style.cssText = `
