@@ -612,3 +612,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:2rem;">链接数据加载失败，请检查 links.json 文件。</p>';
   }
 });
+function switchTheme() {
+  localStorage.setItem('navTheme', 'webstack');
+  window.location.href = 'webstack/index.html';
+}
+window.switchTheme = switchTheme;
