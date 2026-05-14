@@ -4,7 +4,7 @@
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
 const WORKER_URL = 'https://ico.xmynscnq.dpdns.org';
-const BG_WORKER_URL = 'https://xin88.xmynscnq.dpdns.org';  
+const BG_WORKER_URL = 'https://xin88.xmynscnq.dpdns.org';
 
 function buildFaviconUrl(domain) {
   if (!domain) return DEFAULT_ICON;
@@ -20,8 +20,6 @@ function getCardUrl(item) {
 }
 
 // ── Open-Meteo 天气 ────────────────────────────────────────
-
-// WMO 天气代码转图标
 function getWeatherIcon(code) {
   if (code === 0) return '☀️';
   if (code <= 2)  return '🌤';
@@ -35,7 +33,6 @@ function getWeatherIcon(code) {
   return '🌈';
 }
 
-// WMO 代码转文字
 function getWeatherText(code) {
   if (code === 0) return '晴';
   if (code <= 2)  return '少云';
@@ -49,7 +46,6 @@ function getWeatherText(code) {
   return '未知';
 }
 
-// 风向角度转文字
 function getWindDirection(deg) {
   const dirs = ['北','东北','东','东南','南','西南','西','西北'];
   return dirs[Math.round(deg / 45) % 8];
@@ -59,7 +55,6 @@ async function loadWeather(el) {
   el.textContent = '📍 长春';
   el.style.opacity = '1';
 
-  // 5分钟缓存
   const cached = sessionStorage.getItem('weather_cache');
   if (cached) {
     try {
@@ -104,15 +99,12 @@ async function loadHeaderSubtitle() {
   const el = document.getElementById('daily-quote');
   if (!el) return;
 
-  // 奇数次（1,3,5…）→ 天气；偶数次（2,4,6…）→ 名言
   let count = parseInt(sessionStorage.getItem('pageView') || '0') + 1;
   sessionStorage.setItem('pageView', String(count));
 
   if (count % 2 === 1) {
-    // 天气模式
     await loadWeather(el);
   } else {
-    // 名言模式
     try {
       const res  = await fetch('quotes.json');
       const data = await res.json();
@@ -121,7 +113,6 @@ async function loadHeaderSubtitle() {
       const from = q.from ?? '';
       el.textContent = from ? `${text}　——${from}` : text;
     } catch {
-      // 失败保留原文
     } finally {
       el.style.opacity = '1';
     }
@@ -160,9 +151,34 @@ function injectNetToggleBtn() {
 }
 
 // ────────────────────────────────────────────────────────────
+const PC_JSON = "wallpapers/pc.js";
+const PH_JSON = "wallpapers/ph.js";
+const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
 async function changeBackground() {
+  const video   = document.getElementById('bgLayer');
+  const jsonUrl = isMobile ? PH_JSON : PC_JSON;
+
+  const list = await fetch(jsonUrl)
+    .then(r => r.json())
+    .catch(() => null);
+
+  if (!list || list.length === 0) return;
+
+  const file = list[Math.floor(Math.random() * list.length)];
+  const src  = `${BG_WORKER_URL}/video/${file.trim()}`;
+
+  video.dataset.currentSrc = src;
+  video.src = src;
+  video.load();
+  video.play().catch(() => {});
+}
+
+function reloadBackground() {
   const video = document.getElementById('bgLayer');
-  video.src = `${BG_WORKER_URL}/bg?_=${Date.now()}`;
+  const src   = video.dataset.currentSrc;
+  if (!src) { changeBackground(); return; }
+  video.src = src;
   video.load();
   video.play().catch(() => {});
 }
@@ -490,32 +506,58 @@ document.addEventListener('DOMContentLoaded', async () => {
   changeBackground();
   loadHeaderSubtitle();
 
-     // ── 视频背景健壮性处理 ──────────────────────────────
   const video = document.getElementById('bgLayer');
   if (video) {
-    video.addEventListener('error', () => {
-      setTimeout(changeBackground, 500);
+
+    video.addEventListener('timeupdate', () => {
+      if (video.duration && video.currentTime >= video.duration - 0.1) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      }
     });
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    });
+
+    video.addEventListener('error', () => {
+      setTimeout(reloadBackground, 500);
+    });
+
     let stallTimer = null;
     video.addEventListener('waiting', () => {
       stallTimer = setTimeout(() => {
-        if (video.readyState < 3) changeBackground();
-      }, 3000);
+        if (video.readyState < 3) reloadBackground();
+      }, 5000);
     });
     video.addEventListener('playing', () => clearTimeout(stallTimer));
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         video.pause();
       } else {
         setTimeout(() => {
-          if (video.ended || video.error) {
-            changeBackground();
+          if (video.ended || video.error || video.readyState < 3) {
+            reloadBackground();
           } else {
-            video.play().catch(() => changeBackground());
+            video.play().catch(() => reloadBackground());
           }
-        }, 300);
+        }, 800);
       }
     });
+
+    let watchdogTimer = null;
+    function startWatchdog() {
+      clearInterval(watchdogTimer);
+      watchdogTimer = setInterval(() => {
+        if (document.visibilityState === 'hidden') return;
+        if (video.paused && !video.ended) return;
+        if (video.readyState < 2) reloadBackground();
+      }, 5000);
+    }
+    video.addEventListener('playing', startWatchdog);
+    video.addEventListener('pause', () => clearInterval(watchdogTimer));
+    startWatchdog();
   }
 
   renderSearchTabs();
