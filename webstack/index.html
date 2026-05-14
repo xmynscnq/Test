@@ -7,7 +7,6 @@
   <title>王五导航 · WebStack</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
 
-  <!-- WebStack 原版依赖（路径指向 assets/ 文件夹） -->
   <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Arimo:400,700,400italic">
   <link rel="stylesheet" href="assets/css/fonts/linecons/css/linecons.css">
   <link rel="stylesheet" href="assets/css/fonts/fontawesome/css/font-awesome.min.css">
@@ -19,66 +18,97 @@
   <script src="assets/js/jquery-1.11.1.min.js"></script>
 
   <style>
-    /* 主题切换按钮 */
-    .theme-switch-btn {
-      position: fixed;
-      top: 12px;
-      right: 16px;
-      z-index: 9999;
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid rgba(0,0,0,0.15);
-      background: rgba(255,255,255,0.9);
-      color: #333;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      transition: background 0.2s, box-shadow 0.2s;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .theme-switch-btn:hover {
-      background: #fff;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-      color: #333;
-      text-decoration: none;
-    }
-
-    /* 顶部标题栏 logo 区域点击切换 */
     .logo-title {
       cursor: pointer;
       user-select: none;
       transition: opacity 0.2s;
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
     }
     .logo-title:hover { opacity: 0.75; }
+    .logo-title-text {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.06em;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .logo-title-sub {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.08em;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .ws-search-wrap {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      max-width: 500px;
+      margin: 0 16px;
+    }
+    .ws-search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 24px;
+      padding: 0 12px 0 14px;
+      width: 100%;
+      gap: 8px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ws-search-box:focus-within {
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 3px rgba(76,175,80,0.12);
+    }
+    .ws-search-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 0;
+      font-size: 0.92rem;
+      color: #333;
+      outline: none;
+    }
+    .ws-search-box input::placeholder { color: #aaa; }
+    .ws-search-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #888;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+    .ws-search-btn:hover { color: #4CAF50; }
 
     .section-heading {
-      scroll-margin-top: 40px;
+      scroll-margin-top: 60px;
+      padding-top: 8px;
     }
   </style>
 </head>
 
 <body class="page-body">
-  <!-- 主题切换按钮 -->
-  <button class="theme-switch-btn" onclick="switchToMain()">
-    🎬 切换主题
-  </button>
-
   <div class="page-container">
-    <!-- 左侧边栏 -->
     <div class="sidebar-menu toggle-others fixed">
       <div class="sidebar-menu-inner">
         <header class="logo-env">
           <div class="logo">
-            <a class="logo-expanded logo-title" onclick="switchToMain()" title="点击切换主题">
-              <span style="font-size:1.1rem;font-weight:900;color:#fff;letter-spacing:0.05em;">王五导航</span>
+            <a class="logo-expanded logo-title" onclick="switchToMain()" title="点击切换回原版主题">
+              <span>
+                <span class="logo-title-text">王五导航</span>
+                <span class="logo-title-sub">点击切换主题</span>
+              </span>
             </a>
             <a class="logo-collapsed logo-title" onclick="switchToMain()" title="切换主题">
-              <span style="font-size:1rem;color:#fff;">🧭</span>
+              <span style="font-size:1.3rem;color:#fff;">🧭</span>
             </a>
           </div>
           <div class="mobile-menu-toggle visible-xs">
@@ -87,42 +117,44 @@
             </a>
           </div>
         </header>
-
-        <!-- 菜单由 JS 动态生成 -->
         <ul id="main-menu" class="main-menu"></ul>
       </div>
     </div>
 
-    <!-- 主内容区 -->
     <div class="main-content">
       <nav class="navbar user-info-navbar" role="navigation">
         <ul class="user-info-menu left-links list-inline list-unstyled">
           <li class="hidden-sm hidden-xs">
-            <a href="#" data-toggle="sidebar">
-              <i class="fa-bars"></i>
-            </a>
-          </li>
-          <li>
-            <a onclick="switchToMain()" style="cursor:pointer;">
-              🎬 切换到原版主题
-            </a>
+            <a href="#" data-toggle="sidebar"><i class="fa-bars"></i></a>
           </li>
         </ul>
+
+        <div class="ws-search-wrap">
+          <div class="ws-search-box">
+            <input type="text" id="ws-search-input"
+                   placeholder="搜索站内网站..."
+                   oninput="filterCards(this.value)"
+                   onkeydown="if(event.key==='Escape'){this.value='';filterCards('')}" />
+            <button class="ws-search-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <ul class="user-info-menu right-links list-inline list-unstyled"></ul>
       </nav>
 
-      <!-- 链接内容区（由 main.js 动态渲染） -->
       <div id="main-content-area">
         <p style="color:#999;text-align:center;padding:3rem;">加载中...</p>
       </div>
 
-      <!-- 页脚 -->
       <footer class="main-footer sticky footer-type-1">
         <div class="footer-inner">
           <div class="footer-text">
-            &copy; 王五导航 · WebStack 主题
-            <span style="margin-left:12px;">
-              <a onclick="switchToMain()" style="cursor:pointer;color:inherit;">切换回原版 →</a>
-            </span>
+            &copy; 王五导航 · WebStack 主题 ·
+            <a onclick="switchToMain()" style="cursor:pointer;color:inherit;">切换回原版 →</a>
           </div>
           <div class="go-up">
             <a href="#" rel="go-top"><i class="fa-angle-up"></i></a>
@@ -132,7 +164,6 @@
     </div>
   </div>
 
-  <!-- WebStack 原版 JS -->
   <script src="assets/js/bootstrap.min.js"></script>
   <script src="assets/js/TweenMax.min.js"></script>
   <script src="assets/js/resizeable.js"></script>
@@ -141,12 +172,9 @@
   <script src="assets/js/xenon-toggles.js"></script>
   <script src="assets/js/xenon-custom.js"></script>
   <script src="assets/js/lozad.js"></script>
-
-  <!-- 动态渲染脚本 -->
   <script src="main.js"></script>
 
   <script>
-    // 侧边栏折叠按钮兼容
     $(document).ready(function() {
       $('.user-info-menu .hidden-sm').click(function() {
         if ($('.sidebar-menu').hasClass('collapsed')) {
@@ -156,6 +184,22 @@
         }
       });
     });
+
+    function filterCards(query) {
+      query = query.toLowerCase().trim();
+      document.querySelectorAll('.ws-section-block').forEach(block => {
+        let hasVisible = false;
+        block.querySelectorAll('.ws-card-col').forEach(col => {
+          const title = col.querySelector('strong')?.textContent.toLowerCase() ?? '';
+          const desc  = col.querySelector('p')?.textContent.toLowerCase() ?? '';
+          const show  = !query || title.includes(query) || desc.includes(query);
+          col.style.display = show ? '' : 'none';
+          if (show) hasVisible = true;
+        });
+        block.style.display = (!query || hasVisible) ? '' : 'none';
+      });
+    }
+    window.filterCards = filterCards;
   </script>
 </body>
 </html>
