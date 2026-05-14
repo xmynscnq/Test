@@ -590,3 +590,6 @@ h1::after {
     border-radius: 10px;
   }
 }
+#daily-quote a:visited {
+  color: inherit;
+}
