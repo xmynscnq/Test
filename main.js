@@ -51,6 +51,30 @@ function getWindDirection(deg) {
   return dirs[Math.round(deg / 45) % 8];
 }
 
+function makeWeatherLink(text) {
+  const a = document.createElement('a');
+  a.textContent = text;
+  a.href = 'https://www.weather.com.cn/weather/101060101.shtml';
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.style.cssText = `
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 1px dashed rgba(255,255,255,0.45);
+    transition: color 0.2s, border-color 0.2s;
+  `;
+  a.addEventListener('mouseover', () => {
+    a.style.color = '#a8f5ab';
+    a.style.borderBottomColor = '#a8f5ab';
+  });
+  a.addEventListener('mouseout', () => {
+    a.style.color = '';
+    a.style.borderBottomColor = 'rgba(255,255,255,0.45)';
+  });
+  return a;
+}
+
 async function loadWeather(el) {
   el.textContent = '📍 长春';
   el.style.opacity = '1';
@@ -60,7 +84,8 @@ async function loadWeather(el) {
     try {
       const { text, ts } = JSON.parse(cached);
       if (Date.now() - ts < 5 * 60 * 1000) {
-        el.textContent = text;
+        el.innerHTML = '';
+        el.appendChild(makeWeatherLink(text));
         return;
       }
     } catch {}
@@ -86,7 +111,8 @@ async function loadWeather(el) {
 
     const text = `📍 长春  ${icon} ${wtxt}  ${temp}°C（今日 ${tmin}~${tmax}°C）  💧${humid}%  💨 ${winddir}风`;
     sessionStorage.setItem('weather_cache', JSON.stringify({ text, ts: Date.now() }));
-    el.textContent = text;
+    el.innerHTML = '';
+    el.appendChild(makeWeatherLink(text));
 
   } catch (e) {
     console.error('天气错误:', e);
