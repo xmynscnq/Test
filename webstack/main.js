@@ -20,6 +20,11 @@ function faviconSrc(url) {
   return buildFaviconUrl(getDomain(url));
 }
 
+/* ── 生成唯一 ID ── */
+function sectionId(section) {
+  return 'sec-' + section.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-');
+}
+
 /* ── 渲染左侧菜单 ── */
 function renderSidebar(sections) {
   const menu = document.getElementById('main-menu');
@@ -27,30 +32,27 @@ function renderSidebar(sections) {
   menu.innerHTML = '';
 
   sections.forEach(({ section }) => {
+    const id = sectionId(section);
     const li = document.createElement('li');
     const a = document.createElement('a');
-    a.href = `#section-${encodeURIComponent(section)}`;
-    a.className = 'smooth';
+    a.href = '#' + id;
+    a.className = 'nav-smooth';
     a.innerHTML = `<i class="linecons-tag"></i><span class="title">${section}</span>`;
     li.appendChild(a);
     menu.appendChild(li);
   });
 
-  // 平滑滚动
-  document.querySelectorAll('a.smooth').forEach(link => {
+  // 平滑滚动 — 使用原生 scrollIntoView
+  document.querySelectorAll('a.nav-smooth').forEach(link => {
     link.addEventListener('click', function(e) {
       e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
+      const targetId = this.getAttribute('href').substring(1);
+      const target = document.getElementById(targetId);
       if (target) {
-        window.scrollTo({
-          top: target.offsetTop - 30,
-          behavior: 'smooth'
-        });
+        // 60px offset for fixed navbar
+        const top = target.getBoundingClientRect().top + window.scrollY - 60;
+        window.scrollTo({ top, behavior: 'smooth' });
       }
-      // 移动端关闭菜单
-      document.querySelector('.sidebar-menu')?.classList.remove('mobile-is-visible');
-
-      // 高亮当前菜单项
       document.querySelectorAll('#main-menu li').forEach(l => l.classList.remove('active'));
       this.parentElement.classList.add('active');
     });
@@ -64,32 +66,40 @@ function renderContent(sections) {
   main.innerHTML = '';
 
   sections.forEach(({ section, items }) => {
+    const id = sectionId(section);
+
+    // 分区包裹块（用于筛选）
+    const block = document.createElement('div');
+    block.className = 'ws-section-block';
+
     // 分区标题
     const heading = document.createElement('h4');
     heading.className = 'text-gray section-heading';
-    heading.id = `section-${encodeURIComponent(section)}`;
+    heading.id = id;
     heading.innerHTML = `<i class="linecons-tag" style="margin-right:7px;"></i>${section}`;
-    main.appendChild(heading);
+    block.appendChild(heading);
 
-    // 卡片网格（每行4个）
+    // 卡片行
     let row = null;
     items.forEach((item, idx) => {
       if (idx % 4 === 0) {
         row = document.createElement('div');
         row.className = 'row';
-        main.appendChild(row);
+        block.appendChild(row);
       }
-
-      const col = document.createElement('div');
-      col.className = 'col-sm-3';
 
       const url = item.url || '#';
       const domain = getDomain(url);
       const iconSrc = item.icon || faviconSrc(url);
+      const title = (item.title || '').replace(/'/g, '&#39;');
+      const desc = (item.desc || item['data-desc'] || '').replace(/'/g, '&#39;');
+      const safeUrl = url.replace(/'/g, "\\'");
 
+      const col = document.createElement('div');
+      col.className = 'col-sm-3 ws-card-col';
       col.innerHTML = `
         <div class="xe-widget xe-conversations box2 label-info"
-             onclick="window.open('${url.replace(/'/g, "\\'")}', '_blank')"
+             onclick="window.open('${safeUrl}', '_blank')"
              data-toggle="tooltip" data-placement="bottom"
              title="" data-original-title="${domain || url}">
           <div class="xe-comment-entry">
@@ -99,19 +109,19 @@ function renderContent(sections) {
             </a>
             <div class="xe-comment">
               <a href="#" class="xe-user-name overflowClip_1">
-                <strong>${item.title || ''}</strong>
+                <strong>${title}</strong>
               </a>
-              <p class="overflowClip_2">${item.desc || item['data-desc'] || ''}</p>
+              <p class="overflowClip_2">${desc}</p>
             </div>
           </div>
         </div>
       `;
-
       row.appendChild(col);
     });
 
     const br = document.createElement('br');
-    main.appendChild(br);
+    block.appendChild(br);
+    main.appendChild(block);
   });
 }
 
@@ -130,7 +140,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderSidebar(data);
     renderContent(data);
 
-    // 初始化 Bootstrap tooltip（如果 jQuery 可用）
     if (typeof $ !== 'undefined') {
       $('[data-toggle="tooltip"]').tooltip();
     }
@@ -138,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('加载 links.json 失败：', err);
     const area = document.getElementById('main-content-area');
     if (area) {
-      area.innerHTML = '<p style="color:#999;text-align:center;padding:2rem;">链接数据加载失败，请检查 links.json 文件。</p>';
+      area.innerHTML = '<p style="color:#999;text-align:center;padding:3rem;">链接数据加载失败，请检查 links.json 文件。</p>';
     }
   }
 });
