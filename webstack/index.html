@@ -16,21 +16,24 @@
 
   <style>
     /* ══════════════════════════════════════
-       侧边栏 Logo
+       侧边栏 Logo — 修复截断
     ══════════════════════════════════════ */
-    .sidebar-logo { padding: 12px 16px !important; min-height: 70px; display: flex; align-items: center; }
+    .sidebar-logo {
+      padding: 12px 14px !important;
+      min-height: 70px; display: flex; align-items: center;
+      overflow: visible !important;   /* 覆盖原主题 overflow:hidden */
+    }
+    .logo { overflow: visible !important; }
     .logo-title-link { cursor: pointer; text-decoration: none !important; display: block; white-space: nowrap; }
     .logo-title-link:hover { opacity: 0.8; }
-    .logo-title-text { font-size: 1.3rem; font-weight: 900; letter-spacing: 0.04em; line-height: 1.2; display: block; }
-    .logo-title-sub { font-size: 0.58rem; letter-spacing: 0.1em; opacity: 0.5; display: block; margin-top: 2px; text-transform: uppercase; }
+    .logo-title-text { font-size: 1.15rem; font-weight: 900; letter-spacing: 0.04em; line-height: 1.2; display: block; white-space: nowrap; }
+    .logo-title-sub  { font-size: 0.56rem; letter-spacing: 0.08em; opacity: 0.5; display: block; margin-top: 2px; text-transform: uppercase; white-space: nowrap; }
 
-    /* emoji 作为侧边栏图标 */
-    .sidebar-emoji { font-size: 1.1rem; display: inline-block; width: 1.5em; text-align: center; }
+    /* emoji 侧边栏图标 */
+    .sidebar-emoji { font-size: 1.1rem; display: inline-block; width: 1.6em; text-align: center; flex-shrink: 0; }
 
     /* ══════════════════════════════════════
        Banner 背景
-       背景图优先用 --banner-bg-image（由 JS 注入）
-       fallback 到深色渐变
     ══════════════════════════════════════ */
     .header-big {
       position: relative;
@@ -40,58 +43,50 @@
       display: flex;
       align-items: center;
       justify-content: center;
-
-      /* fallback 渐变 */
       background: linear-gradient(135deg, #1a2a3a 0%, #0f3460 50%, #1a2a3a 100%);
     }
-
-    /* 背景图层（通过 JS 设置 src 后显示） */
     .header-big .banner-bg {
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      z-index: 0;
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      opacity: 0; transition: opacity 0.6s ease; z-index: 0;
     }
     .header-big .banner-bg.loaded { opacity: 1; }
-
-    /* 半透明遮罩，让文字可读 */
     .header-big .banner-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg,
-        rgba(10,20,35,0.55) 0%,
-        rgba(10,20,35,0.45) 60%,
-        rgba(10,20,35,0.65) 100%);
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(10,20,35,0.55) 0%, rgba(10,20,35,0.45) 60%, rgba(10,20,35,0.65) 100%);
       z-index: 1;
     }
 
+    /* ══════════════════════════════════════
+       搜索区整体
+    ══════════════════════════════════════ */
     .s-search {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 660px;
-      margin: 0 auto;
-      padding: 24px 20px;
+      position: relative; z-index: 2;
+      width: 100%; max-width: 660px;
+      margin: 0 auto; padding: 20px 20px;
     }
 
     /* ══════════════════════════════════════
-       分类 Tab
+       分类 Tab — 强制横排，修复竖排问题
     ══════════════════════════════════════ */
     .s-type-list.big {
-      display: flex; gap: 4px;
-      justify-content: center; flex-wrap: wrap;
-      margin-bottom: 20px;
+      display: flex !important;
+      flex-direction: row !important;   /* 明确横排 */
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: center;
+      margin-bottom: 16px;
+      padding: 0;
+      list-style: none;
     }
     .s-type-list.big label {
-      padding: 5px 20px; border-radius: 20px; cursor: pointer;
-      font-size: 0.9rem; font-weight: 600;
+      display: inline-block !important;
+      padding: 5px 18px; border-radius: 20px; cursor: pointer;
+      font-size: 0.88rem; font-weight: 600;
       color: rgba(255,255,255,0.6);
       transition: all 0.18s; user-select: none; margin: 0;
       border: 1px solid transparent;
+      white-space: nowrap;
     }
     .s-type-list.big label:hover { color: #fff; }
     .s-type-list.big label.active {
@@ -101,120 +96,110 @@
     }
 
     /* ══════════════════════════════════════
-       搜索框 — 白底黑字，大圆角（对标图1）
+       搜索框
     ══════════════════════════════════════ */
     .super-search-fm {
       display: flex; align-items: center;
-      background: #fff;
-      border: none;
-      border-radius: 40px;
-      padding: 0 8px 0 20px;
-      gap: 8px;
+      background: #fff; border: none; border-radius: 40px;
+      padding: 0 8px 0 20px; gap: 8px;
       box-shadow: 0 4px 24px rgba(0,0,0,0.25);
       transition: box-shadow 0.2s;
     }
-    .super-search-fm:focus-within {
-      box-shadow: 0 6px 32px rgba(0,0,0,0.35);
-    }
+    .super-search-fm:focus-within { box-shadow: 0 6px 32px rgba(0,0,0,0.35); }
     .super-search-fm .search-key {
-      flex: 1;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      color: #222 !important;
-      font-size: 1rem;
-      padding: 14px 4px;
-      height: auto;
+      flex: 1; background: transparent !important; border: none !important;
+      box-shadow: none !important; color: #222 !important;
+      font-size: 1rem; padding: 14px 4px; height: auto;
     }
     .super-search-fm .search-key::placeholder { color: #aaa; }
-
-    /* 搜索按钮 */
     .super-search-fm .submit {
-      background: #1677ff;
-      border: none;
-      color: #fff;
-      font-size: 1rem;
-      cursor: pointer;
-      padding: 0;
-      width: 40px; height: 40px;
-      border-radius: 50%;
+      background: #1677ff; border: none; color: #fff; font-size: 1rem; cursor: pointer;
+      padding: 0; width: 40px; height: 40px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s, transform 0.15s;
-      flex-shrink: 0;
+      transition: background 0.2s, transform 0.15s; flex-shrink: 0;
     }
     .super-search-fm .submit:hover { background: #0958d9; transform: scale(1.05); }
-
-    /* 引擎触发器 */
     .ws-engine-trigger {
       display: flex; align-items: center; gap: 5px;
-      background: none; border: none;
-      color: #555;
+      background: none; border: none; color: #555;
       font-size: 0.83rem; font-weight: 600; font-family: inherit;
       cursor: pointer; padding: 10px 4px 10px 0;
-      flex-shrink: 0; white-space: nowrap;
-      transition: color 0.15s;
+      flex-shrink: 0; white-space: nowrap; transition: color 0.15s;
     }
     .ws-engine-trigger:hover { color: #1677ff; }
     .ws-engine-trigger img { width: 16px; height: 16px; border-radius: 3px; }
     .ws-engine-trigger .arrow { font-size: 0.62rem; opacity: 0.4; transition: transform 0.2s; }
     .ws-divider { width: 1px; height: 18px; background: #ddd; flex-shrink: 0; }
 
-    /* ══════════════════════════════════════
-       引擎面板（搜索框下方）
-    ══════════════════════════════════════ */
+    /* 引擎面板 */
     #search-list { margin-top: 14px; }
     .search-type { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
     .search-type li label {
       padding: 4px 16px; border-radius: 16px; cursor: pointer;
       font-size: 0.82rem; font-weight: 600;
       color: rgba(255,255,255,0.65);
-      transition: all 0.15s; margin: 0; user-select: none;
-      border: 1px solid transparent;
+      transition: all 0.15s; margin: 0; user-select: none; border: 1px solid transparent;
     }
     .search-type li label:hover { color: #fff; background: rgba(255,255,255,0.12); }
     .search-type li input[type=radio] { display: none; }
-    .search-type li input[type=radio]:checked + label {
-      color: #fff;
-      background: rgba(255,255,255,0.2);
-      border-color: rgba(255,255,255,0.3);
-    }
+    .search-type li input[type=radio]:checked + label { color: #fff; background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); }
 
-    /* ══════════════════════════════════════
-       快捷引擎标签（对标图1搜索框下方那排）
-    ══════════════════════════════════════ */
-    .quick-engines {
-      display: flex; gap: 6px; justify-content: center;
-      flex-wrap: wrap; margin-top: 14px;
-    }
+    /* 快捷引擎标签 */
+    .quick-engines { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
     .quick-engine-btn {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 16px;
-      color: rgba(255,255,255,0.8);
-      font-size: 0.78rem; font-weight: 600;
-      padding: 4px 14px; cursor: pointer;
-      transition: all 0.15s; white-space: nowrap;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 16px; color: rgba(255,255,255,0.8);
+      font-size: 0.78rem; font-weight: 600; padding: 4px 14px;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
     }
-    .quick-engine-btn:hover,
-    .quick-engine-btn.active {
-      background: rgba(255,255,255,0.25);
-      color: #fff;
-      border-color: rgba(255,255,255,0.4);
+    .quick-engine-btn:hover, .quick-engine-btn.active {
+      background: rgba(255,255,255,0.25); color: #fff; border-color: rgba(255,255,255,0.4);
     }
 
     /* ══════════════════════════════════════
-       卡片图标
+       卡片
     ══════════════════════════════════════ */
     .url-img { width: 48px !important; height: 48px !important; flex-shrink: 0; }
     .url-img img { width: 36px !important; height: 36px !important; border-radius: 8px; object-fit: contain; }
-    .url-card .card { border-radius: 10px; }
+    .url-card .card { border-radius: 10px; transition: background 0.3s, border-color 0.3s; }
 
     /* ══════════════════════════════════════
        内容区
     ══════════════════════════════════════ */
     .content-wrap { overflow: auto; }
 
+    /* ══════════════════════════════════════
+       暗色模式
+    ══════════════════════════════════════ */
+    body.dark-mode { background: #12181f !important; color: #d4d4d4 !important; }
+    body.dark-mode .page-container { background: #12181f !important; }
+    body.dark-mode #sidebar { background: #1a2230 !important; border-color: #2a3448 !important; }
+    body.dark-mode .border-color { border-color: #2a3448 !important; }
+    body.dark-mode #content-wrap { background: #12181f !important; }
+    body.dark-mode .card {
+      background: #1e2736 !important;
+      border-color: #2a3448 !important;
+      color: #d4d4d4 !important;
+    }
+    body.dark-mode .card:hover { background: #263045 !important; }
+    body.dark-mode .text-muted { color: #7a8a9a !important; }
+    body.dark-mode .text-gray  { color: #9aaabb !important; }
+    body.dark-mode strong      { color: #d4d4d4 !important; }
+    body.dark-mode .content-site { background: #12181f !important; }
 
+    /* 暗色模式切换按钮 — 右下角悬浮 */
+    #dark-toggle {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      width: 46px; height: 46px; border-radius: 50%;
+      background: #1677ff; border: none; color: #fff;
+      font-size: 1.15rem; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+    }
+    #dark-toggle:hover { background: #0958d9; transform: scale(1.08); }
+    body.dark-mode #dark-toggle { background: #f0c040; color: #222; }
+    body.dark-mode #dark-toggle:hover { background: #e6b800; }
   </style>
 </head>
 
@@ -309,6 +294,11 @@
   </div>
 </div>
 
+<!-- 右下角暗色模式切换按钮 -->
+<button id="dark-toggle" title="切换暗色模式" onclick="toggleDark()">
+  <i class="fas fa-moon" id="dark-icon"></i>
+</button>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="assets/js/bootstrap.min-4.3.1.js"></script>
 <script src="assets/js/lazyload.min-12.4.0.js"></script>
@@ -337,6 +327,24 @@
     contentWrap.style.marginLeft = MINI_W;
   }
   collapse();
+})();
+
+/* ══════════════════════════════════════
+   暗色模式（记忆状态）
+══════════════════════════════════════ */
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+  document.getElementById('dark-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+}
+window.toggleDark = toggleDark;
+
+(function() {
+  if (localStorage.getItem('darkMode') === '1') {
+    document.body.classList.add('dark-mode');
+    const icon = document.getElementById('dark-icon');
+    if (icon) icon.className = 'fas fa-sun';
+  }
 })();
 
 /* ══════════════════════════════════════
