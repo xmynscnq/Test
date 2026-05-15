@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (video) {
 
     video.addEventListener('timeupdate', () => {
-      if (video.duration && video.currentTime >= video.duration - 0.1) {
+      if (video.duration && video.currentTime >= video.duration - 0.2) {
         video.currentTime = 0;
         video.play().catch(() => {});
       }
