@@ -1,5 +1,5 @@
 /* ===========================
-   王五导航 · WebStack-Hugo主题 · main.js
+   王五导航 · WebStack主题 · main.js
    =========================== */
 
 const WORKER_URL = 'https://ico.xmynscnq.dpdns.org';
@@ -7,7 +7,32 @@ const LINKS_FILE = '../links.json';
 
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
-/* ── 搜索引擎数据（与原版一致） ── */
+/* ══════════════════════════════════════
+   侧边栏图标映射
+   根据 section 首字符 emoji 自动匹配 FontAwesome 图标
+══════════════════════════════════════ */
+const SECTION_ICON_MAP = {
+  '⭐': 'fas fa-star',
+  '🤖': 'fas fa-robot',
+  '🔧': 'fas fa-tools',
+  '💻': 'fas fa-code',
+  '📰': 'fas fa-newspaper',
+  '🎬': 'fas fa-film',
+  '🛒': 'fas fa-shopping-cart',
+  '🎮': 'fas fa-gamepad',
+  '📦': 'fas fa-box-open',
+  // 兜底图标
+  '_default': 'fas fa-tag',
+};
+
+function getSectionIcon(section) {
+  const emoji = [...section][0]; // 取第一个字符（可能是 emoji）
+  return SECTION_ICON_MAP[emoji] || SECTION_ICON_MAP['_default'];
+}
+
+/* ══════════════════════════════════════
+   搜索引擎数据
+══════════════════════════════════════ */
 const SEARCH_CATEGORIES = [
   {
     id: 'engine', label: '引擎',
@@ -76,6 +101,7 @@ let currentCategoryId = 'engine';
 let currentEngine = SEARCH_CATEGORIES[0].engines[0];
 let enginePanelOpen = false;
 
+/* ── 工具函数 ── */
 function getDomain(url) {
   try { return new URL(url).hostname; } catch { return null; }
 }
@@ -86,7 +112,9 @@ function buildFaviconUrl(domain) {
 function faviconSrc(url) { return buildFaviconUrl(getDomain(url)); }
 function engineFavicon(e) { return buildFaviconUrl(e.domain); }
 
-/* ── 分类 Tab ── */
+/* ══════════════════════════════════════
+   分类 Tab
+══════════════════════════════════════ */
 function renderTabs() {
   const el = document.getElementById('ws-tabs');
   if (!el) return;
@@ -100,6 +128,7 @@ function renderTabs() {
       currentEngine = cat.engines[0];
       renderTabs();
       updateEngineDisplay();
+      renderQuickEngines();
       if (enginePanelOpen) renderEngineList();
     };
     el.appendChild(label);
@@ -113,7 +142,35 @@ function updateEngineDisplay() {
   if (name) name.textContent = currentEngine.name;
 }
 
-/* ── 引擎面板 ── */
+/* ══════════════════════════════════════
+   快捷引擎标签（搜索框正下方一排，对标图1）
+   显示当前分类前 6 个引擎
+══════════════════════════════════════ */
+function renderQuickEngines() {
+  const wrap = document.getElementById('quick-engines');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const cat = SEARCH_CATEGORIES.find(c => c.id === currentCategoryId);
+  if (!cat) return;
+
+  cat.engines.slice(0, 6).forEach(engine => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'quick-engine-btn' + (engine === currentEngine ? ' active' : '');
+    btn.textContent = engine.name;
+    btn.onclick = () => {
+      currentEngine = engine;
+      updateEngineDisplay();
+      renderQuickEngines();
+      document.getElementById('search-text')?.focus();
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+/* ══════════════════════════════════════
+   引擎面板（展开模式）
+══════════════════════════════════════ */
 function renderEngineList() {
   const panel = document.getElementById('search-list');
   if (!panel) return;
@@ -135,11 +192,12 @@ function renderEngineList() {
 
     const label = document.createElement('label');
     label.htmlFor = id;
-    label.innerHTML = `<span class="text-muted">${engine.name}</span>`;
+    label.innerHTML = `<span>${engine.name}</span>`;
     label.onclick = () => {
       currentEngine = engine;
       updateEngineDisplay();
       renderEngineList();
+      renderQuickEngines();
       document.getElementById('search-text')?.focus();
     };
 
@@ -160,6 +218,9 @@ function toggleEnginePanel() {
 }
 window.toggleEnginePanel = toggleEnginePanel;
 
+/* ══════════════════════════════════════
+   搜索执行
+══════════════════════════════════════ */
 function doSearch(e) {
   if (e) e.preventDefault();
   const kw = document.getElementById('search-text')?.value.trim();
@@ -198,24 +259,30 @@ function filterCards(query) {
 }
 window.filterCards = filterCards;
 
-/* ── ID ── */
+/* ══════════════════════════════════════
+   ID 生成
+══════════════════════════════════════ */
 function sectionId(s) {
   return 'sec-' + s.replace(/\s+/g, '-').replace(/[^\w\u4e00-\u9fa5-]/g, '');
 }
 
-/* ── 渲染侧边栏 ── */
+/* ══════════════════════════════════════
+   渲染侧边栏（使用图标映射）
+══════════════════════════════════════ */
 function renderSidebar(sections) {
   const menu = document.getElementById('main-menu');
   if (!menu) return;
   menu.innerHTML = '';
   sections.forEach(({ section }) => {
     const id = sectionId(section);
+    const iconClass = getSectionIcon(section);
+
     const li = document.createElement('li');
     li.className = 'sidebar-item';
     const a = document.createElement('a');
     a.href = '#' + id;
     a.className = 'nav-smooth';
-    a.innerHTML = `<i class="iconfont icon-tag icon-fw icon-lg mr-2"></i><span>${section}</span>`;
+    a.innerHTML = `<i class="${iconClass} icon-fw icon-lg mr-2"></i><span>${section}</span>`;
     li.appendChild(a);
     menu.appendChild(li);
   });
@@ -225,7 +292,7 @@ function renderSidebar(sections) {
       e.preventDefault();
       const target = document.getElementById(this.getAttribute('href').substring(1));
       if (target) {
-        const bannerH = document.querySelector('.header-big')?.offsetHeight || 180;
+        const bannerH = document.querySelector('.header-big')?.offsetHeight || 200;
         const top = target.getBoundingClientRect().top + window.scrollY - bannerH - 10;
         window.scrollTo({ top, behavior: 'smooth' });
       }
@@ -235,7 +302,9 @@ function renderSidebar(sections) {
   });
 }
 
-/* ── 渲染内容区 ── */
+/* ══════════════════════════════════════
+   渲染内容区
+══════════════════════════════════════ */
 function renderContent(sections) {
   const main = document.getElementById('content');
   if (!main) return;
@@ -243,6 +312,8 @@ function renderContent(sections) {
 
   sections.forEach(({ section, items }) => {
     const id = sectionId(section);
+    const iconClass = getSectionIcon(section);
+
     const block = document.createElement('div');
     block.className = 'ws-section';
 
@@ -251,7 +322,7 @@ function renderContent(sections) {
     heading.className = 'd-flex flex-fill';
     heading.innerHTML = `
       <h4 class="text-gray text-lg mb-4">
-        <i class="site-tag iconfont icon-tag icon-lg mr-1" id="${id}"></i>${section}
+        <i class="${iconClass} icon-lg mr-1" id="${id}"></i>${section}
       </h4>`;
     block.appendChild(heading);
 
@@ -264,7 +335,6 @@ function renderContent(sections) {
       const iconSrc = item.icon || faviconSrc(url);
       const title = (item.title || '').replace(/</g, '&lt;');
       const desc = (item.desc || item['data-desc'] || '').replace(/</g, '&lt;');
-      const safeUrl = url.replace(/'/g, "\\'");
       const domain = getDomain(url) || url;
 
       const col = document.createElement('div');
@@ -296,23 +366,27 @@ function renderContent(sections) {
     main.appendChild(block);
   });
 
-  // tooltip
   if (typeof $ !== 'undefined') {
     $('[data-toggle="tooltip"]').tooltip();
   }
 }
 
-/* ── 切换回主题一 ── */
+/* ══════════════════════════════════════
+   切换回主题一
+══════════════════════════════════════ */
 function switchToMain() {
   localStorage.setItem('navTheme', 'main');
   window.location.href = '../index.html';
 }
 window.switchToMain = switchToMain;
 
-/* ── 入口 ── */
+/* ══════════════════════════════════════
+   入口
+══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', async () => {
   renderTabs();
   updateEngineDisplay();
+  renderQuickEngines();
 
   try {
     const res = await fetch(LINKS_FILE);
