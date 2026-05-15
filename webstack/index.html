@@ -182,7 +182,42 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="assets/js/bootstrap.min-4.3.1.js"></script>
 <script src="assets/js/lazyload.min-12.4.0.js"></script>
-<script src="assets/js/app-mini.js"></script>
 <script src="main.js"></script>
+<script>
+// 侧边栏展开收缩
+(function() {
+  const sidebar = document.getElementById('sidebar');
+  const contentWrap = document.getElementById('content-wrap');
+  const EXPANDED_W = '170px';
+  const MINI_W = '60px';
+  let expanded = false;
+
+  // 点击侧边栏菜单项时展开
+  document.addEventListener('click', function(e) {
+    const item = e.target.closest('.sidebar-item a');
+    if (item && sidebar.classList.contains('mini-sidebar')) {
+      expand();
+    }
+  });
+
+  // 鼠标悬停展开，移开收起
+  sidebar.addEventListener('mouseenter', () => expand());
+  sidebar.addEventListener('mouseleave', () => collapse());
+
+  function expand() {
+    sidebar.classList.remove('mini-sidebar');
+    sidebar.style.width = EXPANDED_W;
+    contentWrap.style.marginLeft = EXPANDED_W;
+  }
+  function collapse() {
+    sidebar.classList.add('mini-sidebar');
+    sidebar.style.width = MINI_W;
+    contentWrap.style.marginLeft = MINI_W;
+  }
+
+  // 初始化
+  collapse();
+})();
+</script>
 </body>
 </html>
