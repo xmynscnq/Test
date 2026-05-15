@@ -8,26 +8,14 @@ const LINKS_FILE = '../links.json';
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
 /* ══════════════════════════════════════
-   侧边栏图标映射
-   根据 section 首字符 emoji 自动匹配 FontAwesome 图标
+   section 名处理：分离 emoji 和文字
 ══════════════════════════════════════ */
-const SECTION_ICON_MAP = {
-  '⭐': 'fas fa-star',
-  '🤖': 'fas fa-robot',
-  '🔧': 'fas fa-tools',
-  '💻': 'fas fa-code',
-  '📰': 'fas fa-newspaper',
-  '🎬': 'fas fa-film',
-  '🛒': 'fas fa-shopping-cart',
-  '🎮': 'fas fa-gamepad',
-  '📦': 'fas fa-box-open',
-  // 兜底图标
-  '_default': 'fas fa-tag',
-};
-
-function getSectionIcon(section) {
-  const emoji = [...section][0]; // 取第一个字符（可能是 emoji）
-  return SECTION_ICON_MAP[emoji] || SECTION_ICON_MAP['_default'];
+function sectionLabel(section) {
+  return section.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}]+/u, '').trim();
+}
+function sectionEmoji(section) {
+  const m = section.match(/^([\p{Emoji_Presentation}\p{Extended_Pictographic}]+)/u);
+  return m ? m[1] : '';
 }
 
 /* ══════════════════════════════════════
@@ -275,14 +263,16 @@ function renderSidebar(sections) {
   menu.innerHTML = '';
   sections.forEach(({ section }) => {
     const id = sectionId(section);
-    const iconClass = getSectionIcon(section);
+    const emoji = sectionEmoji(section);
+    const label = sectionLabel(section);
 
     const li = document.createElement('li');
     li.className = 'sidebar-item';
     const a = document.createElement('a');
     a.href = '#' + id;
     a.className = 'nav-smooth';
-    a.innerHTML = `<i class="${iconClass} icon-fw icon-lg mr-2"></i><span>${section}</span>`;
+    // 收起时只显示 emoji，展开时显示 emoji + 文字
+    a.innerHTML = `<span class="sidebar-emoji icon-fw mr-2">${emoji}</span><span>${label}</span>`;
     li.appendChild(a);
     menu.appendChild(li);
   });
@@ -312,17 +302,18 @@ function renderContent(sections) {
 
   sections.forEach(({ section, items }) => {
     const id = sectionId(section);
-    const iconClass = getSectionIcon(section);
+    const emoji = sectionEmoji(section);
+    const label = sectionLabel(section);
 
     const block = document.createElement('div');
     block.className = 'ws-section';
 
-    // 标题
+    // 标题：emoji + 文字，不再插入 FontAwesome 图标
     const heading = document.createElement('div');
     heading.className = 'd-flex flex-fill';
     heading.innerHTML = `
-      <h4 class="text-gray text-lg mb-4">
-        <i class="${iconClass} icon-lg mr-1" id="${id}"></i>${section}
+      <h4 class="text-gray text-lg mb-4" id="${id}">
+        <span class="section-emoji mr-1">${emoji}</span>${label}
       </h4>`;
     block.appendChild(heading);
 
