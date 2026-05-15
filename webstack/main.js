@@ -296,10 +296,12 @@ function renderContent(sections) {
     main.appendChild(block);
   });
 
-  // tooltip
-  if (typeof $ !== 'undefined') {
-    $('[data-toggle="tooltip"]').tooltip();
-  }
+ // tooltip
+  try {
+    if (typeof $ !== 'undefined') {
+      $('[data-toggle="tooltip"]').tooltip();
+    }
+  } catch(e) {}
 }
 
 /* ── 切换回主题一 ── */
