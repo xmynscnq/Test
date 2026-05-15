@@ -533,44 +533,79 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadHeaderSubtitle();
 
   const video = document.getElementById('bgLayer');
+
+   // ── 在 if(video) 块之前，加一个模块级变量 ──
+let _bgErrorCount = 0;
+let _bgPlayedOnce = false; // 是否已经成功播放过
+   
   if (video) {
 
-    video.addEventListener('timeupdate', () => {
-      if (video.duration && video.currentTime >= video.duration - 0.2) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      }
-    });
-    video.addEventListener('ended', () => {
+  video.addEventListener('timeupdate', () => {
+    if (video.duration && video.currentTime >= video.duration - 0.2) {
       video.currentTime = 0;
       video.play().catch(() => {});
-    });
+    }
+  });
+  video.addEventListener('ended', () => {
+    video.currentTime = 0;
+    video.play().catch(() => {});
+  });
 
-    video.addEventListener('error', () => {
-      setTimeout(reloadBackground, 500);
-    });
+  // ── 核心改动：error 加计数保护 ──
+  video.addEventListener('error', () => {
+    _bgErrorCount++;
+    if (_bgErrorCount <= 2) {
+      // 递增间隔重试：1s、2s、3s
+      setTimeout(reloadBackground, 1000 * _bgErrorCount);
+    } else {
+      // 超过3次，放弃，不再请求
+      console.warn(`[BG] 连续失败 ${_bgErrorCount} 次，已放弃加载背景视频`);
+      // 不调用任何重试，等用户手动刷新页面
+    }
+  });
 
-    let stallTimer = null;
-    video.addEventListener('waiting', () => {
-      stallTimer = setTimeout(() => {
-        if (video.readyState < 3) reloadBackground();
-      }, 5000);
-    });
-    video.addEventListener('playing', () => clearTimeout(stallTimer));
+  // ── 成功开始播放：重置计数 + 标记已播放过 ──
+  video.addEventListener('playing', () => {
+    _bgErrorCount = 0;
+    _bgPlayedOnce = true;
+    clearTimeout(stallTimer);
+  });
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        video.pause();
-      } else {
-        setTimeout(() => {
+  let stallTimer = null;
+  video.addEventListener('waiting', () => {
+    stallTimer = setTimeout(() => {
+      if (video.readyState < 2 && _bgErrorCount <= 2) {
+        reloadBackground();
+      }
+    }, 5000);
+  });
+
+  // ── 切走/切回：已播放过则沿用原逻辑，否则受计数约束 ──
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      video.pause();
+    } else {
+      setTimeout(() => {
+        if (_bgPlayedOnce) {
+          // 已成功播放过：切回来正常恢复，出错也允许重试（计数已被重置）
           if (video.ended || video.error || video.readyState < 3) {
             reloadBackground();
           } else {
             video.play().catch(() => reloadBackground());
           }
-        }, 800);
-      }
-    });
+        } else {
+          // 还没成功播放过：仍受计数约束
+          if (_bgErrorCount <= 2) {
+            if (video.ended || video.error || video.readyState < 3) {
+              reloadBackground();
+            } else {
+              video.play().catch(() => {});
+            }
+          }
+        }
+      }, 800);
+    }
+  });
 
     let watchdogTimer = null;
     function startWatchdog() {
