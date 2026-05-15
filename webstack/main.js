@@ -268,7 +268,7 @@ function renderContent(sections) {
       const domain = getDomain(url) || url;
 
       const col = document.createElement('div');
-      col.className = 'url-card col-6 col-sm-6 col-md-4 col-xl-3';
+      col.className = 'url-card col-6 col-sm-4 col-md-3 col-xl-2';
       col.innerHTML = `
         <div class="url-body default">
           <a href="${url}" target="_blank" data-url="${url}"
@@ -296,12 +296,10 @@ function renderContent(sections) {
     main.appendChild(block);
   });
 
- // tooltip
-  try {
-    if (typeof $ !== 'undefined') {
-      $('[data-toggle="tooltip"]').tooltip();
-    }
-  } catch(e) {}
+  // tooltip
+  if (typeof $ !== 'undefined') {
+    $('[data-toggle="tooltip"]').tooltip();
+  }
 }
 
 /* ── 切换回主题一 ── */
