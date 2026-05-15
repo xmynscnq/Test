@@ -1,95 +1,310 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>王五导航</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>王五导航 · WebStack</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Arimo:400,700,400italic">
+  <link rel="stylesheet" href="assets/css/fonts/linecons/css/linecons.css">
+  <link rel="stylesheet" href="assets/css/fonts/fontawesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap.css">
+  <link rel="stylesheet" href="assets/css/xenon-core.css">
+  <link rel="stylesheet" href="assets/css/xenon-components.css">
+  <link rel="stylesheet" href="assets/css/xenon-skins.css">
+  <link rel="stylesheet" href="assets/css/nav.css">
+  <script src="assets/js/jquery-1.11.1.min.js"></script>
+
+  <style>
+    /* ── 左上角标题 ── */
+    .logo-title {
+      cursor: pointer;
+      user-select: none;
+      transition: opacity 0.2s;
+      display: block !important;
+      padding: 10px 0 4px 0;
+    }
+    .logo-title:hover { opacity: 0.75; }
+    .logo-title-text {
+      font-size: 1.9rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.08em;
+      line-height: 1.15;
+      white-space: nowrap;
+      display: block;
+    }
+    .logo-title-sub {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.12em;
+      display: block;
+      margin-top: 3px;
+      text-transform: uppercase;
+    }
+    /* 折叠状态 */
+    .logo-collapsed.logo-title .logo-title-text {
+      font-size: 1.1rem;
+    }
+
+    /* ── 顶部导航栏搜索区 ── */
+    .ws-search-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 6px 20px;
+      gap: 6px;
+    }
+
+    /* 引擎分类 Tab */
+    .ws-tabs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .ws-tab {
+      padding: 3px 12px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .ws-tab:hover { color: #fff; }
+    .ws-tab.active { color: #fff; background: rgba(255,255,255,0.15); border-radius: 12px; }
+
+    /* 搜索框 */
+    .ws-search-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 560px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      padding: 0 10px 0 12px;
+      gap: 8px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .ws-search-row:focus-within {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    /* 引擎选择器 */
+    .ws-engine-trigger {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: inherit;
+      white-space: nowrap;
+      padding: 6px 6px 6px 0;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .ws-engine-trigger:hover { color: #fff; }
+    .ws-engine-trigger img {
+      width: 14px; height: 14px;
+      border-radius: 2px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .ws-engine-arrow {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.45);
+      transition: transform 0.2s;
+    }
+
+    .ws-divider {
+      width: 1px; height: 16px;
+      background: rgba(255,255,255,0.25);
+      flex-shrink: 0;
+    }
+
+    .ws-search-row input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 4px;
+      font-size: 0.9rem;
+      color: #fff;
+      outline: none;
+      min-width: 0;
+    }
+    .ws-search-row input::placeholder { color: rgba(255,255,255,0.45); }
+
+    .ws-submit-btn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      width: 30px; height: 30px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: rgba(255,255,255,0.8);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.18s;
+    }
+    .ws-submit-btn:hover { background: rgba(255,255,255,0.25); color: #fff; }
+
+    /* 引擎面板 */
+    .ws-engine-panel {
+      display: none;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: center;
+      width: 100%;
+      max-width: 560px;
+      animation: fadeIn 0.15s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .ws-engine-btn {
+      display: flex; align-items: center; gap: 4px;
+      padding: 4px 12px;
+      border-radius: 14px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .ws-engine-btn img { width: 13px; height: 13px; border-radius: 2px; }
+    .ws-engine-btn:hover { color: #fff; background: rgba(255,255,255,0.12); }
+    .ws-engine-btn.active { color: #fff; background: rgba(255,255,255,0.2); }
+
+    /* navbar 高度调整 */
+    .user-info-navbar { height: auto !important; min-height: 50px; padding: 4px 0; }
+
+    /* 分区锚点偏移 */
+    .section-heading { scroll-margin-top: 80px; padding-top: 8px; }
+  </style>
 </head>
-<body>
-<video id="bgLayer" autoplay muted playsinline></video>
-<div id="bgOverlay"></div>
-<div class="container">
-  <!-- 头部 -->
-  <div class="header-area">
-    <div>
-      <h1 onclick="switchTheme()" style="cursor:pointer;" title="点击切换主题">王五导航</h1>
-      <p class="header-subtitle" id="daily-quote" style="opacity:0;transition:opacity 0.4s ease;">沉舟侧畔千帆过，病树前头万木春。</p>
+
+<body class="page-body">
+  <div class="page-container">
+
+    <!-- 左侧边栏 -->
+    <div class="sidebar-menu toggle-others fixed">
+      <div class="sidebar-menu-inner">
+        <header class="logo-env">
+          <div class="logo">
+            <a class="logo-expanded logo-title" onclick="switchToMain()" title="点击切换回原版主题">
+              <span class="logo-title-text">王五导航</span>
+              <span class="logo-title-sub">Click to switch theme</span>
+            </a>
+            <a class="logo-collapsed logo-title" onclick="switchToMain()" title="切换主题">
+              <span class="logo-title-text">W5</span>
+            </a>
+          </div>
+          <div class="mobile-menu-toggle visible-xs">
+            <a href="#" data-toggle="mobile-menu"><i class="fa-bars"></i></a>
+          </div>
+        </header>
+        <ul id="main-menu" class="main-menu"></ul>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+      <nav class="navbar user-info-navbar" role="navigation">
+        <ul class="user-info-menu left-links list-inline list-unstyled">
+          <li class="hidden-sm hidden-xs">
+            <a href="#" data-toggle="sidebar"><i class="fa-bars"></i></a>
+          </li>
+        </ul>
+
+        <!-- 搜索区域 -->
+        <div class="ws-search-area">
+          <!-- 分类 Tab -->
+          <div class="ws-tabs" id="ws-tabs"></div>
+
+          <!-- 搜索框 -->
+          <div class="ws-search-row">
+            <button class="ws-engine-trigger" id="ws-engine-trigger" onclick="toggleEnginePanel()">
+              <img id="ws-engine-icon" src="" alt="">
+              <span id="ws-engine-name"></span>
+              <span class="ws-engine-arrow" id="ws-engine-arrow">▾</span>
+            </button>
+            <div class="ws-divider"></div>
+            <input type="text" id="ws-search-input"
+                   placeholder="搜索网页 / 定位站内网站"
+                   autocomplete="off"
+                   oninput="onSearchInput()"
+                   onkeydown="onSearchKeydown(event)" />
+            <button class="ws-submit-btn" onclick="doSearch()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- 引擎选择面板 -->
+          <div class="ws-engine-panel" id="ws-engine-panel"></div>
+        </div>
+
+        <ul class="user-info-menu right-links list-inline list-unstyled"></ul>
+      </nav>
+
+      <div id="main-content-area">
+        <p style="color:#999;text-align:center;padding:3rem;">加载中...</p>
+      </div>
+
+      <footer class="main-footer sticky footer-type-1">
+        <div class="footer-inner">
+          <div class="footer-text">
+            &copy; 王五导航 · WebStack 主题 ·
+            <a onclick="switchToMain()" style="cursor:pointer;color:inherit;">切换回原版 →</a>
+          </div>
+          <div class="go-up">
+            <a href="#" rel="go-top"><i class="fa-angle-up"></i></a>
+          </div>
+        </div>
+      </footer>
     </div>
   </div>
-  <!-- 搜索区域 -->
-  <div class="search-wrapper">
-    <!-- 分类 Tab -->
-    <div class="search-tabs" id="searchTabs"></div>
-    <!-- 搜索框 -->
-    <div class="search-box">
-      <button class="engine-trigger" id="engineTrigger" aria-label="切换搜索引擎">
-        <img id="search-engine-icon" src="" alt="搜索引擎图标">
-        <span class="engine-name" id="engineName"></span>
-        <span class="engine-arrow" id="engineArrow">▾</span>
-      </button>
-      <div class="search-divider"></div>
-      <input type="text" id="searchInput" placeholder="搜索网页 / 定位站内网站" autocomplete="off" oninput="filterLinks()" />
-      <button class="clear-btn" id="clearBtn" aria-label="清空" style="display:none;" onclick="clearSearch()">✕</button>
-      <button class="search-submit-btn" onclick="doSearch()" aria-label="搜索">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-      </button>
-    </div>
-    <!-- 内联引擎面板（展开时出现在搜索框正下方，撑开布局） -->
-    <div class="engine-list" id="enginePanel" style="display:none;"></div>
-  </div>
-  <!-- 链接分区（由 main.js 动态渲染） -->
-  <div id="main-content"></div>
-</div>
-<script src="main.js"></script>
-<script>
-  const cursor = document.createElement('div');
-  cursor.style.cssText = `
-    position: fixed;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    background:
-      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.0) 45%),
-      radial-gradient(circle at 70% 75%, rgba(255,255,255,0.15) 0%, transparent 40%);
-    border: 1.5px solid rgba(255,255,255,0.6);
-    box-shadow:
-      0 0 8px rgba(255,255,255,0.2),
-      inset 0 0 6px rgba(255,255,255,0.08);
-    backdrop-filter: blur(1px);
-  `;
-  document.body.appendChild(cursor);
 
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let glowX = mouseX;
-  let glowY = mouseY;
+  <script src="assets/js/bootstrap.min.js"></script>
+  <script src="assets/js/TweenMax.min.js"></script>
+  <script src="assets/js/resizeable.js"></script>
+  <script src="assets/js/joinable.js"></script>
+  <script src="assets/js/xenon-api.js"></script>
+  <script src="assets/js/xenon-toggles.js"></script>
+  <script src="assets/js/xenon-custom.js"></script>
+  <script src="assets/js/lozad.js"></script>
+  <script src="main.js"></script>
 
-  document.addEventListener('mousemove', e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    cursor.style.display = 'none';
-  }
-
-  function animateCursor() {
-    const ease = 0.03;
-    glowX += (mouseX - glowX) * ease;
-    glowY += (mouseY - glowY) * ease;
-    cursor.style.left = glowX + 'px';
-    cursor.style.top  = glowY + 'px';
-    requestAnimationFrame(animateCursor);
-  }
-  animateCursor();
-</script>
+  <script>
+    $(document).ready(function() {
+      $('.user-info-menu .hidden-sm').click(function() {
+        if ($('.sidebar-menu').hasClass('collapsed')) {
+          $('.has-sub.expanded > ul').attr('style', '');
+        } else {
+          $('.has-sub.expanded > ul').show();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
