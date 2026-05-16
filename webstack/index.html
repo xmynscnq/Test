@@ -16,7 +16,7 @@
 
   <style>
     /* ══════════════════════════════════════
-       固定顶部栏 — 毛玻璃，Logo+汉堡+格言
+       固定顶部栏 — 毛玻璃，汉堡+格言
     ══════════════════════════════════════ */
     #top-bar {
       position: fixed; top: 0; left: 0; right: 0;
@@ -28,14 +28,23 @@
       display: flex; align-items: center;
       padding: 0 20px 0 0;
       gap: 0;
-      transition: background 0.3s, left 0.25s;
+      transition: background 0.3s, left 0.25s, backdrop-filter 0.3s,
+                  border-color 0.3s;
     }
     body.dark-mode #top-bar {
       background: rgba(18,24,31,0.82);
       border-color: rgba(255,255,255,0.06);
     }
+    /* 顶部时透明 */
+    #top-bar.at-top {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-bottom-color: transparent !important;
+      box-shadow: none !important;
+    }
 
-    /* 汉堡按钮 — 无背景无边框 */
+    /* 汉堡按钮 */
     #top-bar-toggle {
       width: 54px; height: 54px; flex-shrink: 0;
       background: none; border: none; outline: none;
@@ -48,28 +57,6 @@
     #top-bar-toggle:focus { outline: none; box-shadow: none; }
     body.dark-mode #top-bar-toggle { color: #9aaabb; }
     body.dark-mode #top-bar-toggle:hover { color: #fff; }
-
-    /* 顶部栏 Logo 区域 */
-    #top-bar-logo {
-      display: flex; align-items: center; gap: 8px;
-      flex-shrink: 0; padding-right: 16px;
-      border-right: 1px solid rgba(0,0,0,0.08);
-      margin-right: 0;
-      /* 展开时宽度跟侧边栏对齐，由JS控制 */
-    }
-    body.dark-mode #top-bar-logo { border-color: rgba(255,255,255,0.07); }
-    #top-bar-logo img {
-      width: 28px; height: 28px; border-radius: 7px;
-      object-fit: contain; flex-shrink: 0;
-    }
-    #top-bar-logo-text {
-      font-size: 1.1rem; font-weight: 900;
-      letter-spacing: 0.04em; white-space: nowrap;
-      color: #222;
-    }
-    body.dark-mode #top-bar-logo-text { color: #e0e6f0; }
-    /* 侧边栏收起时隐藏 Logo 文字，只保留图片 */
-    #top-bar-logo.mini #top-bar-logo-text { display: none; }
 
     /* 顶部栏格言 */
     #top-quote {
@@ -87,20 +74,10 @@
     #top-quote.fade-in  { opacity: 1; }
 
     /* 顶部栏占位 */
-#top-bar-spacer { height: 54px; flex-shrink: 0; }
-
-/* ① 顶部栏滚动到顶时隐藏背景，保留按钮和格言 */
-#top-bar { transition: background 0.3s, left 0.25s, backdrop-filter 0.3s; }
-#top-bar.at-top {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-bottom-color: transparent !important;
-  box-shadow: none !important;
-}
+    #top-bar-spacer { height: 54px; flex-shrink: 0; }
 
     /* ══════════════════════════════════════
-       侧边栏 — 顶部栏下方，默认展开
+       侧边栏
     ══════════════════════════════════════ */
     #sidebar {
       top: 54px !important;
@@ -109,8 +86,33 @@
     }
     .sidebar-nav-inner { max-width: none !important; }
 
-    /* Logo 区域（侧边栏内隐藏，已移到顶部栏） */
-    .sidebar-logo { display: none !important; }
+    /* ── 侧边栏顶部 Logo 区域 ── */
+    .sidebar-logo {
+      display: flex !important;
+      align-items: center;
+      height: 54px;
+      padding: 0 14px;
+      gap: 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    body.dark-mode .sidebar-logo {
+      border-color: rgba(255,255,255,0.06);
+    }
+    .sidebar-logo img {
+      width: 32px; height: 32px;
+      border-radius: 8px; object-fit: contain; flex-shrink: 0;
+    }
+    #sidebar-logo-text {
+      font-size: 1.15rem; font-weight: 900;
+      letter-spacing: 0.04em; white-space: nowrap;
+      color: #222; transition: opacity 0.2s;
+    }
+    body.dark-mode #sidebar-logo-text { color: #e0e6f0; }
+    /* 收起时隐藏文字，只显示图标 */
+    #sidebar.mini-sidebar .sidebar-logo { justify-content: center; padding: 0; }
+    #sidebar.mini-sidebar #sidebar-logo-text { display: none; }
 
     /* ── 菜单项 ── */
     .sidebar-emoji {
@@ -137,6 +139,7 @@
       margin: 2px 6px; height: 42px;
     }
     #sidebar.mini-sidebar #main-menu li a .menu-label { display: none; }
+    #sidebar.mini-sidebar #main-menu li a .sidebar-emoji { display: inline-flex !important; }
 
     /* ── 悬停浮层 ── */
     .sidebar-popup-label {
@@ -183,7 +186,7 @@
       margin: 0 auto; padding: 20px;
     }
 
-    /* 分类 Tab — 无气泡，纯文字 */
+    /* 分类 Tab */
     .header-big .s-type-list.big,
     .s-type:hover .s-type-list.big,
     .s-type-list.big {
@@ -199,7 +202,7 @@
     .s-type-list.big label {
       display: inline-block !important;
       padding: 5px 18px !important;
-      border-radius: 0 !important;          /* 无气泡 */
+      border-radius: 0 !important;
       background: none !important;
       border: none !important;
       border-bottom: 2px solid transparent !important;
@@ -264,16 +267,24 @@
     .search-type li input[type=radio] { display: none; }
     .search-type li input[type=radio]:checked + label { color: #fff; background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); }
 
-    /* 快捷引擎标签 */
-    .quick-engines { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
-    .quick-engine-btn {
-      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 16px; color: rgba(255,255,255,0.8);
-      font-size: 0.78rem; font-weight: 600; padding: 4px 14px;
-      cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    /* 快捷引擎标签 — 纯文字无胶囊 */
+    .quick-engines {
+      display: flex; gap: 2px; justify-content: center;
+      flex-wrap: wrap; margin-top: 14px;
     }
-    .quick-engine-btn:hover, .quick-engine-btn.active {
-      background: rgba(255,255,255,0.25); color: #fff; border-color: rgba(255,255,255,0.4);
+    .quick-engine-btn {
+      background: none !important; border: none !important;
+      border-bottom: 2px solid transparent;
+      border-radius: 0 !important;
+      padding: 4px 12px; cursor: pointer;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.82rem; font-weight: 600;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .quick-engine-btn:hover { color: #fff !important; }
+    .quick-engine-btn.active {
+      color: #fff !important;
+      border-bottom-color: #fff;
     }
 
     /* ══════════════════════════════════════
@@ -337,7 +348,7 @@
     #go-top.visible { opacity: 1; pointer-events: auto; }
 
     /* ══════════════════════════════════════
-       搜索全屏模态框 — 加分类Tab切换
+       搜索全屏模态框
     ══════════════════════════════════════ */
     #search-modal {
       display: none; position: fixed; inset: 0; z-index: 10000;
@@ -358,7 +369,6 @@
       from { opacity:0; transform: translateY(-20px); }
       to   { opacity:1; transform: translateY(0); }
     }
-    /* 模态框分类 Tab */
     #search-modal-cats {
       display: flex; gap: 0; border-bottom: 1px solid #eee;
       margin-bottom: 14px; overflow-x: auto;
@@ -374,7 +384,6 @@
     .modal-cat-btn.active { color: #1677ff; border-bottom-color: #1677ff; }
     body.dark-mode .modal-cat-btn { color: #6a7a8a; }
     body.dark-mode .modal-cat-btn.active { color: #4da6ff; border-bottom-color: #4da6ff; }
-    /* 模态框引擎按钮 */
     #search-modal-engines {
       display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
     }
@@ -388,7 +397,6 @@
     }
     body.dark-mode .modal-engine-btn { background: #263045; border-color: #2a3448; color: #aaa; }
     body.dark-mode .modal-engine-btn.active { background: #1677ff; color: #fff; }
-    /* 搜索框 */
     #search-modal-form {
       display: flex; align-items: center; gap: 10px;
       border: 1.5px solid #e0e0e0; border-radius: 10px;
@@ -411,53 +419,23 @@
     }
     #search-modal-submit:hover { background: #0958d9; }
     #search-modal-close {
-      position: fixed; top: calc(100px + /* box height ~ */160px);
+      position: fixed; top: calc(100px + 160px);
       left: 50%; transform: translateX(-50%);
       background: none; border: none; color: rgba(255,255,255,0.8);
       font-size: 2rem; cursor: pointer; margin-top: 20px;
       transition: color 0.2s; z-index: 10001;
     }
     #search-modal-close:hover { color: #fff; }
-
-    /* ② Logo标题加粗变大，紧靠左上角 */
-#top-bar-logo { padding-left: 0; }
-#top-bar-toggle { width: 44px; }
-#top-bar-logo img { width: 36px !important; height: 36px !important; }
-#top-bar-logo-text { font-size: 1.25rem; font-weight: 900; }
-
-/* ③ 侧边栏收起时显示emoji图标 */
-#sidebar.mini-sidebar #main-menu li a .sidebar-emoji { display: inline-flex !important; }
-
-/* ④ 搜索框下方快捷引擎去掉胶囊样式 */
-.quick-engine-btn {
-  background: none !important;
-  border: none !important;
-  border-bottom: 2px solid transparent;
-  border-radius: 0 !important;
-  padding: 4px 10px;
-  color: rgba(255,255,255,0.65);
-  font-size: 0.82rem; font-weight: 600;
-}
-.quick-engine-btn:hover, .quick-engine-btn.active {
-  background: none !important;
-  color: #fff !important;
-  border-bottom-color: #fff;
-}
-    
   </style>
 </head>
 
 <body class="io-grey-mode">
 
-<!-- 固定顶部栏 -->
+<!-- 固定顶部栏：汉堡 + 格言 -->
 <div id="top-bar">
   <button id="top-bar-toggle" onclick="toggleSidebar()" title="切换侧边栏">
     <i class="fas fa-bars"></i>
   </button>
-  <div id="top-bar-logo">
-    <img src="assets/images/logo.png" alt="logo" onerror="this.style.display='none'">
-    <span id="top-bar-logo-text">王五导航</span>
-  </div>
   <span id="top-quote" title="点击换一条"></span>
 </div>
 
@@ -467,8 +445,11 @@
   <div id="sidebar" class="sticky sidebar-nav fade" style="width:180px;">
     <div class="modal-dialog h-100 sidebar-nav-inner">
 
-      <!-- Logo（已移至顶部栏，此处保留占位以维持边框） -->
-      <div class="sidebar-logo border-bottom border-color" style="display:none!important;"></div>
+      <!-- Logo 区域：收起时只显示图标，展开时显示图标+标题 -->
+      <div class="sidebar-logo border-bottom border-color">
+        <img src="assets/images/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span id="sidebar-logo-text">王五导航</span>
+      </div>
 
       <!-- 菜单 -->
       <div class="sidebar-menu flex-fill">
@@ -506,12 +487,8 @@
 
     <!-- 顶部搜索 banner -->
     <div class="header-big post-top css-color mb-4" id="search-bg">
-
-      <!-- 背景图层 -->
       <div class="banner-bg" id="banner-bg-layer"></div>
-      <!-- 遮罩 -->
       <div class="banner-overlay"></div>
-
 
       <div class="s-search">
         <!-- 分类 Tab -->
@@ -528,19 +505,18 @@
           </button>
           <div class="ws-divider"></div>
           <input type="text" id="search-text" class="form-control search-key"
-                 placeholder="搜索网页 / 定位站内网站"
+                 placeholder="搜索网页"
                  autocomplete="off"
-                 oninput="onSearchInput()"
                  onkeydown="onSearchKeydown(event)" />
           <button class="submit" type="submit">
             <i class="iconfont icon-search"></i>
           </button>
         </form>
 
-        <!-- 快捷引擎标签（搜索框下方一排，对标图1） -->
+        <!-- 快捷引擎标签 -->
         <div class="quick-engines" id="quick-engines"></div>
 
-        <!-- 引擎面板（展开时显示） -->
+        <!-- 引擎面板 -->
         <div id="search-list" style="display:none;"></div>
       </div>
     </div>
@@ -553,7 +529,7 @@
   </div>
 </div>
 
-<!-- 右下角暗色模式切换按钮 -->
+<!-- 暗色模式切换按钮 -->
 <button id="dark-toggle" title="切换暗色模式" onclick="toggleDark()">
   <i class="fas fa-moon" id="dark-icon"></i>
 </button>
@@ -565,7 +541,6 @@
     <div id="search-modal-engines"></div>
     <div id="search-modal-form">
       <input id="search-modal-input" type="text" placeholder="搜索…"
-             oninput="filterCards(this.value)"
              onkeydown="onModalKeydown(event)" autocomplete="off" />
       <button id="search-modal-submit" onclick="doModalSearch()">
         <i class="fas fa-search"></i>
@@ -577,7 +552,7 @@
   </button>
 </div>
 
-<!-- 右下角工具栏：站内搜索 + 回顶部 -->
+<!-- 右下角工具栏 -->
 <div id="float-tools">
   <button class="float-btn" id="go-top" title="回到顶部" onclick="scrollToTop()">
     <i class="fas fa-chevron-up"></i>
@@ -593,7 +568,7 @@
 <script src="main.js"></script>
 <script>
 /* ══════════════════════════════════════
-   侧边栏 — 顶部栏汉堡切换，同步Logo
+   侧边栏展开/收起
 ══════════════════════════════════════ */
 (function() {
   const EXPANDED_W = '180px';
@@ -601,7 +576,6 @@
   const sidebar    = document.getElementById('sidebar');
   const wrap       = document.getElementById('content-wrap');
   const topBar     = document.getElementById('top-bar');
-  const topLogo    = document.getElementById('top-bar-logo');
 
   let isExpanded = localStorage.getItem('sidebarExpanded') !== '0';
 
@@ -612,13 +586,11 @@
       sidebar.style.width = EXPANDED_W;
       wrap.style.marginLeft = EXPANDED_W;
       if (topBar) topBar.style.left = EXPANDED_W;
-      if (topLogo) topLogo.classList.remove('mini');
     } else {
       sidebar.classList.add('mini-sidebar');
       sidebar.style.width = MINI_W;
       wrap.style.marginLeft = MINI_W;
       if (topBar) topBar.style.left = MINI_W;
-      if (topLogo) topLogo.classList.add('mini');
     }
     if (!animate) requestAnimationFrame(() => sidebar.style.transition = '');
   }
@@ -657,7 +629,7 @@
 })();
 
 /* ══════════════════════════════════════
-   暗色模式（记忆状态）
+   暗色模式
 ══════════════════════════════════════ */
 function toggleDark() {
   const isDark = document.body.classList.toggle('dark-mode');
@@ -676,8 +648,6 @@ window.toggleDark = toggleDark;
 
 /* ══════════════════════════════════════
    Banner 背景图
-   修改下方路径即可更换背景图
-   支持相对路径，如 assets/images/banner.jpg
 ══════════════════════════════════════ */
 (function() {
   const BANNER_IMAGE = 'assets/images/banner.jpg';
@@ -688,7 +658,7 @@ window.toggleDark = toggleDark;
 })();
 
 /* ══════════════════════════════════════
-   格言（固定顶部栏右侧）
+   格言
 ══════════════════════════════════════ */
 (function() {
   let quotes = [];
@@ -728,7 +698,20 @@ window.toggleDark = toggleDark;
 })();
 
 /* ══════════════════════════════════════
-   回顶部（滚动超过300px后出现）
+   顶部栏：滚动时显示毛玻璃，顶部时透明
+══════════════════════════════════════ */
+(function() {
+  const bar = document.getElementById('top-bar');
+  function checkScroll() {
+    if (window.scrollY < 10) bar.classList.add('at-top');
+    else bar.classList.remove('at-top');
+  }
+  window.addEventListener('scroll', checkScroll, { passive: true });
+  checkScroll();
+})();
+
+/* ══════════════════════════════════════
+   回顶部
 ══════════════════════════════════════ */
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -743,7 +726,19 @@ window.addEventListener('scroll', function() {
 });
 
 /* ══════════════════════════════════════
-   搜索全屏模态框 — 支持分类Tab切换
+   搜索快捷键
+══════════════════════════════════════ */
+function onSearchKeydown(e) {
+  if (e.key === 'Escape') {
+    const input = document.getElementById('search-text');
+    if (input) input.value = '';
+    if (enginePanelOpen) toggleEnginePanel();
+  }
+}
+window.onSearchKeydown = onSearchKeydown;
+
+/* ══════════════════════════════════════
+   搜索全屏模态框
 ══════════════════════════════════════ */
 function openSearchModal() {
   const modal = document.getElementById('search-modal');
@@ -763,7 +758,7 @@ function closeSearchModal(e) {
   const modal = document.getElementById('search-modal');
   const input = document.getElementById('search-modal-input');
   if (modal) modal.classList.remove('open');
-  if (input) { input.value = ''; filterCards(''); }
+  if (input) input.value = '';
 }
 window.closeSearchModal = closeSearchModal;
 
@@ -778,12 +773,11 @@ function onModalKeydown(e) {
   if (e.key === 'Escape') {
     document.getElementById('search-modal')?.classList.remove('open');
     const input = document.getElementById('search-modal-input');
-    if (input) { input.value = ''; filterCards(''); }
+    if (input) input.value = '';
   }
 }
 window.onModalKeydown = onModalKeydown;
 
-/* 渲染分类Tab */
 function renderModalCats() {
   const wrap = document.getElementById('search-modal-cats');
   if (!wrap) return;
@@ -805,7 +799,6 @@ function renderModalCats() {
   });
 }
 
-/* 渲染引擎按钮 */
 function renderModalEngines() {
   const wrap = document.getElementById('search-modal-engines');
   if (!wrap) return;
@@ -833,20 +826,10 @@ document.addEventListener('keydown', function(e) {
     if (modal?.classList.contains('open')) {
       modal.classList.remove('open');
       const input = document.getElementById('search-modal-input');
-      if (input) { input.value = ''; filterCards(''); }
+      if (input) input.value = '';
     }
   }
 });
-/* 顶部栏：在顶部时透明，滚动后显示毛玻璃 */
-(function() {
-  const bar = document.getElementById('top-bar');
-  function checkScroll() {
-    if (window.scrollY < 10) bar.classList.add('at-top');
-    else bar.classList.remove('at-top');
-  }
-  window.addEventListener('scroll', checkScroll, { passive: true });
-  checkScroll();
-})();
 </script>
 </body>
 </html>
