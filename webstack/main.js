@@ -271,8 +271,7 @@ function renderSidebar(sections) {
     const a = document.createElement('a');
     a.href = '#' + id;
     a.className = 'nav-smooth';
-    // 收起时只显示 emoji，展开时显示 emoji + 文字
-    a.innerHTML = `<span class="sidebar-emoji icon-fw mr-2">${emoji}</span><span>${label}</span>`;
+    a.innerHTML = `<span class="sidebar-emoji">${emoji}</span><span class="menu-label">${label}</span>`;
     li.appendChild(a);
     menu.appendChild(li);
   });
