@@ -87,7 +87,17 @@
     #top-quote.fade-in  { opacity: 1; }
 
     /* 顶部栏占位 */
-    #top-bar-spacer { height: 54px; flex-shrink: 0; }
+#top-bar-spacer { height: 54px; flex-shrink: 0; }
+
+/* ① 顶部栏滚动到顶时隐藏背景，保留按钮和格言 */
+#top-bar { transition: background 0.3s, left 0.25s, backdrop-filter 0.3s; }
+#top-bar.at-top {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom-color: transparent !important;
+  box-shadow: none !important;
+}
 
     /* ══════════════════════════════════════
        侧边栏 — 顶部栏下方，默认展开
@@ -408,6 +418,32 @@
       transition: color 0.2s; z-index: 10001;
     }
     #search-modal-close:hover { color: #fff; }
+
+    /* ② Logo标题加粗变大，紧靠左上角 */
+#top-bar-logo { padding-left: 0; }
+#top-bar-toggle { width: 44px; }
+#top-bar-logo img { width: 36px !important; height: 36px !important; }
+#top-bar-logo-text { font-size: 1.25rem; font-weight: 900; }
+
+/* ③ 侧边栏收起时显示emoji图标 */
+#sidebar.mini-sidebar #main-menu li a .sidebar-emoji { display: inline-flex !important; }
+
+/* ④ 搜索框下方快捷引擎去掉胶囊样式 */
+.quick-engine-btn {
+  background: none !important;
+  border: none !important;
+  border-bottom: 2px solid transparent;
+  border-radius: 0 !important;
+  padding: 4px 10px;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.82rem; font-weight: 600;
+}
+.quick-engine-btn:hover, .quick-engine-btn.active {
+  background: none !important;
+  color: #fff !important;
+  border-bottom-color: #fff;
+}
+    
   </style>
 </head>
 
@@ -801,6 +837,16 @@ document.addEventListener('keydown', function(e) {
     }
   }
 });
+/* 顶部栏：在顶部时透明，滚动后显示毛玻璃 */
+(function() {
+  const bar = document.getElementById('top-bar');
+  function checkScroll() {
+    if (window.scrollY < 10) bar.classList.add('at-top');
+    else bar.classList.remove('at-top');
+  }
+  window.addEventListener('scroll', checkScroll, { passive: true });
+  checkScroll();
+})();
 </script>
 </body>
 </html>
