@@ -355,29 +355,87 @@
     #go-top { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     #go-top.visible { opacity: 1; pointer-events: auto; }
 
-    /* 站内搜索面板 */
-    #site-search-panel {
-      position: fixed; right: 84px; bottom: 84px;
-      background: #fff; border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      padding: 12px 16px; display: none; align-items: center; gap: 8px;
-      z-index: 9998; min-width: 240px;
-      transition: all 0.2s;
+    /* ══════════════════════════════════════
+       搜索全屏模态框
+    ══════════════════════════════════════ */
+    #search-modal {
+      display: none;
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 120px;
     }
-    #site-search-panel.open { display: flex; }
-    body.dark-mode #site-search-panel { background: #1e2736; }
-    #site-search-input {
+    #search-modal.open { display: flex; }
+    #search-modal-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px 28px;
+      width: 100%; max-width: 600px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: modal-in 0.2s ease;
+    }
+    body.dark-mode #search-modal-box { background: #1e2736; }
+    @keyframes modal-in {
+      from { opacity:0; transform: translateY(-20px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    #search-modal-engines {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 16px; align-items: center;
+    }
+    #search-modal-engines .modal-cat-label {
+      font-size: 0.8rem; font-weight: 700; color: #888;
+      margin-right: 4px;
+    }
+    #search-modal-engines .modal-engine-btn {
+      padding: 4px 14px; border-radius: 14px; border: 1px solid #e0e0e0;
+      background: #f5f5f5; color: #555;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s;
+    }
+    #search-modal-engines .modal-engine-btn:hover,
+    #search-modal-engines .modal-engine-btn.active {
+      background: #1677ff; color: #fff; border-color: #1677ff;
+    }
+    body.dark-mode #search-modal-engines .modal-engine-btn {
+      background: #263045; border-color: #2a3448; color: #aaa;
+    }
+    body.dark-mode #search-modal-engines .modal-engine-btn.active {
+      background: #1677ff; color: #fff;
+    }
+    #search-modal-form {
+      display: flex; align-items: center; gap: 10px;
+      border: 1.5px solid #e0e0e0; border-radius: 10px;
+      padding: 4px 6px 4px 16px;
+      transition: border-color 0.2s;
+    }
+    #search-modal-form:focus-within { border-color: #1677ff; }
+    body.dark-mode #search-modal-form { border-color: #2a3448; background: #263045; }
+    #search-modal-input {
       flex: 1; border: none; outline: none; background: transparent;
-      font-size: 0.9rem; color: #333;
+      font-size: 1rem; color: #222; padding: 10px 0;
     }
-    body.dark-mode #site-search-input { color: #ddd; }
-    #site-search-input::placeholder { color: #aaa; }
-    #site-search-clear {
-      background: none; border: none; color: #aaa;
-      cursor: pointer; font-size: 0.85rem; padding: 0 2px;
-      transition: color 0.15s;
+    body.dark-mode #search-modal-input { color: #ddd; }
+    #search-modal-input::placeholder { color: #aaa; }
+    #search-modal-submit {
+      background: #1677ff; border: none; color: #fff;
+      width: 38px; height: 38px; border-radius: 8px;
+      font-size: 0.9rem; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
     }
-    #site-search-clear:hover { color: #f1404b; }
+    #search-modal-submit:hover { background: #0958d9; }
+    #search-modal-close {
+      position: fixed; bottom: calc(120px - 60px);
+      left: 50%; transform: translateX(-50%);
+      background: none; border: none; color: rgba(255,255,255,0.8);
+      font-size: 2rem; cursor: pointer; margin-top: 20px;
+      transition: color 0.2s; z-index: 10001;
+    }
+    #search-modal-close:hover { color: #fff; }
 
     /* ══════════════════════════════════════
        右上角格言
@@ -516,13 +574,22 @@
   <i class="fas fa-moon" id="dark-icon"></i>
 </button>
 
-<!-- 站内搜索浮层 -->
-<div id="site-search-panel">
-  <i class="fas fa-search" style="color:#aaa;font-size:0.85rem;flex-shrink:0;"></i>
-  <input id="site-search-input" type="text" placeholder="搜索站内网站…"
-         oninput="filterCards(this.value)"
-         onkeydown="if(event.key==='Escape'){closeSiteSearch()}" />
-  <button id="site-search-clear" onclick="closeSiteSearch()" title="关闭">✕</button>
+<!-- 搜索全屏模态框 -->
+<div id="search-modal" onclick="closeSearchModal(event)">
+  <div id="search-modal-box">
+    <div id="search-modal-engines" id="search-modal-engines"></div>
+    <div id="search-modal-form">
+      <input id="search-modal-input" type="text" placeholder="搜索…"
+             oninput="filterCards(this.value)"
+             onkeydown="onModalKeydown(event)" autocomplete="off" />
+      <button id="search-modal-submit" onclick="doModalSearch()">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </div>
+  <button id="search-modal-close" onclick="closeSearchModal()">
+    <i class="fas fa-times-circle"></i>
+  </button>
 </div>
 
 <!-- 右下角工具栏：站内搜索 + 回顶部 -->
@@ -530,7 +597,7 @@
   <button class="float-btn" id="go-top" title="回到顶部" onclick="scrollToTop()">
     <i class="fas fa-chevron-up"></i>
   </button>
-  <button class="float-btn" id="site-search-btn" title="站内搜索" onclick="toggleSiteSearch()">
+  <button class="float-btn" id="site-search-btn" title="站内搜索" onclick="openSearchModal()">
     <i class="fas fa-search"></i>
   </button>
 </div>
@@ -695,36 +762,76 @@ window.addEventListener('scroll', function() {
 });
 
 /* ══════════════════════════════════════
-   站内搜索浮层
+   搜索全屏模态框
 ══════════════════════════════════════ */
-function toggleSiteSearch() {
-  const panel = document.getElementById('site-search-panel');
-  const input = document.getElementById('site-search-input');
-  if (!panel) return;
-  const isOpen = panel.classList.toggle('open');
-  if (isOpen) {
-    setTimeout(() => input?.focus(), 50);
-  } else {
-    if (input) { input.value = ''; filterCards(''); }
-  }
+function openSearchModal() {
+  const modal = document.getElementById('search-modal');
+  const input = document.getElementById('search-modal-input');
+  if (!modal) return;
+  // 渲染引擎按钮（当前分类）
+  renderModalEngines();
+  modal.classList.add('open');
+  setTimeout(() => input?.focus(), 80);
 }
-window.toggleSiteSearch = toggleSiteSearch;
+window.openSearchModal = openSearchModal;
 
-function closeSiteSearch() {
-  const panel = document.getElementById('site-search-panel');
-  const input = document.getElementById('site-search-input');
-  if (panel) panel.classList.remove('open');
+function closeSearchModal(e) {
+  if (e && e.target !== document.getElementById('search-modal') &&
+      e.target !== document.getElementById('search-modal-close') &&
+      !document.getElementById('search-modal-close').contains(e.target)) return;
+  const modal = document.getElementById('search-modal');
+  const input = document.getElementById('search-modal-input');
+  if (modal) modal.classList.remove('open');
   if (input) { input.value = ''; filterCards(''); }
 }
-window.closeSiteSearch = closeSiteSearch;
+window.closeSearchModal = closeSearchModal;
 
-// 点击面板外关闭
-document.addEventListener('click', function(e) {
-  const panel = document.getElementById('site-search-panel');
-  const btn = document.getElementById('site-search-btn');
-  if (!panel || !panel.classList.contains('open')) return;
-  if (!panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-    closeSiteSearch();
+function doModalSearch() {
+  const kw = document.getElementById('search-modal-input')?.value.trim();
+  if (kw) window.open(currentEngine.url + encodeURIComponent(kw), '_blank');
+}
+window.doModalSearch = doModalSearch;
+
+function onModalKeydown(e) {
+  if (e.key === 'Enter') doModalSearch();
+  if (e.key === 'Escape') closeSearchModal(e);
+}
+window.onModalKeydown = onModalKeydown;
+
+function renderModalEngines() {
+  const wrap = document.getElementById('search-modal-engines');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const cat = SEARCH_CATEGORIES.find(c => c.id === currentCategoryId);
+  if (!cat) return;
+  const catLabel = document.createElement('span');
+  catLabel.className = 'modal-cat-label';
+  catLabel.textContent = cat.label + ' ›';
+  wrap.appendChild(catLabel);
+  cat.engines.forEach(engine => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-engine-btn' + (engine === currentEngine ? ' active' : '');
+    btn.textContent = engine.name;
+    btn.onclick = () => {
+      currentEngine = engine;
+      updateEngineDisplay();
+      renderQuickEngines();
+      renderModalEngines();
+      document.getElementById('search-modal-input')?.focus();
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+// Esc 关闭模态框
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('search-modal');
+    if (modal?.classList.contains('open')) {
+      modal.classList.remove('open');
+      const input = document.getElementById('search-modal-input');
+      if (input) { input.value = ''; filterCards(''); }
+    }
   }
 });
 </script>
