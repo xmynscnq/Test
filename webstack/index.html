@@ -21,9 +21,15 @@
     .sidebar-logo {
       padding: 12px 14px !important;
       min-height: 70px; display: flex; align-items: center;
-      overflow: visible !important;   /* 覆盖原主题 overflow:hidden */
+      overflow: visible !important;
     }
-    .logo { overflow: visible !important; }
+    /* 原主题 .sidebar-nav .logo 有 text-align:center 和 line-height:74px，全部覆盖 */
+    .sidebar-nav .logo {
+      overflow: visible !important;
+      text-align: left !important;
+      line-height: normal !important;
+      width: auto !important;
+    }
     .logo-title-link { cursor: pointer; text-decoration: none !important; display: block; white-space: nowrap; }
     .logo-title-link:hover { opacity: 0.8; }
     .logo-title-text { font-size: 1.15rem; font-weight: 900; letter-spacing: 0.04em; line-height: 1.2; display: block; white-space: nowrap; }
@@ -67,32 +73,57 @@
     }
 
     /* ══════════════════════════════════════
-       分类 Tab — 强制横排，修复竖排问题
+       分类 Tab — 强制横排
+       原主题 .header-big .s-type-list 设了 display:inline-table
+       必须用更高优先级覆盖
     ══════════════════════════════════════ */
+    .header-big .s-type-list.big,
+    .s-type:hover .s-type-list.big,
     .s-type-list.big {
       display: flex !important;
-      flex-direction: row !important;   /* 明确横排 */
-      flex-wrap: wrap;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      position: static !important;
+      top: auto !important;
+      width: auto !important;
+      background: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      white-space: normal !important;
+      overflow: visible !important;
       gap: 4px;
       justify-content: center;
       margin-bottom: 16px;
-      padding: 0;
-      list-style: none;
     }
+    /* 原主题 label 设了 display:block，覆盖为 inline-block */
+    .header-big .s-type-list.big label,
     .s-type-list.big label {
       display: inline-block !important;
-      padding: 5px 18px; border-radius: 20px; cursor: pointer;
+      padding: 5px 18px !important;
+      border-radius: 20px !important;
+      cursor: pointer;
       font-size: 0.88rem; font-weight: 600;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.6) !important;
+      opacity: 1 !important;           /* 原主题设了 opacity:.5 */
       transition: all 0.18s; user-select: none; margin: 0;
       border: 1px solid transparent;
       white-space: nowrap;
+      text-align: center !important;
     }
-    .s-type-list.big label:hover { color: #fff; }
+    .header-big .s-type-list.big label span { display: none !important; } /* 原主题用span包一层，隐藏掉 */
+    .s-type-list.big label:hover { color: #fff !important; opacity: 1 !important; }
     .s-type-list.big label.active {
-      color: #fff;
-      background: rgba(255,255,255,0.15);
-      border-color: rgba(255,255,255,0.25);
+      color: #fff !important;
+      opacity: 1 !important;
+      background: rgba(255,255,255,0.15) !important;
+      border-color: rgba(255,255,255,0.25) !important;
+    }
+    /* 隐藏原主题 .s-type 的绝对定位包装，让我们的 Tab 直接显示 */
+    .header-big .s-type {
+      position: static !important;
+      top: auto !important; left: auto !important;
+      width: auto !important;
+      z-index: auto !important;
     }
 
     /* ══════════════════════════════════════
