@@ -16,92 +16,91 @@
 
   <style>
     /* ══════════════════════════════════════
-       固定顶部栏
+       固定顶部栏 — 毛玻璃，Logo+汉堡+格言
     ══════════════════════════════════════ */
     #top-bar {
       position: fixed; top: 0; left: 0; right: 0;
-      height: 50px; z-index: 1090;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+      height: 54px; z-index: 1090;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-bottom: 1px solid rgba(0,0,0,0.07);
       display: flex; align-items: center;
-      padding: 0 16px 0 0;
-      transition: background 0.3s;
+      padding: 0 20px 0 0;
+      gap: 0;
+      transition: background 0.3s, left 0.25s;
     }
     body.dark-mode #top-bar {
-      background: rgba(26,34,48,0.95);
+      background: rgba(18,24,31,0.82);
       border-color: rgba(255,255,255,0.06);
     }
 
-    /* 顶部栏汉堡按钮 */
+    /* 汉堡按钮 — 无背景无边框 */
     #top-bar-toggle {
-      width: 50px; height: 50px; flex-shrink: 0;
-      background: none; border: none; cursor: pointer;
-      color: #515c6b; font-size: 1rem;
+      width: 54px; height: 54px; flex-shrink: 0;
+      background: none; border: none; outline: none;
+      cursor: pointer; color: #515c6b; font-size: 1.1rem;
       display: flex; align-items: center; justify-content: center;
       transition: color 0.2s;
+      -webkit-appearance: none; appearance: none;
     }
     #top-bar-toggle:hover { color: #1677ff; }
+    #top-bar-toggle:focus { outline: none; box-shadow: none; }
     body.dark-mode #top-bar-toggle { color: #9aaabb; }
     body.dark-mode #top-bar-toggle:hover { color: #fff; }
+
+    /* 顶部栏 Logo 区域 */
+    #top-bar-logo {
+      display: flex; align-items: center; gap: 8px;
+      flex-shrink: 0; padding-right: 16px;
+      border-right: 1px solid rgba(0,0,0,0.08);
+      margin-right: 0;
+      /* 展开时宽度跟侧边栏对齐，由JS控制 */
+    }
+    body.dark-mode #top-bar-logo { border-color: rgba(255,255,255,0.07); }
+    #top-bar-logo img {
+      width: 28px; height: 28px; border-radius: 7px;
+      object-fit: contain; flex-shrink: 0;
+    }
+    #top-bar-logo-text {
+      font-size: 1.1rem; font-weight: 900;
+      letter-spacing: 0.04em; white-space: nowrap;
+      color: #222;
+    }
+    body.dark-mode #top-bar-logo-text { color: #e0e6f0; }
+    /* 侧边栏收起时隐藏 Logo 文字，只保留图片 */
+    #top-bar-logo.mini #top-bar-logo-text { display: none; }
 
     /* 顶部栏格言 */
     #top-quote {
       flex: 1; text-align: right;
       font-size: 0.78rem; font-style: italic;
-      color: #888; cursor: pointer;
+      color: #999; cursor: pointer;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      padding: 0 8px;
+      padding: 0 0 0 16px;
       transition: color 0.2s, opacity 0.4s;
     }
     #top-quote:hover { color: #555; }
-    body.dark-mode #top-quote { color: #6a7a8a; }
+    body.dark-mode #top-quote { color: #5a6a7a; }
     body.dark-mode #top-quote:hover { color: #9aaabb; }
     #top-quote.fade-out { opacity: 0; }
     #top-quote.fade-in  { opacity: 1; }
 
-    /* 顶部栏占位（防止内容被遮住） */
-    #top-bar-spacer { height: 50px; flex-shrink: 0; }
+    /* 顶部栏占位 */
+    #top-bar-spacer { height: 54px; flex-shrink: 0; }
 
     /* ══════════════════════════════════════
-       侧边栏整体 — 默认展开，顶部栏汉堡切换
+       侧边栏 — 顶部栏下方，默认展开
     ══════════════════════════════════════ */
     #sidebar {
-      top: 50px !important;          /* 顶部栏下方开始 */
-      height: calc(100vh - 50px) !important;
+      top: 54px !important;
+      height: calc(100vh - 54px) !important;
       transition: width 0.25s ease;
     }
     .sidebar-nav-inner { max-width: none !important; }
 
-    /* Logo 区域 */
-    .sidebar-logo {
-      padding: 0 14px !important;
-      height: 60px; display: flex; align-items: center; gap: 10px;
-      overflow: visible !important; flex-shrink: 0;
-    }
-    .sidebar-nav .logo {
-      overflow: visible !important; text-align: left !important;
-      line-height: normal !important; width: auto !important;
-      flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
-    }
-    .logo-img {
-      width: 32px; height: 32px; border-radius: 8px;
-      object-fit: contain; flex-shrink: 0;
-    }
-    .logo-title-link {
-      cursor: pointer; text-decoration: none !important;
-      display: flex; align-items: center; gap: 10px; white-space: nowrap;
-    }
-    .logo-title-link:hover { opacity: 0.8; }
-    .logo-title-text {
-      font-size: 1.05rem; font-weight: 900;
-      letter-spacing: 0.04em; white-space: nowrap;
-    }
-
-    /* 收起时隐藏 logo */
-    #sidebar.mini-sidebar .sidebar-logo { justify-content: center; padding: 0 !important; }
-    #sidebar.mini-sidebar .logo-title-link { display: none; }
+    /* Logo 区域（侧边栏内隐藏，已移到顶部栏） */
+    .sidebar-logo { display: none !important; }
 
     /* ── 菜单项 ── */
     .sidebar-emoji {
@@ -120,16 +119,16 @@
     }
     #main-menu li a:hover { background: rgba(22,119,255,0.08) !important; color: #1677ff !important; }
     #main-menu li.active > a { background: rgba(22,119,255,0.12) !important; color: #1677ff !important; }
-    #main-menu li a .menu-label { font-size: 0.85rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
+    #main-menu li a .menu-label { font-size: 0.85rem; font-weight: 500; }
 
-    /* 收起时隐藏文字 */
+    /* 收起时 */
     #sidebar.mini-sidebar #main-menu li a {
       justify-content: center; padding: 0 !important;
-      margin: 2px 6px; height: 42px; position: relative;
+      margin: 2px 6px; height: 42px;
     }
     #sidebar.mini-sidebar #main-menu li a .menu-label { display: none; }
 
-    /* ── 收起时悬停浮层 ── */
+    /* ── 悬停浮层 ── */
     .sidebar-popup-label {
       position: fixed; left: 64px;
       background: #fff; color: #333;
@@ -148,18 +147,14 @@
        Banner 背景
     ══════════════════════════════════════ */
     .header-big {
-      position: relative;
-      text-align: center;
-      min-height: 220px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative; text-align: center;
+      min-height: 220px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, #1a2a3a 0%, #0f3460 50%, #1a2a3a 100%);
     }
     .header-big .banner-bg {
       position: absolute; inset: 0;
-      background-size: cover; background-position: center; background-repeat: no-repeat;
+      background-size: cover; background-position: center;
       opacity: 0; transition: opacity 0.6s ease; z-index: 0;
     }
     .header-big .banner-bg.loaded { opacity: 1; }
@@ -170,77 +165,56 @@
     }
 
     /* ══════════════════════════════════════
-       搜索区整体
+       搜索区
     ══════════════════════════════════════ */
     .s-search {
       position: relative; z-index: 2;
       width: 100%; max-width: 660px;
-      margin: 0 auto; padding: 20px 20px;
+      margin: 0 auto; padding: 20px;
     }
 
-    /* ══════════════════════════════════════
-       分类 Tab — 强制横排
-       原主题 .header-big .s-type-list 设了 display:inline-table
-       必须用更高优先级覆盖
-    ══════════════════════════════════════ */
+    /* 分类 Tab — 无气泡，纯文字 */
     .header-big .s-type-list.big,
     .s-type:hover .s-type-list.big,
     .s-type-list.big {
-      display: flex !important;
-      flex-direction: row !important;
-      flex-wrap: wrap !important;
-      position: static !important;
-      top: auto !important;
-      width: auto !important;
-      background: none !important;
-      box-shadow: none !important;
-      padding: 0 !important;
-      white-space: normal !important;
-      overflow: visible !important;
-      gap: 4px;
-      justify-content: center;
-      margin-bottom: 16px;
+      display: flex !important; flex-direction: row !important;
+      flex-wrap: wrap !important; position: static !important;
+      top: auto !important; width: auto !important;
+      background: none !important; box-shadow: none !important;
+      padding: 0 !important; white-space: normal !important;
+      overflow: visible !important; gap: 4px;
+      justify-content: center; margin-bottom: 16px;
     }
-    /* 原主题 label 设了 display:block，覆盖为 inline-block */
     .header-big .s-type-list.big label,
     .s-type-list.big label {
       display: inline-block !important;
       padding: 5px 18px !important;
-      border-radius: 20px !important;
-      cursor: pointer;
-      font-size: 0.88rem; font-weight: 600;
-      color: rgba(255,255,255,0.6) !important;
-      opacity: 1 !important;           /* 原主题设了 opacity:.5 */
-      transition: all 0.18s; user-select: none; margin: 0;
-      border: 1px solid transparent;
-      white-space: nowrap;
-      text-align: center !important;
+      border-radius: 0 !important;          /* 无气泡 */
+      background: none !important;
+      border: none !important;
+      border-bottom: 2px solid transparent !important;
+      cursor: pointer; font-size: 0.9rem; font-weight: 600;
+      color: rgba(255,255,255,0.55) !important;
+      opacity: 1 !important; transition: all 0.18s;
+      user-select: none; margin: 0; white-space: nowrap;
     }
-    .header-big .s-type-list.big label span { display: none !important; } /* 原主题用span包一层，隐藏掉 */
-    .s-type-list.big label:hover { color: #fff !important; opacity: 1 !important; }
+    .header-big .s-type-list.big label span { display: none !important; }
+    .s-type-list.big label:hover { color: #fff !important; }
     .s-type-list.big label.active {
       color: #fff !important;
-      opacity: 1 !important;
-      background: rgba(255,255,255,0.15) !important;
-      border-color: rgba(255,255,255,0.25) !important;
+      border-bottom-color: #fff !important;
     }
-    /* 隐藏原主题 .s-type 的绝对定位包装，让我们的 Tab 直接显示 */
     .header-big .s-type {
-      position: static !important;
-      top: auto !important; left: auto !important;
-      width: auto !important;
-      z-index: auto !important;
+      position: static !important; top: auto !important;
+      left: auto !important; width: auto !important; z-index: auto !important;
     }
 
-    /* ══════════════════════════════════════
-       搜索框
-    ══════════════════════════════════════ */
+    /* 搜索框 */
     .super-search-fm {
       display: flex; align-items: center;
       background: #fff; border: none; border-radius: 40px;
       padding: 0 8px 0 20px; gap: 8px;
       box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-      transition: box-shadow 0.2s;
     }
     .super-search-fm:focus-within { box-shadow: 0 6px 32px rgba(0,0,0,0.35); }
     .super-search-fm .search-key {
@@ -250,12 +224,12 @@
     }
     .super-search-fm .search-key::placeholder { color: #aaa; }
     .super-search-fm .submit {
-      background: #1677ff; border: none; color: #fff; font-size: 1rem; cursor: pointer;
-      padding: 0; width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s, transform 0.15s; flex-shrink: 0;
+      background: #1677ff; border: none; color: #fff; font-size: 1rem;
+      cursor: pointer; padding: 0; width: 40px; height: 40px;
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; transition: background 0.2s; flex-shrink: 0;
     }
-    .super-search-fm .submit:hover { background: #0958d9; transform: scale(1.05); }
+    .super-search-fm .submit:hover { background: #0958d9; }
     .ws-engine-trigger {
       display: flex; align-items: center; gap: 5px;
       background: none; border: none; color: #555;
@@ -273,8 +247,7 @@
     .search-type { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
     .search-type li label {
       padding: 4px 16px; border-radius: 16px; cursor: pointer;
-      font-size: 0.82rem; font-weight: 600;
-      color: rgba(255,255,255,0.65);
+      font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.65);
       transition: all 0.15s; margin: 0; user-select: none; border: 1px solid transparent;
     }
     .search-type li label:hover { color: #fff; background: rgba(255,255,255,0.12); }
@@ -298,31 +271,27 @@
     ══════════════════════════════════════ */
     .url-img { width: 48px !important; height: 48px !important; flex-shrink: 0; }
     .url-img img { width: 36px !important; height: 36px !important; border-radius: 8px; object-fit: contain; }
-    .url-card .card { border-radius: 10px; transition: background 0.3s, border-color 0.3s; }
+    .url-card .card { border-radius: 10px; }
 
-    /* ══════════════════════════════════════
-       内容区 — 顶部留出顶部栏高度
-    ══════════════════════════════════════ */
+    /* 内容区 */
     .content-wrap { overflow: auto; }
+
     /* ══════════════════════════════════════
        暗色模式
     ══════════════════════════════════════ */
+    body.dark-mode { background: #12181f !important; color: #d4d4d4 !important; }
     body.dark-mode .page-container { background: #12181f !important; }
     body.dark-mode #sidebar { background: #1a2230 !important; border-color: #2a3448 !important; }
     body.dark-mode .border-color { border-color: #2a3448 !important; }
     body.dark-mode #content-wrap { background: #12181f !important; }
-    body.dark-mode .card {
-      background: #1e2736 !important;
-      border-color: #2a3448 !important;
-      color: #d4d4d4 !important;
-    }
+    body.dark-mode .card { background: #1e2736 !important; border-color: #2a3448 !important; color: #d4d4d4 !important; }
     body.dark-mode .card:hover { background: #263045 !important; }
     body.dark-mode .text-muted { color: #7a8a9a !important; }
     body.dark-mode .text-gray  { color: #9aaabb !important; }
     body.dark-mode strong      { color: #d4d4d4 !important; }
     body.dark-mode .content-site { background: #12181f !important; }
 
-    /* 暗色模式切换按钮 — 右下角悬浮 */
+    /* 暗色切换按钮 */
     #dark-toggle {
       position: fixed; bottom: 28px; right: 28px; z-index: 9999;
       width: 46px; height: 46px; border-radius: 50%;
@@ -337,12 +306,11 @@
     body.dark-mode #dark-toggle:hover { background: #e6b800; }
 
     /* ══════════════════════════════════════
-       右下角工具栏（搜索 + 回顶部）
+       右下角工具栏
     ══════════════════════════════════════ */
     #float-tools {
       position: fixed; right: 28px; bottom: 84px;
-      display: flex; flex-direction: column; gap: 10px;
-      z-index: 9998;
+      display: flex; flex-direction: column; gap: 10px; z-index: 9998;
     }
     .float-btn {
       width: 46px; height: 46px; border-radius: 50%;
@@ -355,30 +323,23 @@
     .float-btn:hover { background: #f0f4ff; color: #1677ff; transform: scale(1.08); }
     body.dark-mode .float-btn { background: #1e2736; color: #aaa; }
     body.dark-mode .float-btn:hover { background: #263045; color: #fff; }
-
-    /* 回顶部默认隐藏，滚动后出现 */
     #go-top { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     #go-top.visible { opacity: 1; pointer-events: auto; }
 
     /* ══════════════════════════════════════
-       搜索全屏模态框
+       搜索全屏模态框 — 加分类Tab切换
     ══════════════════════════════════════ */
     #search-modal {
-      display: none;
-      position: fixed; inset: 0; z-index: 10000;
+      display: none; position: fixed; inset: 0; z-index: 10000;
       background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 120px;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      align-items: flex-start; justify-content: center;
+      padding-top: 100px;
     }
     #search-modal.open { display: flex; }
     #search-modal-box {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px 28px;
-      width: 100%; max-width: 600px;
+      background: #fff; border-radius: 16px;
+      padding: 20px 24px 24px; width: 100%; max-width: 620px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.2);
       animation: modal-in 0.2s ease;
     }
@@ -387,35 +348,41 @@
       from { opacity:0; transform: translateY(-20px); }
       to   { opacity:1; transform: translateY(0); }
     }
+    /* 模态框分类 Tab */
+    #search-modal-cats {
+      display: flex; gap: 0; border-bottom: 1px solid #eee;
+      margin-bottom: 14px; overflow-x: auto;
+    }
+    body.dark-mode #search-modal-cats { border-color: #2a3448; }
+    .modal-cat-btn {
+      background: none; border: none; border-bottom: 2px solid transparent;
+      padding: 6px 16px; font-size: 0.85rem; font-weight: 600;
+      color: #888; cursor: pointer; white-space: nowrap;
+      transition: all 0.15s; margin-bottom: -1px;
+    }
+    .modal-cat-btn:hover { color: #1677ff; }
+    .modal-cat-btn.active { color: #1677ff; border-bottom-color: #1677ff; }
+    body.dark-mode .modal-cat-btn { color: #6a7a8a; }
+    body.dark-mode .modal-cat-btn.active { color: #4da6ff; border-bottom-color: #4da6ff; }
+    /* 模态框引擎按钮 */
     #search-modal-engines {
-      display: flex; flex-wrap: wrap; gap: 6px;
-      margin-bottom: 16px; align-items: center;
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
     }
-    #search-modal-engines .modal-cat-label {
-      font-size: 0.8rem; font-weight: 700; color: #888;
-      margin-right: 4px;
-    }
-    #search-modal-engines .modal-engine-btn {
+    .modal-engine-btn {
       padding: 4px 14px; border-radius: 14px; border: 1px solid #e0e0e0;
       background: #f5f5f5; color: #555;
-      font-size: 0.8rem; font-weight: 600; cursor: pointer;
-      transition: all 0.15s;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
     }
-    #search-modal-engines .modal-engine-btn:hover,
-    #search-modal-engines .modal-engine-btn.active {
+    .modal-engine-btn:hover, .modal-engine-btn.active {
       background: #1677ff; color: #fff; border-color: #1677ff;
     }
-    body.dark-mode #search-modal-engines .modal-engine-btn {
-      background: #263045; border-color: #2a3448; color: #aaa;
-    }
-    body.dark-mode #search-modal-engines .modal-engine-btn.active {
-      background: #1677ff; color: #fff;
-    }
+    body.dark-mode .modal-engine-btn { background: #263045; border-color: #2a3448; color: #aaa; }
+    body.dark-mode .modal-engine-btn.active { background: #1677ff; color: #fff; }
+    /* 搜索框 */
     #search-modal-form {
       display: flex; align-items: center; gap: 10px;
       border: 1.5px solid #e0e0e0; border-radius: 10px;
-      padding: 4px 6px 4px 16px;
-      transition: border-color 0.2s;
+      padding: 4px 6px 4px 16px; transition: border-color 0.2s;
     }
     #search-modal-form:focus-within { border-color: #1677ff; }
     body.dark-mode #search-modal-form { border-color: #2a3448; background: #263045; }
@@ -434,15 +401,13 @@
     }
     #search-modal-submit:hover { background: #0958d9; }
     #search-modal-close {
-      position: fixed; bottom: calc(120px - 60px);
+      position: fixed; top: calc(100px + /* box height ~ */160px);
       left: 50%; transform: translateX(-50%);
       background: none; border: none; color: rgba(255,255,255,0.8);
       font-size: 2rem; cursor: pointer; margin-top: 20px;
       transition: color 0.2s; z-index: 10001;
     }
     #search-modal-close:hover { color: #fff; }
-
-  </style>
 </head>
 
 <body class="io-grey-mode">
@@ -452,6 +417,10 @@
   <button id="top-bar-toggle" onclick="toggleSidebar()" title="切换侧边栏">
     <i class="fas fa-bars"></i>
   </button>
+  <div id="top-bar-logo">
+    <img src="assets/images/logo.png" alt="logo" onerror="this.style.display='none'">
+    <span id="top-bar-logo-text">王五导航</span>
+  </div>
   <span id="top-quote" title="点击换一条"></span>
 </div>
 
@@ -461,16 +430,8 @@
   <div id="sidebar" class="sticky sidebar-nav fade" style="width:180px;">
     <div class="modal-dialog h-100 sidebar-nav-inner">
 
-      <!-- Logo -->
-      <div class="sidebar-logo border-bottom border-color">
-        <div class="logo">
-          <a class="logo-title-link" onclick="switchToMain()">
-            <img src="assets/images/logo.png" class="logo-img" alt="logo"
-                 onerror="this.style.display='none'">
-            <span class="logo-title-text">王五导航</span>
-          </a>
-        </div>
-      </div>
+      <!-- Logo（已移至顶部栏，此处保留占位以维持边框） -->
+      <div class="sidebar-logo border-bottom border-color" style="display:none!important;"></div>
 
       <!-- 菜单 -->
       <div class="sidebar-menu flex-fill">
@@ -563,7 +524,8 @@
 <!-- 搜索全屏模态框 -->
 <div id="search-modal" onclick="closeSearchModal(event)">
   <div id="search-modal-box">
-    <div id="search-modal-engines" id="search-modal-engines"></div>
+    <div id="search-modal-cats"></div>
+    <div id="search-modal-engines"></div>
     <div id="search-modal-form">
       <input id="search-modal-input" type="text" placeholder="搜索…"
              oninput="filterCards(this.value)"
@@ -594,7 +556,7 @@
 <script src="main.js"></script>
 <script>
 /* ══════════════════════════════════════
-   侧边栏 — 顶部栏汉堡按钮切换
+   侧边栏 — 顶部栏汉堡切换，同步Logo
 ══════════════════════════════════════ */
 (function() {
   const EXPANDED_W = '180px';
@@ -602,6 +564,7 @@
   const sidebar    = document.getElementById('sidebar');
   const wrap       = document.getElementById('content-wrap');
   const topBar     = document.getElementById('top-bar');
+  const topLogo    = document.getElementById('top-bar-logo');
 
   let isExpanded = localStorage.getItem('sidebarExpanded') !== '0';
 
@@ -612,11 +575,13 @@
       sidebar.style.width = EXPANDED_W;
       wrap.style.marginLeft = EXPANDED_W;
       if (topBar) topBar.style.left = EXPANDED_W;
+      if (topLogo) topLogo.classList.remove('mini');
     } else {
       sidebar.classList.add('mini-sidebar');
       sidebar.style.width = MINI_W;
       wrap.style.marginLeft = MINI_W;
       if (topBar) topBar.style.left = MINI_W;
+      if (topLogo) topLogo.classList.add('mini');
     }
     if (!animate) requestAnimationFrame(() => sidebar.style.transition = '');
   }
@@ -629,7 +594,7 @@
 
   applyState(false);
 
-  /* ── 收起时悬停菜单项显示浮层 ── */
+  /* 收起时悬停浮层 */
   const popup = document.getElementById('sidebar-popup-label');
   let popupTimer = null;
 
@@ -645,13 +610,11 @@
     popup.style.top = (rect.top + rect.height / 2 - 16) + 'px';
     popup.classList.add('show');
   });
-
   document.getElementById('main-menu').addEventListener('mouseout', function(e) {
     const li = e.target.closest('li');
     if (!li) return;
     popupTimer = setTimeout(() => popup.classList.remove('show'), 120);
   });
-
   popup.addEventListener('mouseenter', () => clearTimeout(popupTimer));
   popup.addEventListener('mouseleave', () => popup.classList.remove('show'));
 })();
@@ -743,13 +706,13 @@ window.addEventListener('scroll', function() {
 });
 
 /* ══════════════════════════════════════
-   搜索全屏模态框
+   搜索全屏模态框 — 支持分类Tab切换
 ══════════════════════════════════════ */
 function openSearchModal() {
   const modal = document.getElementById('search-modal');
   const input = document.getElementById('search-modal-input');
   if (!modal) return;
-  // 渲染引擎按钮（当前分类）
+  renderModalCats();
   renderModalEngines();
   modal.classList.add('open');
   setTimeout(() => input?.focus(), 80);
@@ -759,7 +722,7 @@ window.openSearchModal = openSearchModal;
 function closeSearchModal(e) {
   if (e && e.target !== document.getElementById('search-modal') &&
       e.target !== document.getElementById('search-modal-close') &&
-      !document.getElementById('search-modal-close').contains(e.target)) return;
+      !document.getElementById('search-modal-close')?.contains(e.target)) return;
   const modal = document.getElementById('search-modal');
   const input = document.getElementById('search-modal-input');
   if (modal) modal.classList.remove('open');
@@ -775,20 +738,43 @@ window.doModalSearch = doModalSearch;
 
 function onModalKeydown(e) {
   if (e.key === 'Enter') doModalSearch();
-  if (e.key === 'Escape') closeSearchModal(e);
+  if (e.key === 'Escape') {
+    document.getElementById('search-modal')?.classList.remove('open');
+    const input = document.getElementById('search-modal-input');
+    if (input) { input.value = ''; filterCards(''); }
+  }
 }
 window.onModalKeydown = onModalKeydown;
 
+/* 渲染分类Tab */
+function renderModalCats() {
+  const wrap = document.getElementById('search-modal-cats');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  SEARCH_CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-cat-btn' + (cat.id === currentCategoryId ? ' active' : '');
+    btn.textContent = cat.label;
+    btn.onclick = () => {
+      currentCategoryId = cat.id;
+      currentEngine = cat.engines[0];
+      updateEngineDisplay();
+      renderQuickEngines();
+      renderModalCats();
+      renderModalEngines();
+      document.getElementById('search-modal-input')?.focus();
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+/* 渲染引擎按钮 */
 function renderModalEngines() {
   const wrap = document.getElementById('search-modal-engines');
   if (!wrap) return;
   wrap.innerHTML = '';
   const cat = SEARCH_CATEGORIES.find(c => c.id === currentCategoryId);
   if (!cat) return;
-  const catLabel = document.createElement('span');
-  catLabel.className = 'modal-cat-label';
-  catLabel.textContent = cat.label + ' ›';
-  wrap.appendChild(catLabel);
   cat.engines.forEach(engine => {
     const btn = document.createElement('button');
     btn.className = 'modal-engine-btn' + (engine === currentEngine ? ' active' : '');
@@ -804,7 +790,6 @@ function renderModalEngines() {
   });
 }
 
-// Esc 关闭模态框
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     const modal = document.getElementById('search-modal');
