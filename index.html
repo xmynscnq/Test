@@ -2,819 +2,94 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>王五导航 · WebStack</title>
-  <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>" />
-  <link rel="stylesheet" href="assets/css/block-library.min-5.6.2.css" />
-  <link rel="stylesheet" href="assets/css/iconfont-3.03029.1.css" />
-  <link rel="stylesheet" href="assets/css/bootstrap.min-4.3.1.css" />
-  <link rel="stylesheet" href="assets/css/style-3.03029.1.css" />
-  <link rel="stylesheet" href="assets/css/custom-style.css" />
-  <link rel="stylesheet" href="assets/fontawesome-5.15.4/css/all.min.css" />
-  <script src="assets/js/jquery.min-3.2.1.js"></script>
-
-  <style>
-    /* ══════════════════════════════════════
-       固定顶部栏
-    ══════════════════════════════════════ */
-    #top-bar {
-      position: fixed; top: 0; left: 0; right: 0;
-      height: 50px; z-index: 1090;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      display: flex; align-items: center;
-      padding: 0 16px 0 0;
-      transition: background 0.3s;
-    }
-    body.dark-mode #top-bar {
-      background: rgba(26,34,48,0.95);
-      border-color: rgba(255,255,255,0.06);
-    }
-
-    /* 顶部栏汉堡按钮 */
-    #top-bar-toggle {
-      width: 50px; height: 50px; flex-shrink: 0;
-      background: none; border: none; cursor: pointer;
-      color: #515c6b; font-size: 1rem;
-      display: flex; align-items: center; justify-content: center;
-      transition: color 0.2s;
-    }
-    #top-bar-toggle:hover { color: #1677ff; }
-    body.dark-mode #top-bar-toggle { color: #9aaabb; }
-    body.dark-mode #top-bar-toggle:hover { color: #fff; }
-
-    /* 顶部栏格言 */
-    #top-quote {
-      flex: 1; text-align: right;
-      font-size: 0.78rem; font-style: italic;
-      color: #888; cursor: pointer;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      padding: 0 8px;
-      transition: color 0.2s, opacity 0.4s;
-    }
-    #top-quote:hover { color: #555; }
-    body.dark-mode #top-quote { color: #6a7a8a; }
-    body.dark-mode #top-quote:hover { color: #9aaabb; }
-    #top-quote.fade-out { opacity: 0; }
-    #top-quote.fade-in  { opacity: 1; }
-
-    /* 顶部栏占位（防止内容被遮住） */
-    #top-bar-spacer { height: 50px; flex-shrink: 0; }
-
-    /* ══════════════════════════════════════
-       侧边栏整体 — 默认展开，顶部栏汉堡切换
-    ══════════════════════════════════════ */
-    #sidebar {
-      top: 50px !important;          /* 顶部栏下方开始 */
-      height: calc(100vh - 50px) !important;
-      transition: width 0.25s ease;
-    }
-    .sidebar-nav-inner { max-width: none !important; }
-
-    /* Logo 区域 */
-    .sidebar-logo {
-      padding: 0 14px !important;
-      height: 60px; display: flex; align-items: center; gap: 10px;
-      overflow: visible !important; flex-shrink: 0;
-    }
-    .sidebar-nav .logo {
-      overflow: visible !important; text-align: left !important;
-      line-height: normal !important; width: auto !important;
-      flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
-    }
-    .logo-img {
-      width: 32px; height: 32px; border-radius: 8px;
-      object-fit: contain; flex-shrink: 0;
-    }
-    .logo-title-link {
-      cursor: pointer; text-decoration: none !important;
-      display: flex; align-items: center; gap: 10px; white-space: nowrap;
-    }
-    .logo-title-link:hover { opacity: 0.8; }
-    .logo-title-text {
-      font-size: 1.05rem; font-weight: 900;
-      letter-spacing: 0.04em; white-space: nowrap;
-    }
-
-    /* 收起时隐藏 logo */
-    #sidebar.mini-sidebar .sidebar-logo { justify-content: center; padding: 0 !important; }
-    #sidebar.mini-sidebar .logo-title-link { display: none; }
-
-    /* ── 菜单项 ── */
-    .sidebar-emoji {
-      font-size: 1.15rem; display: inline-flex;
-      width: 36px; height: 36px;
-      align-items: center; justify-content: center;
-      flex-shrink: 0; border-radius: 8px;
-    }
-    #main-menu li a {
-      display: flex !important; align-items: center; gap: 10px;
-      padding: 0 14px !important; height: 42px;
-      line-height: 42px !important; max-height: 42px !important;
-      border-radius: 8px; margin: 2px 8px;
-      transition: background 0.15s, color 0.15s;
-      white-space: nowrap; overflow: hidden;
-    }
-    #main-menu li a:hover { background: rgba(22,119,255,0.08) !important; color: #1677ff !important; }
-    #main-menu li.active > a { background: rgba(22,119,255,0.12) !important; color: #1677ff !important; }
-    #main-menu li a .menu-label { font-size: 0.85rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
-
-    /* 收起时隐藏文字 */
-    #sidebar.mini-sidebar #main-menu li a {
-      justify-content: center; padding: 0 !important;
-      margin: 2px 6px; height: 42px; position: relative;
-    }
-    #sidebar.mini-sidebar #main-menu li a .menu-label { display: none; }
-
-    /* ── 收起时悬停浮层 ── */
-    .sidebar-popup-label {
-      position: fixed; left: 64px;
-      background: #fff; color: #333;
-      font-size: 0.82rem; font-weight: 600;
-      padding: 6px 14px; border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.14);
-      pointer-events: none; opacity: 0;
-      transform: translateX(-6px);
-      transition: opacity 0.15s, transform 0.15s;
-      white-space: nowrap; z-index: 9999;
-    }
-    .sidebar-popup-label.show { opacity: 1; transform: translateX(0); }
-    body.dark-mode .sidebar-popup-label { background: #263045; color: #ddd; }
-
-    /* ══════════════════════════════════════
-       Banner 背景
-    ══════════════════════════════════════ */
-    .header-big {
-      position: relative;
-      text-align: center;
-      min-height: 220px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #1a2a3a 0%, #0f3460 50%, #1a2a3a 100%);
-    }
-    .header-big .banner-bg {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center; background-repeat: no-repeat;
-      opacity: 0; transition: opacity 0.6s ease; z-index: 0;
-    }
-    .header-big .banner-bg.loaded { opacity: 1; }
-    .header-big .banner-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(10,20,35,0.55) 0%, rgba(10,20,35,0.45) 60%, rgba(10,20,35,0.65) 100%);
-      z-index: 1;
-    }
-
-    /* ══════════════════════════════════════
-       搜索区整体
-    ══════════════════════════════════════ */
-    .s-search {
-      position: relative; z-index: 2;
-      width: 100%; max-width: 660px;
-      margin: 0 auto; padding: 20px 20px;
-    }
-
-    /* ══════════════════════════════════════
-       分类 Tab — 强制横排
-       原主题 .header-big .s-type-list 设了 display:inline-table
-       必须用更高优先级覆盖
-    ══════════════════════════════════════ */
-    .header-big .s-type-list.big,
-    .s-type:hover .s-type-list.big,
-    .s-type-list.big {
-      display: flex !important;
-      flex-direction: row !important;
-      flex-wrap: wrap !important;
-      position: static !important;
-      top: auto !important;
-      width: auto !important;
-      background: none !important;
-      box-shadow: none !important;
-      padding: 0 !important;
-      white-space: normal !important;
-      overflow: visible !important;
-      gap: 4px;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-    /* 原主题 label 设了 display:block，覆盖为 inline-block */
-    .header-big .s-type-list.big label,
-    .s-type-list.big label {
-      display: inline-block !important;
-      padding: 5px 18px !important;
-      border-radius: 20px !important;
-      cursor: pointer;
-      font-size: 0.88rem; font-weight: 600;
-      color: rgba(255,255,255,0.6) !important;
-      opacity: 1 !important;           /* 原主题设了 opacity:.5 */
-      transition: all 0.18s; user-select: none; margin: 0;
-      border: 1px solid transparent;
-      white-space: nowrap;
-      text-align: center !important;
-    }
-    .header-big .s-type-list.big label span { display: none !important; } /* 原主题用span包一层，隐藏掉 */
-    .s-type-list.big label:hover { color: #fff !important; opacity: 1 !important; }
-    .s-type-list.big label.active {
-      color: #fff !important;
-      opacity: 1 !important;
-      background: rgba(255,255,255,0.15) !important;
-      border-color: rgba(255,255,255,0.25) !important;
-    }
-    /* 隐藏原主题 .s-type 的绝对定位包装，让我们的 Tab 直接显示 */
-    .header-big .s-type {
-      position: static !important;
-      top: auto !important; left: auto !important;
-      width: auto !important;
-      z-index: auto !important;
-    }
-
-    /* ══════════════════════════════════════
-       搜索框
-    ══════════════════════════════════════ */
-    .super-search-fm {
-      display: flex; align-items: center;
-      background: #fff; border: none; border-radius: 40px;
-      padding: 0 8px 0 20px; gap: 8px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-      transition: box-shadow 0.2s;
-    }
-    .super-search-fm:focus-within { box-shadow: 0 6px 32px rgba(0,0,0,0.35); }
-    .super-search-fm .search-key {
-      flex: 1; background: transparent !important; border: none !important;
-      box-shadow: none !important; color: #222 !important;
-      font-size: 1rem; padding: 14px 4px; height: auto;
-    }
-    .super-search-fm .search-key::placeholder { color: #aaa; }
-    .super-search-fm .submit {
-      background: #1677ff; border: none; color: #fff; font-size: 1rem; cursor: pointer;
-      padding: 0; width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s, transform 0.15s; flex-shrink: 0;
-    }
-    .super-search-fm .submit:hover { background: #0958d9; transform: scale(1.05); }
-    .ws-engine-trigger {
-      display: flex; align-items: center; gap: 5px;
-      background: none; border: none; color: #555;
-      font-size: 0.83rem; font-weight: 600; font-family: inherit;
-      cursor: pointer; padding: 10px 4px 10px 0;
-      flex-shrink: 0; white-space: nowrap; transition: color 0.15s;
-    }
-    .ws-engine-trigger:hover { color: #1677ff; }
-    .ws-engine-trigger img { width: 16px; height: 16px; border-radius: 3px; }
-    .ws-engine-trigger .arrow { font-size: 0.62rem; opacity: 0.4; transition: transform 0.2s; }
-    .ws-divider { width: 1px; height: 18px; background: #ddd; flex-shrink: 0; }
-
-    /* 引擎面板 */
-    #search-list { margin-top: 14px; }
-    .search-type { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
-    .search-type li label {
-      padding: 4px 16px; border-radius: 16px; cursor: pointer;
-      font-size: 0.82rem; font-weight: 600;
-      color: rgba(255,255,255,0.65);
-      transition: all 0.15s; margin: 0; user-select: none; border: 1px solid transparent;
-    }
-    .search-type li label:hover { color: #fff; background: rgba(255,255,255,0.12); }
-    .search-type li input[type=radio] { display: none; }
-    .search-type li input[type=radio]:checked + label { color: #fff; background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.3); }
-
-    /* 快捷引擎标签 */
-    .quick-engines { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
-    .quick-engine-btn {
-      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 16px; color: rgba(255,255,255,0.8);
-      font-size: 0.78rem; font-weight: 600; padding: 4px 14px;
-      cursor: pointer; transition: all 0.15s; white-space: nowrap;
-    }
-    .quick-engine-btn:hover, .quick-engine-btn.active {
-      background: rgba(255,255,255,0.25); color: #fff; border-color: rgba(255,255,255,0.4);
-    }
-
-    /* ══════════════════════════════════════
-       卡片
-    ══════════════════════════════════════ */
-    .url-img { width: 48px !important; height: 48px !important; flex-shrink: 0; }
-    .url-img img { width: 36px !important; height: 36px !important; border-radius: 8px; object-fit: contain; }
-    .url-card .card { border-radius: 10px; transition: background 0.3s, border-color 0.3s; }
-
-    /* ══════════════════════════════════════
-       内容区 — 顶部留出顶部栏高度
-    ══════════════════════════════════════ */
-    .content-wrap { overflow: auto; }
-    /* ══════════════════════════════════════
-       暗色模式
-    ══════════════════════════════════════ */
-    body.dark-mode .page-container { background: #12181f !important; }
-    body.dark-mode #sidebar { background: #1a2230 !important; border-color: #2a3448 !important; }
-    body.dark-mode .border-color { border-color: #2a3448 !important; }
-    body.dark-mode #content-wrap { background: #12181f !important; }
-    body.dark-mode .card {
-      background: #1e2736 !important;
-      border-color: #2a3448 !important;
-      color: #d4d4d4 !important;
-    }
-    body.dark-mode .card:hover { background: #263045 !important; }
-    body.dark-mode .text-muted { color: #7a8a9a !important; }
-    body.dark-mode .text-gray  { color: #9aaabb !important; }
-    body.dark-mode strong      { color: #d4d4d4 !important; }
-    body.dark-mode .content-site { background: #12181f !important; }
-
-    /* 暗色模式切换按钮 — 右下角悬浮 */
-    #dark-toggle {
-      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
-      width: 46px; height: 46px; border-radius: 50%;
-      background: #1677ff; border: none; color: #fff;
-      font-size: 1.15rem; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s, transform 0.15s;
-    }
-    #dark-toggle:hover { background: #0958d9; transform: scale(1.08); }
-    body.dark-mode #dark-toggle { background: #f0c040; color: #222; }
-    body.dark-mode #dark-toggle:hover { background: #e6b800; }
-
-    /* ══════════════════════════════════════
-       右下角工具栏（搜索 + 回顶部）
-    ══════════════════════════════════════ */
-    #float-tools {
-      position: fixed; right: 28px; bottom: 84px;
-      display: flex; flex-direction: column; gap: 10px;
-      z-index: 9998;
-    }
-    .float-btn {
-      width: 46px; height: 46px; border-radius: 50%;
-      background: #fff; border: none; color: #555;
-      font-size: 1.1rem; cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-    }
-    .float-btn:hover { background: #f0f4ff; color: #1677ff; transform: scale(1.08); }
-    body.dark-mode .float-btn { background: #1e2736; color: #aaa; }
-    body.dark-mode .float-btn:hover { background: #263045; color: #fff; }
-
-    /* 回顶部默认隐藏，滚动后出现 */
-    #go-top { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-    #go-top.visible { opacity: 1; pointer-events: auto; }
-
-    /* ══════════════════════════════════════
-       搜索全屏模态框
-    ══════════════════════════════════════ */
-    #search-modal {
-      display: none;
-      position: fixed; inset: 0; z-index: 10000;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 120px;
-    }
-    #search-modal.open { display: flex; }
-    #search-modal-box {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px 28px;
-      width: 100%; max-width: 600px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-      animation: modal-in 0.2s ease;
-    }
-    body.dark-mode #search-modal-box { background: #1e2736; }
-    @keyframes modal-in {
-      from { opacity:0; transform: translateY(-20px); }
-      to   { opacity:1; transform: translateY(0); }
-    }
-    #search-modal-engines {
-      display: flex; flex-wrap: wrap; gap: 6px;
-      margin-bottom: 16px; align-items: center;
-    }
-    #search-modal-engines .modal-cat-label {
-      font-size: 0.8rem; font-weight: 700; color: #888;
-      margin-right: 4px;
-    }
-    #search-modal-engines .modal-engine-btn {
-      padding: 4px 14px; border-radius: 14px; border: 1px solid #e0e0e0;
-      background: #f5f5f5; color: #555;
-      font-size: 0.8rem; font-weight: 600; cursor: pointer;
-      transition: all 0.15s;
-    }
-    #search-modal-engines .modal-engine-btn:hover,
-    #search-modal-engines .modal-engine-btn.active {
-      background: #1677ff; color: #fff; border-color: #1677ff;
-    }
-    body.dark-mode #search-modal-engines .modal-engine-btn {
-      background: #263045; border-color: #2a3448; color: #aaa;
-    }
-    body.dark-mode #search-modal-engines .modal-engine-btn.active {
-      background: #1677ff; color: #fff;
-    }
-    #search-modal-form {
-      display: flex; align-items: center; gap: 10px;
-      border: 1.5px solid #e0e0e0; border-radius: 10px;
-      padding: 4px 6px 4px 16px;
-      transition: border-color 0.2s;
-    }
-    #search-modal-form:focus-within { border-color: #1677ff; }
-    body.dark-mode #search-modal-form { border-color: #2a3448; background: #263045; }
-    #search-modal-input {
-      flex: 1; border: none; outline: none; background: transparent;
-      font-size: 1rem; color: #222; padding: 10px 0;
-    }
-    body.dark-mode #search-modal-input { color: #ddd; }
-    #search-modal-input::placeholder { color: #aaa; }
-    #search-modal-submit {
-      background: #1677ff; border: none; color: #fff;
-      width: 38px; height: 38px; border-radius: 8px;
-      font-size: 0.9rem; cursor: pointer; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
-    #search-modal-submit:hover { background: #0958d9; }
-    #search-modal-close {
-      position: fixed; bottom: calc(120px - 60px);
-      left: 50%; transform: translateX(-50%);
-      background: none; border: none; color: rgba(255,255,255,0.8);
-      font-size: 2rem; cursor: pointer; margin-top: 20px;
-      transition: color 0.2s; z-index: 10001;
-    }
-    #search-modal-close:hover { color: #fff; }
-
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>王五导航</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+  <link rel="stylesheet" href="style.css">
 </head>
-
-<body class="io-grey-mode">
-
-<!-- 固定顶部栏 -->
-<div id="top-bar">
-  <button id="top-bar-toggle" onclick="toggleSidebar()" title="切换侧边栏">
-    <i class="fas fa-bars"></i>
-  </button>
-  <span id="top-quote" title="点击换一条"></span>
-</div>
-
-<div class="page-container">
-
-  <!-- 左侧边栏 -->
-  <div id="sidebar" class="sticky sidebar-nav fade" style="width:180px;">
-    <div class="modal-dialog h-100 sidebar-nav-inner">
-
-      <!-- Logo -->
-      <div class="sidebar-logo border-bottom border-color">
-        <div class="logo">
-          <a class="logo-title-link" onclick="switchToMain()">
-            <img src="assets/images/logo.png" class="logo-img" alt="logo"
-                 onerror="this.style.display='none'">
-            <span class="logo-title-text">王五导航</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- 菜单 -->
-      <div class="sidebar-menu flex-fill">
-        <div class="sidebar-scroll">
-          <div class="sidebar-menu-inner">
-            <ul id="main-menu"></ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- 底部切换主题 -->
-      <div class="border-top py-2 border-color">
-        <div class="flex-bottom">
-          <ul>
-            <li class="sidebar-item">
-              <a onclick="switchToMain()" style="cursor:pointer;">
-                <span class="sidebar-emoji">🔄</span>
-                <span class="menu-label">切换主题</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-
+<body>
+<video id="bgLayer" autoplay muted playsinline></video>
+<div id="bgOverlay"></div>
+<div class="container">
+  <!-- 头部 -->
+  <div class="header-area">
+    <div>
+      <h1>王五导航</h1>
+      <p class="header-subtitle" id="daily-quote" style="opacity:0;transition:opacity 0.4s ease;">沉舟侧畔千帆过，病树前头万木春。</p>
     </div>
   </div>
-
-  <!-- 悬停浮层（收起时显示分类名） -->
-  <div id="sidebar-popup-label" class="sidebar-popup-label"></div>
-
-  <!-- 主内容区 -->
-  <div id="content-wrap" class="content-wrap">
-    <!-- 顶部栏占位 -->
-    <div id="top-bar-spacer"></div>
-
-    <!-- 顶部搜索 banner -->
-    <div class="header-big post-top css-color mb-4" id="search-bg">
-
-      <!-- 背景图层 -->
-      <div class="banner-bg" id="banner-bg-layer"></div>
-      <!-- 遮罩 -->
-      <div class="banner-overlay"></div>
-
-
-      <div class="s-search">
-        <!-- 分类 Tab -->
-        <div class="s-type text-center">
-          <div class="s-type-list big" id="ws-tabs"></div>
-        </div>
-
-        <!-- 搜索框 -->
-        <form class="super-search-fm" onsubmit="doSearch(event)">
-          <button type="button" class="ws-engine-trigger" id="ws-engine-trigger" onclick="toggleEnginePanel()">
-            <img id="ws-engine-icon" src="" alt="" onerror="this.style.display='none'">
-            <span id="ws-engine-name"></span>
-            <span class="arrow" id="ws-engine-arrow">▾</span>
-          </button>
-          <div class="ws-divider"></div>
-          <input type="text" id="search-text" class="form-control search-key"
-                 placeholder="搜索网页 / 定位站内网站"
-                 autocomplete="off"
-                 oninput="onSearchInput()"
-                 onkeydown="onSearchKeydown(event)" />
-          <button class="submit" type="submit">
-            <i class="iconfont icon-search"></i>
-          </button>
-        </form>
-
-        <!-- 快捷引擎标签（搜索框下方一排，对标图1） -->
-        <div class="quick-engines" id="quick-engines"></div>
-
-        <!-- 引擎面板（展开时显示） -->
-        <div id="search-list" style="display:none;"></div>
-      </div>
-    </div>
-
-    <!-- 链接内容区 -->
-    <div id="content" class="content-site customize-site">
-      <p style="color:#999;text-align:center;padding:3rem;">加载中...</p>
-    </div>
-
-  </div>
-</div>
-
-<!-- 右下角暗色模式切换按钮 -->
-<button id="dark-toggle" title="切换暗色模式" onclick="toggleDark()">
-  <i class="fas fa-moon" id="dark-icon"></i>
-</button>
-
-<!-- 搜索全屏模态框 -->
-<div id="search-modal" onclick="closeSearchModal(event)">
-  <div id="search-modal-box">
-    <div id="search-modal-engines" id="search-modal-engines"></div>
-    <div id="search-modal-form">
-      <input id="search-modal-input" type="text" placeholder="搜索…"
-             oninput="filterCards(this.value)"
-             onkeydown="onModalKeydown(event)" autocomplete="off" />
-      <button id="search-modal-submit" onclick="doModalSearch()">
-        <i class="fas fa-search"></i>
+  <!-- 搜索区域 -->
+  <div class="search-wrapper">
+    <!-- 分类 Tab -->
+    <div class="search-tabs" id="searchTabs"></div>
+    <!-- 搜索框 -->
+    <div class="search-box">
+      <button class="engine-trigger" id="engineTrigger" aria-label="切换搜索引擎">
+        <img id="search-engine-icon" src="" alt="搜索引擎图标">
+        <span class="engine-name" id="engineName"></span>
+        <span class="engine-arrow" id="engineArrow">▾</span>
+      </button>
+      <div class="search-divider"></div>
+      <input type="text" id="searchInput" placeholder="搜索网页 / 定位站内网站" autocomplete="off" oninput="filterLinks()" />
+      <button class="clear-btn" id="clearBtn" aria-label="清空" style="display:none;" onclick="clearSearch()">✕</button>
+      <button class="search-submit-btn" onclick="doSearch()" aria-label="搜索">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
       </button>
     </div>
+    <!-- 内联引擎面板（展开时出现在搜索框正下方，撑开布局） -->
+    <div class="engine-list" id="enginePanel" style="display:none;"></div>
   </div>
-  <button id="search-modal-close" onclick="closeSearchModal()">
-    <i class="fas fa-times-circle"></i>
-  </button>
+  <!-- 链接分区（由 main.js 动态渲染） -->
+  <div id="main-content"></div>
 </div>
-
-<!-- 右下角工具栏：站内搜索 + 回顶部 -->
-<div id="float-tools">
-  <button class="float-btn" id="go-top" title="回到顶部" onclick="scrollToTop()">
-    <i class="fas fa-chevron-up"></i>
-  </button>
-  <button class="float-btn" id="site-search-btn" title="站内搜索" onclick="openSearchModal()">
-    <i class="fas fa-search"></i>
-  </button>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="assets/js/bootstrap.min-4.3.1.js"></script>
-<script src="assets/js/lazyload.min-12.4.0.js"></script>
 <script src="main.js"></script>
 <script>
-/* ══════════════════════════════════════
-   侧边栏 — 顶部栏汉堡按钮切换
-══════════════════════════════════════ */
-(function() {
-  const EXPANDED_W = '180px';
-  const MINI_W     = '60px';
-  const sidebar    = document.getElementById('sidebar');
-  const wrap       = document.getElementById('content-wrap');
-  const topBar     = document.getElementById('top-bar');
+  const cursor = document.createElement('div');
+  cursor.style.cssText = `
+    position: fixed;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.0) 45%),
+      radial-gradient(circle at 70% 75%, rgba(255,255,255,0.15) 0%, transparent 40%);
+    border: 1.5px solid rgba(255,255,255,0.6);
+    box-shadow:
+      0 0 8px rgba(255,255,255,0.2),
+      inset 0 0 6px rgba(255,255,255,0.08);
+    backdrop-filter: blur(1px);
+  `;
+  document.body.appendChild(cursor);
 
-  let isExpanded = localStorage.getItem('sidebarExpanded') !== '0';
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let glowX = mouseX;
+  let glowY = mouseY;
 
-  function applyState(animate) {
-    if (!animate) sidebar.style.transition = 'none';
-    if (isExpanded) {
-      sidebar.classList.remove('mini-sidebar');
-      sidebar.style.width = EXPANDED_W;
-      wrap.style.marginLeft = EXPANDED_W;
-      if (topBar) topBar.style.left = EXPANDED_W;
-    } else {
-      sidebar.classList.add('mini-sidebar');
-      sidebar.style.width = MINI_W;
-      wrap.style.marginLeft = MINI_W;
-      if (topBar) topBar.style.left = MINI_W;
-    }
-    if (!animate) requestAnimationFrame(() => sidebar.style.transition = '');
-  }
-
-  window.toggleSidebar = function() {
-    isExpanded = !isExpanded;
-    localStorage.setItem('sidebarExpanded', isExpanded ? '1' : '0');
-    applyState(true);
-  };
-
-  applyState(false);
-
-  /* ── 收起时悬停菜单项显示浮层 ── */
-  const popup = document.getElementById('sidebar-popup-label');
-  let popupTimer = null;
-
-  document.getElementById('main-menu').addEventListener('mouseover', function(e) {
-    if (!sidebar.classList.contains('mini-sidebar')) return;
-    const li = e.target.closest('li');
-    if (!li) return;
-    const label = li.querySelector('.menu-label');
-    if (!label) return;
-    clearTimeout(popupTimer);
-    const rect = li.getBoundingClientRect();
-    popup.textContent = label.textContent;
-    popup.style.top = (rect.top + rect.height / 2 - 16) + 'px';
-    popup.classList.add('show');
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
   });
 
-  document.getElementById('main-menu').addEventListener('mouseout', function(e) {
-    const li = e.target.closest('li');
-    if (!li) return;
-    popupTimer = setTimeout(() => popup.classList.remove('show'), 120);
-  });
-
-  popup.addEventListener('mouseenter', () => clearTimeout(popupTimer));
-  popup.addEventListener('mouseleave', () => popup.classList.remove('show'));
-})();
-
-/* ══════════════════════════════════════
-   暗色模式（记忆状态）
-══════════════════════════════════════ */
-function toggleDark() {
-  const isDark = document.body.classList.toggle('dark-mode');
-  localStorage.setItem('darkMode', isDark ? '1' : '0');
-  document.getElementById('dark-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-}
-window.toggleDark = toggleDark;
-
-(function() {
-  if (localStorage.getItem('darkMode') === '1') {
-    document.body.classList.add('dark-mode');
-    const icon = document.getElementById('dark-icon');
-    if (icon) icon.className = 'fas fa-sun';
-  }
-})();
-
-/* ══════════════════════════════════════
-   Banner 背景图
-   修改下方路径即可更换背景图
-   支持相对路径，如 assets/images/banner.jpg
-══════════════════════════════════════ */
-(function() {
-  const BANNER_IMAGE = 'assets/images/banner.jpg';
-  const layer = document.getElementById('banner-bg-layer');
-  if (!layer) return;
-  layer.style.backgroundImage = `url(${BANNER_IMAGE})`;
-  requestAnimationFrame(() => layer.classList.add('loaded'));
-})();
-
-/* ══════════════════════════════════════
-   格言（固定顶部栏右侧）
-══════════════════════════════════════ */
-(function() {
-  let quotes = [];
-  let currentIdx = -1;
-
-  async function loadQuotes() {
-    try {
-      const res = await fetch('../quotes.json');
-      quotes = await res.json();
-      showQuote();
-    } catch(e) {
-      console.warn('quotes.json 加载失败', e);
-    }
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    cursor.style.display = 'none';
   }
 
-  function showQuote(forceIdx) {
-    if (!quotes.length) return;
-    const el = document.getElementById('top-quote');
-    if (!el) return;
-    let idx = forceIdx;
-    if (idx === undefined) {
-      do { idx = Math.floor(Math.random() * quotes.length); }
-      while (idx === currentIdx && quotes.length > 1);
-    }
-    currentIdx = idx;
-    el.classList.add('fade-out');
-    setTimeout(() => {
-      el.textContent = quotes[idx].text;
-      el.classList.remove('fade-out');
-      el.classList.add('fade-in');
-    }, 350);
+  function animateCursor() {
+    const ease = 0.03;
+    glowX += (mouseX - glowX) * ease;
+    glowY += (mouseY - glowY) * ease;
+    cursor.style.left = glowX + 'px';
+    cursor.style.top  = glowY + 'px';
+    requestAnimationFrame(animateCursor);
   }
-
-  document.getElementById('top-quote')?.addEventListener('click', () => showQuote());
-  loadQuotes();
-  setInterval(() => showQuote(), 60000);
-})();
-
-/* ══════════════════════════════════════
-   回顶部（滚动超过300px后出现）
-══════════════════════════════════════ */
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-window.scrollToTop = scrollToTop;
-
-window.addEventListener('scroll', function() {
-  const btn = document.getElementById('go-top');
-  if (!btn) return;
-  if (window.scrollY > 300) btn.classList.add('visible');
-  else btn.classList.remove('visible');
-});
-
-/* ══════════════════════════════════════
-   搜索全屏模态框
-══════════════════════════════════════ */
-function openSearchModal() {
-  const modal = document.getElementById('search-modal');
-  const input = document.getElementById('search-modal-input');
-  if (!modal) return;
-  // 渲染引擎按钮（当前分类）
-  renderModalEngines();
-  modal.classList.add('open');
-  setTimeout(() => input?.focus(), 80);
-}
-window.openSearchModal = openSearchModal;
-
-function closeSearchModal(e) {
-  if (e && e.target !== document.getElementById('search-modal') &&
-      e.target !== document.getElementById('search-modal-close') &&
-      !document.getElementById('search-modal-close').contains(e.target)) return;
-  const modal = document.getElementById('search-modal');
-  const input = document.getElementById('search-modal-input');
-  if (modal) modal.classList.remove('open');
-  if (input) { input.value = ''; filterCards(''); }
-}
-window.closeSearchModal = closeSearchModal;
-
-function doModalSearch() {
-  const kw = document.getElementById('search-modal-input')?.value.trim();
-  if (kw) window.open(currentEngine.url + encodeURIComponent(kw), '_blank');
-}
-window.doModalSearch = doModalSearch;
-
-function onModalKeydown(e) {
-  if (e.key === 'Enter') doModalSearch();
-  if (e.key === 'Escape') closeSearchModal(e);
-}
-window.onModalKeydown = onModalKeydown;
-
-function renderModalEngines() {
-  const wrap = document.getElementById('search-modal-engines');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  const cat = SEARCH_CATEGORIES.find(c => c.id === currentCategoryId);
-  if (!cat) return;
-  const catLabel = document.createElement('span');
-  catLabel.className = 'modal-cat-label';
-  catLabel.textContent = cat.label + ' ›';
-  wrap.appendChild(catLabel);
-  cat.engines.forEach(engine => {
-    const btn = document.createElement('button');
-    btn.className = 'modal-engine-btn' + (engine === currentEngine ? ' active' : '');
-    btn.textContent = engine.name;
-    btn.onclick = () => {
-      currentEngine = engine;
-      updateEngineDisplay();
-      renderQuickEngines();
-      renderModalEngines();
-      document.getElementById('search-modal-input')?.focus();
-    };
-    wrap.appendChild(btn);
-  });
-}
-
-// Esc 关闭模态框
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    const modal = document.getElementById('search-modal');
-    if (modal?.classList.contains('open')) {
-      modal.classList.remove('open');
-      const input = document.getElementById('search-modal-input');
-      if (input) { input.value = ''; filterCards(''); }
-    }
-  }
-});
+  animateCursor();
 </script>
 </body>
 </html>
