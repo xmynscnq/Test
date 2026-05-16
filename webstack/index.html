@@ -16,66 +16,92 @@
 
   <style>
     /* ══════════════════════════════════════
-       侧边栏整体 — 默认展开，按钮切换
+       固定顶部栏
+    ══════════════════════════════════════ */
+    #top-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 50px; z-index: 1090;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      display: flex; align-items: center;
+      padding: 0 16px 0 0;
+      transition: background 0.3s;
+    }
+    body.dark-mode #top-bar {
+      background: rgba(26,34,48,0.95);
+      border-color: rgba(255,255,255,0.06);
+    }
+
+    /* 顶部栏汉堡按钮 */
+    #top-bar-toggle {
+      width: 50px; height: 50px; flex-shrink: 0;
+      background: none; border: none; cursor: pointer;
+      color: #515c6b; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s;
+    }
+    #top-bar-toggle:hover { color: #1677ff; }
+    body.dark-mode #top-bar-toggle { color: #9aaabb; }
+    body.dark-mode #top-bar-toggle:hover { color: #fff; }
+
+    /* 顶部栏格言 */
+    #top-quote {
+      flex: 1; text-align: right;
+      font-size: 0.78rem; font-style: italic;
+      color: #888; cursor: pointer;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      padding: 0 8px;
+      transition: color 0.2s, opacity 0.4s;
+    }
+    #top-quote:hover { color: #555; }
+    body.dark-mode #top-quote { color: #6a7a8a; }
+    body.dark-mode #top-quote:hover { color: #9aaabb; }
+    #top-quote.fade-out { opacity: 0; }
+    #top-quote.fade-in  { opacity: 1; }
+
+    /* 顶部栏占位（防止内容被遮住） */
+    #top-bar-spacer { height: 50px; flex-shrink: 0; }
+
+    /* ══════════════════════════════════════
+       侧边栏整体 — 默认展开，顶部栏汉堡切换
     ══════════════════════════════════════ */
     #sidebar {
+      top: 50px !important;          /* 顶部栏下方开始 */
+      height: calc(100vh - 50px) !important;
       transition: width 0.25s ease;
     }
-    .sidebar-nav-inner {
-      max-width: none !important;
-    }
+    .sidebar-nav-inner { max-width: none !important; }
 
     /* Logo 区域 */
     .sidebar-logo {
       padding: 0 14px !important;
-      height: 56px; display: flex; align-items: center;
-      justify-content: space-between;
-      overflow: visible !important;
-      flex-shrink: 0;
+      height: 60px; display: flex; align-items: center; gap: 10px;
+      overflow: visible !important; flex-shrink: 0;
     }
     .sidebar-nav .logo {
-      overflow: visible !important;
-      text-align: left !important;
-      line-height: normal !important;
-      width: auto !important;
-      flex: 1; min-width: 0;
+      overflow: visible !important; text-align: left !important;
+      line-height: normal !important; width: auto !important;
+      flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
     }
-    .logo-title-link { cursor: pointer; text-decoration: none !important; display: block; white-space: nowrap; overflow: hidden; }
+    .logo-img {
+      width: 32px; height: 32px; border-radius: 8px;
+      object-fit: contain; flex-shrink: 0;
+    }
+    .logo-title-link {
+      cursor: pointer; text-decoration: none !important;
+      display: flex; align-items: center; gap: 10px; white-space: nowrap;
+    }
     .logo-title-link:hover { opacity: 0.8; }
-    .logo-title-text { font-size: 1.05rem; font-weight: 900; letter-spacing: 0.04em; line-height: 1.2; display: block; white-space: nowrap; }
-    .logo-title-sub  { font-size: 0.54rem; letter-spacing: 0.08em; opacity: 0.5; display: block; margin-top: 2px; text-transform: uppercase; white-space: nowrap; }
-
-    /* 汉堡按钮 */
-    #sidebar-toggle {
-      background: none; border: none; cursor: pointer;
-      color: #515c6b; padding: 6px; border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: color 0.2s, background 0.2s;
-      font-size: 1rem;
+    .logo-title-text {
+      font-size: 1.05rem; font-weight: 900;
+      letter-spacing: 0.04em; white-space: nowrap;
     }
-    #sidebar-toggle:hover { color: #1677ff; background: rgba(22,119,255,0.08); }
-    body.dark-mode #sidebar-toggle { color: #9aaabb; }
-    body.dark-mode #sidebar-toggle:hover { color: #fff; }
 
-    /* 收起时隐藏 logo 文字和汉堡按钮，只留 emoji 图标触发 */
+    /* 收起时隐藏 logo */
+    #sidebar.mini-sidebar .sidebar-logo { justify-content: center; padding: 0 !important; }
     #sidebar.mini-sidebar .logo-title-link { display: none; }
-    #sidebar.mini-sidebar #sidebar-toggle { display: none; }
-
-    /* 收起时 logo 区域变成一个居中的汉堡图标占位 */
-    #sidebar.mini-sidebar .sidebar-logo {
-      justify-content: center;
-      padding: 0 !important;
-    }
-    #sidebar-mini-toggle {
-      display: none;
-      background: none; border: none; cursor: pointer;
-      color: #515c6b; padding: 6px; border-radius: 6px;
-      align-items: center; justify-content: center;
-      transition: color 0.2s; font-size: 1rem; width: 100%; height: 56px;
-    }
-    #sidebar.mini-sidebar #sidebar-mini-toggle { display: flex; }
-    #sidebar-mini-toggle:hover { color: #1677ff; }
-    body.dark-mode #sidebar-mini-toggle { color: #9aaabb; }
 
     /* ── 菜单项 ── */
     .sidebar-emoji {
@@ -83,22 +109,14 @@
       width: 36px; height: 36px;
       align-items: center; justify-content: center;
       flex-shrink: 0; border-radius: 8px;
-      transition: background 0.15s;
     }
-    /* 展开时菜单项样式 */
     #main-menu li a {
-      display: flex !important;
-      align-items: center;
-      gap: 10px;
-      padding: 0 14px !important;
-      height: 42px;
-      line-height: 42px !important;
-      max-height: 42px !important;
-      border-radius: 8px;
-      margin: 2px 8px;
+      display: flex !important; align-items: center; gap: 10px;
+      padding: 0 14px !important; height: 42px;
+      line-height: 42px !important; max-height: 42px !important;
+      border-radius: 8px; margin: 2px 8px;
       transition: background 0.15s, color 0.15s;
-      white-space: nowrap;
-      overflow: hidden;
+      white-space: nowrap; overflow: hidden;
     }
     #main-menu li a:hover { background: rgba(22,119,255,0.08) !important; color: #1677ff !important; }
     #main-menu li.active > a { background: rgba(22,119,255,0.12) !important; color: #1677ff !important; }
@@ -106,35 +124,24 @@
 
     /* 收起时隐藏文字 */
     #sidebar.mini-sidebar #main-menu li a {
-      justify-content: center;
-      padding: 0 !important;
-      margin: 2px 6px;
-      height: 42px;
-      position: relative;
+      justify-content: center; padding: 0 !important;
+      margin: 2px 6px; height: 42px; position: relative;
     }
     #sidebar.mini-sidebar #main-menu li a .menu-label { display: none; }
 
     /* ── 收起时悬停浮层 ── */
     .sidebar-popup-label {
-      position: fixed;
-      left: 64px;
-      background: #fff;
-      color: #333;
+      position: fixed; left: 64px;
+      background: #fff; color: #333;
       font-size: 0.82rem; font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 8px;
+      padding: 6px 14px; border-radius: 8px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.14);
-      pointer-events: none;
-      opacity: 0;
+      pointer-events: none; opacity: 0;
       transform: translateX(-6px);
       transition: opacity 0.15s, transform 0.15s;
-      white-space: nowrap;
-      z-index: 9999;
+      white-space: nowrap; z-index: 9999;
     }
-    .sidebar-popup-label.show {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    .sidebar-popup-label.show { opacity: 1; transform: translateX(0); }
     body.dark-mode .sidebar-popup-label { background: #263045; color: #ddd; }
 
     /* ══════════════════════════════════════
@@ -294,14 +301,12 @@
     .url-card .card { border-radius: 10px; transition: background 0.3s, border-color 0.3s; }
 
     /* ══════════════════════════════════════
-       内容区
+       内容区 — 顶部留出顶部栏高度
     ══════════════════════════════════════ */
     .content-wrap { overflow: auto; }
-
     /* ══════════════════════════════════════
        暗色模式
     ══════════════════════════════════════ */
-    body.dark-mode { background: #12181f !important; color: #d4d4d4 !important; }
     body.dark-mode .page-container { background: #12181f !important; }
     body.dark-mode #sidebar { background: #1a2230 !important; border-color: #2a3448 !important; }
     body.dark-mode .border-color { border-color: #2a3448 !important; }
@@ -437,50 +442,34 @@
     }
     #search-modal-close:hover { color: #fff; }
 
-    /* ══════════════════════════════════════
-       右上角格言
-    ══════════════════════════════════════ */
-    #quote-box {
-      position: absolute; top: 14px; right: 18px;
-      z-index: 10; max-width: 340px; text-align: right;
-      cursor: pointer;
-    }
-    #quote-text {
-      font-size: 0.78rem; color: rgba(255,255,255,0.75);
-      font-style: italic; line-height: 1.6;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
-      transition: opacity 0.4s;
-      display: block;
-    }
-    #quote-text:hover { color: rgba(255,255,255,1); }
-    #quote-text.fade-out { opacity: 0; }
-    #quote-text.fade-in  { opacity: 1; }
   </style>
 </head>
 
 <body class="io-grey-mode">
+
+<!-- 固定顶部栏 -->
+<div id="top-bar">
+  <button id="top-bar-toggle" onclick="toggleSidebar()" title="切换侧边栏">
+    <i class="fas fa-bars"></i>
+  </button>
+  <span id="top-quote" title="点击换一条"></span>
+</div>
+
 <div class="page-container">
 
   <!-- 左侧边栏 -->
   <div id="sidebar" class="sticky sidebar-nav fade" style="width:180px;">
     <div class="modal-dialog h-100 sidebar-nav-inner">
 
-      <!-- Logo + 汉堡按钮 -->
+      <!-- Logo -->
       <div class="sidebar-logo border-bottom border-color">
-        <!-- 收起状态：居中汉堡 -->
-        <button id="sidebar-mini-toggle" onclick="toggleSidebar()" title="展开侧边栏">
-          <i class="fas fa-bars"></i>
-        </button>
-        <!-- 展开状态：logo + 汉堡 -->
         <div class="logo">
           <a class="logo-title-link" onclick="switchToMain()">
+            <img src="assets/images/logo.png" class="logo-img" alt="logo"
+                 onerror="this.style.display='none'">
             <span class="logo-title-text">王五导航</span>
-            <span class="logo-title-sub">click to switch</span>
           </a>
         </div>
-        <button id="sidebar-toggle" onclick="toggleSidebar()" title="收起侧边栏">
-          <i class="fas fa-bars"></i>
-        </button>
       </div>
 
       <!-- 菜单 -->
@@ -514,6 +503,8 @@
 
   <!-- 主内容区 -->
   <div id="content-wrap" class="content-wrap">
+    <!-- 顶部栏占位 -->
+    <div id="top-bar-spacer"></div>
 
     <!-- 顶部搜索 banner -->
     <div class="header-big post-top css-color mb-4" id="search-bg">
@@ -523,11 +514,6 @@
       <!-- 遮罩 -->
       <div class="banner-overlay"></div>
 
-
-      <!-- 格言（右上角） -->
-      <div id="quote-box" title="点击换一条">
-        <span id="quote-text"></span>
-      </div>
 
       <div class="s-search">
         <!-- 分类 Tab -->
@@ -608,15 +594,15 @@
 <script src="main.js"></script>
 <script>
 /* ══════════════════════════════════════
-   侧边栏 — 默认展开，汉堡按钮切换
+   侧边栏 — 顶部栏汉堡按钮切换
 ══════════════════════════════════════ */
 (function() {
   const EXPANDED_W = '180px';
   const MINI_W     = '60px';
   const sidebar    = document.getElementById('sidebar');
   const wrap       = document.getElementById('content-wrap');
+  const topBar     = document.getElementById('top-bar');
 
-  // 读取上次状态，默认展开
   let isExpanded = localStorage.getItem('sidebarExpanded') !== '0';
 
   function applyState(animate) {
@@ -625,10 +611,12 @@
       sidebar.classList.remove('mini-sidebar');
       sidebar.style.width = EXPANDED_W;
       wrap.style.marginLeft = EXPANDED_W;
+      if (topBar) topBar.style.left = EXPANDED_W;
     } else {
       sidebar.classList.add('mini-sidebar');
       sidebar.style.width = MINI_W;
       wrap.style.marginLeft = MINI_W;
+      if (topBar) topBar.style.left = MINI_W;
     }
     if (!animate) requestAnimationFrame(() => sidebar.style.transition = '');
   }
@@ -639,7 +627,6 @@
     applyState(true);
   };
 
-  // 初始化（无动画）
   applyState(false);
 
   /* ── 收起时悬停菜单项显示浮层 ── */
@@ -652,7 +639,6 @@
     if (!li) return;
     const label = li.querySelector('.menu-label');
     if (!label) return;
-
     clearTimeout(popupTimer);
     const rect = li.getBoundingClientRect();
     popup.textContent = label.textContent;
@@ -702,7 +688,7 @@ window.toggleDark = toggleDark;
 })();
 
 /* ══════════════════════════════════════
-   格言（右上角，读取 quotes.json）
+   格言（固定顶部栏右侧）
 ══════════════════════════════════════ */
 (function() {
   let quotes = [];
@@ -720,16 +706,14 @@ window.toggleDark = toggleDark;
 
   function showQuote(forceIdx) {
     if (!quotes.length) return;
-    const el = document.getElementById('quote-text');
+    const el = document.getElementById('top-quote');
     if (!el) return;
-
     let idx = forceIdx;
     if (idx === undefined) {
       do { idx = Math.floor(Math.random() * quotes.length); }
       while (idx === currentIdx && quotes.length > 1);
     }
     currentIdx = idx;
-
     el.classList.add('fade-out');
     setTimeout(() => {
       el.textContent = quotes[idx].text;
@@ -738,10 +722,7 @@ window.toggleDark = toggleDark;
     }, 350);
   }
 
-  // 点击换一条
-  document.getElementById('quote-box')?.addEventListener('click', () => showQuote());
-
-  // 每60秒自动换一条
+  document.getElementById('top-quote')?.addEventListener('click', () => showQuote());
   loadQuotes();
   setInterval(() => showQuote(), 60000);
 })();
