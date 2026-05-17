@@ -14,10 +14,7 @@
   <link rel="stylesheet" href="assets/fontawesome-5.15.4/css/all.min.css" />
   <script src="assets/js/jquery.min-3.2.1.js"></script>
   <style>
-
-    /* ══════════════════════════════════════
-       全局：消除所有按钮focus轮廓和阴影
-    ══════════════════════════════════════ */
+    /* 全局消除focus轮廓 */
     button:focus, button:focus-visible,
     .btn:focus, .btn:focus-visible,
     .quick-engine-btn:focus,
@@ -27,9 +24,7 @@
       box-shadow: none !important;
     }
 
-    /* ══════════════════════════════════════
-       侧边栏
-    ══════════════════════════════════════ */
+    /* ══ 侧边栏 ══ */
     #sidebar {
       position: fixed !important;
       top: 0 !important; left: 0;
@@ -50,33 +45,21 @@
       border-color: #2a3448;
     }
 
-    /* Logo区域 */
+    /* Logo区 */
     .sidebar-logo {
       display: flex !important;
       align-items: center;
-      height: 54px; padding: 0 14px; gap: 10px;
+      height: 60px; padding: 0 14px; gap: 10px;
       border-bottom: 1px solid rgba(0,0,0,0.07);
       flex-shrink: 0; overflow: hidden;
-      background: inherit;
     }
     body.dark-mode .sidebar-logo { border-color: #2a3448; }
-
-    /* 强制覆盖所有来源的图标尺寸限制 */
-    div#sidebar .sidebar-logo img,
-    div#sidebar .sidebar-logo img[src],
-    #sidebar .sidebar-nav-inner .sidebar-logo img {
-      width: 38px !important;
-      height: 38px !important;
-      min-width: 38px !important;
-      min-height: 38px !important;
-      max-width: 38px !important;
-      max-height: 38px !important;
-      border-radius: 10px !important;
-      object-fit: contain !important;
-      flex-shrink: 0 !important;
-      display: block !important;
+    /* CSS层面也写上，JS行内样式会覆盖 */
+    .sidebar-logo img {
+      border-radius: 10px;
+      object-fit: contain;
+      flex-shrink: 0;
     }
-
     #sidebar-logo-text {
       font-size: 1.18rem; font-weight: 900;
       letter-spacing: 0.04em; white-space: nowrap; color: #222;
@@ -106,11 +89,7 @@
     }
     #main-menu li a:hover { background: rgba(22,119,255,0.08) !important; color: #1677ff !important; }
     #main-menu li.active > a { background: rgba(22,119,255,0.12) !important; color: #1677ff !important; }
-    /* 侧边栏分类字体与右侧内容标题一致 */
-    #main-menu li a .menu-label {
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
+    #main-menu li a .menu-label { font-size: 0.95rem; font-weight: 600; }
     #sidebar.mini-sidebar #main-menu li a {
       justify-content: center; padding: 0 !important; margin: 2px 6px;
     }
@@ -148,9 +127,7 @@
     #sidebar.mini-sidebar .sidebar-bottom li a { justify-content: center; padding: 0 !important; margin: 2px 6px; }
     #sidebar.mini-sidebar .sidebar-bottom li a .menu-label { display: none; }
 
-    /* ══════════════════════════════════════
-       顶部栏
-    ══════════════════════════════════════ */
+    /* ══ 顶部栏 ══ */
     #top-bar {
       position: fixed; top: 0; right: 0;
       height: 54px; z-index: 1089;
@@ -162,10 +139,7 @@
       padding: 0 24px 0 0;
       transition: background 0.3s, left 0.25s, backdrop-filter 0.3s, border-color 0.3s;
     }
-    body.dark-mode #top-bar {
-      background: rgba(18,24,31,0.82);
-      border-color: rgba(255,255,255,0.06);
-    }
+    body.dark-mode #top-bar { background: rgba(18,24,31,0.82); border-color: rgba(255,255,255,0.06); }
     #top-bar.at-top {
       background: transparent !important;
       backdrop-filter: none !important;
@@ -184,7 +158,7 @@
     body.dark-mode #top-bar-toggle { color: #9aaabb; }
     body.dark-mode #top-bar-toggle:hover { color: #fff; }
 
-    /* 格言加深 */
+    /* 格言 */
     #top-quote {
       flex: 1; text-align: right;
       font-size: 0.82rem; font-style: italic;
@@ -198,21 +172,16 @@
     body.dark-mode #top-quote:hover { color: #fff; }
     #top-quote.fade-out { opacity: 0; }
     #top-quote.fade-in  { opacity: 1; }
-
     #top-bar-spacer { height: 54px; flex-shrink: 0; }
 
-    /* ══════════════════════════════════════
-       主内容区
-    ══════════════════════════════════════ */
+    /* ══ 主内容 ══ */
     .page-container { display: flex; }
     #content-wrap { flex: 1; overflow: auto; min-width: 0; }
 
-    /* ══════════════════════════════════════
-       Banner — 去掉mb-4白缝，直接与网格衔接
-    ══════════════════════════════════════ */
+    /* ══ Banner ══ */
     .header-big {
       position: relative; text-align: center;
-      min-height: 220px; overflow: hidden;
+      min-height: 240px; overflow: hidden;
       display: flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, #1a2a3a 0%, #0f3460 50%, #1a2a3a 100%);
       margin-bottom: 0 !important;
@@ -229,16 +198,13 @@
       z-index: 1;
     }
 
-    /* ══════════════════════════════════════
-       搜索区
-    ══════════════════════════════════════ */
+    /* ══ 搜索区 ══ */
     .s-search {
       position: relative; z-index: 2;
       width: 100%; max-width: 780px;
-      margin: 0 auto; padding: 24px 20px;
+      margin: 0 auto; padding: 28px 20px;
     }
-
-    /* 分类Tab — 字体加大 */
+    /* 分类Tab */
     .header-big .s-type-list.big, .s-type-list.big {
       display: flex !important; flex-direction: row !important;
       flex-wrap: wrap !important; position: static !important;
@@ -246,15 +212,15 @@
       background: none !important; box-shadow: none !important;
       padding: 0 !important; white-space: normal !important;
       overflow: visible !important; gap: 4px;
-      justify-content: center; margin-bottom: 20px;
+      justify-content: center; margin-bottom: 22px;
     }
     .header-big .s-type-list.big label, .s-type-list.big label {
       display: inline-block !important;
-      padding: 6px 20px !important;
+      padding: 6px 22px !important;
       border-radius: 0 !important;
       background: none !important; border: none !important;
       border-bottom: 2px solid transparent !important;
-      cursor: pointer; font-size: 1rem; font-weight: 600;
+      cursor: pointer; font-size: 1.05rem; font-weight: 600;
       color: rgba(255,255,255,0.55) !important;
       opacity: 1 !important; transition: all 0.18s;
       user-select: none; margin: 0; white-space: nowrap;
@@ -267,7 +233,7 @@
       left: auto !important; width: auto !important; z-index: auto !important;
     }
 
-    /* 搜索框 — 无前端按钮，放大镜纯图标，字体加大 */
+    /* 搜索框 */
     .super-search-fm {
       display: flex; align-items: center;
       background: rgba(255,255,255,0.15);
@@ -286,112 +252,83 @@
     .super-search-fm .search-key {
       flex: 1; background: transparent !important; border: none !important;
       box-shadow: none !important; color: #fff !important;
-      font-size: 1.08rem; padding: 16px 4px; height: auto;
+      font-size: 1.12rem; padding: 17px 4px; height: auto;
     }
     .super-search-fm .search-key::placeholder { color: rgba(255,255,255,0.55); }
     .super-search-fm .submit {
-      background: none !important;
-      border: none !important;
-      outline: none !important;
-      box-shadow: none !important;
+      background: none !important; border: none !important;
+      outline: none !important; box-shadow: none !important;
       color: rgba(255,255,255,0.85);
-      font-size: 1.2rem; cursor: pointer; padding: 0;
-      width: 38px; height: 38px;
+      font-size: 1.25rem; cursor: pointer; padding: 0;
+      width: 40px; height: 40px;
       display: flex; align-items: center; justify-content: center;
       transition: color 0.2s; flex-shrink: 0;
     }
     .super-search-fm .submit:hover { color: #fff; }
     .super-search-fm .submit:focus { outline: none !important; box-shadow: none !important; }
 
-    /* 快捷引擎 — 一排不换行，选中上方箭头，无框无背景 */
+    /* 快捷引擎 */
     .quick-engines {
       display: flex; gap: 0; justify-content: center;
-      flex-wrap: nowrap; margin-top: 18px;
+      flex-wrap: nowrap; margin-top: 20px;
       overflow-x: auto;
     }
     .quick-engine-btn {
-      position: relative;
-      background: none !important;
-      border: none !important;
-      outline: none !important;
-      box-shadow: none !important;
+      background: none !important; border: none !important;
+      outline: none !important; box-shadow: none !important;
       border-radius: 0 !important;
-      padding: 6px 18px 4px;
-      cursor: pointer;
+      padding: 6px 18px 4px; cursor: pointer;
       color: rgba(255,255,255,0.6);
       font-size: 0.92rem; font-weight: 600;
       transition: color 0.15s; white-space: nowrap;
       display: flex; flex-direction: column; align-items: center; gap: 3px;
     }
     .quick-engine-btn::before {
-      content: '▼';
-      font-size: 0.5rem;
-      color: transparent;
-      transition: color 0.15s;
-      line-height: 1;
+      content: '▼'; font-size: 0.5rem;
+      color: transparent; transition: color 0.15s; line-height: 1;
     }
     .quick-engine-btn.active::before { color: rgba(255,255,255,0.9); }
     .quick-engine-btn:hover { color: rgba(255,255,255,0.9) !important; }
     .quick-engine-btn.active { color: #fff !important; }
     .quick-engine-btn:focus { outline: none !important; box-shadow: none !important; }
 
-    /* ══════════════════════════════════════
-       卡片区域 — 网格纹理，直接紧贴Banner
-    ══════════════════════════════════════ */
+    /* ══ 内容区网格 ══ */
     #content.content-site {
       background-image:
-        linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
-      background-size: 22px 22px;
+        linear-gradient(rgba(0,0,0,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.07) 1px, transparent 1px);
+      background-size: 18px 18px;
       background-color: #f2f3f5;
       padding: 24px 20px 40px;
       margin-top: 0 !important;
     }
     body.dark-mode #content.content-site {
       background-image:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 22px 22px;
+        linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+      background-size: 18px 18px;
       background-color: #12181f;
     }
 
     /* 卡片 */
     .url-card .card { border-radius: 10px; }
     .url-card .card-body { padding: 0.65rem 0.85rem; }
-    .url-card strong {
-      font-size: 0.93rem !important;
-      color: #1a1a2e !important;
-      font-weight: 700 !important;
-    }
+    .url-card strong { font-size: 0.93rem !important; color: #1a1a2e !important; font-weight: 700 !important; }
     body.dark-mode .url-card strong { color: #e0e6f0 !important; }
-    .url-card p.text-muted {
-      font-size: 0.75rem !important;
-      color: #555 !important;
-    }
+    .url-card p.text-muted { font-size: 0.75rem !important; color: #555 !important; }
     body.dark-mode .url-card p.text-muted { color: #7a8a9a !important; }
-
-    /* 网站图标（卡片内） */
     .url-img { width: 40px !important; height: 40px !important; flex-shrink: 0; }
     .url-img img { width: 32px !important; height: 32px !important; border-radius: 8px; object-fit: contain; }
-
-    /* 分类标题与侧边栏字体大小一致 */
-    .ws-section h4 {
-      color: #333 !important;
-      font-weight: 700 !important;
-      font-size: 0.95rem !important;
-    }
+    .ws-section h4 { color: #333 !important; font-weight: 700 !important; font-size: 0.95rem !important; }
     body.dark-mode .ws-section h4 { color: #9aaabb !important; }
 
-    /* ══════════════════════════════════════
-       暗色模式
-    ══════════════════════════════════════ */
+    /* ══ 暗色模式 ══ */
     body.dark-mode { background: #12181f !important; color: #d4d4d4 !important; }
     body.dark-mode .page-container { background: #12181f !important; }
     body.dark-mode #content-wrap { background: #12181f !important; }
     body.dark-mode .card { background: #1e2736 !important; border-color: #2a3448 !important; color: #d4d4d4 !important; }
     body.dark-mode .card:hover { background: #263045 !important; }
 
-    /* 暗色切换 */
     #dark-toggle {
       position: fixed; bottom: 28px; right: 28px; z-index: 9999;
       width: 46px; height: 46px; border-radius: 50%;
@@ -405,7 +342,6 @@
     body.dark-mode #dark-toggle { background: #f0c040; color: #222; }
     body.dark-mode #dark-toggle:hover { background: #e6b800; }
 
-    /* 工具栏 */
     #float-tools {
       position: fixed; right: 28px; bottom: 84px;
       display: flex; flex-direction: column; gap: 10px; z-index: 9998;
@@ -424,79 +360,82 @@
     #go-top { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     #go-top.visible { opacity: 1; pointer-events: auto; }
 
-    /* ══════════════════════════════════════
-       搜索模态框
-    ══════════════════════════════════════ */
+    /* ══ 搜索模态框 — 更大更居中，去掉上下箭头 ══ */
     #search-modal {
       display: none; position: fixed; inset: 0; z-index: 10000;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      align-items: flex-start; justify-content: center;
-      padding-top: 100px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      align-items: center; justify-content: center;
     }
     #search-modal.open { display: flex; }
     #search-modal-box {
-      background: #fff; border-radius: 16px;
-      padding: 20px 24px 24px; width: 100%; max-width: 620px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      background: #fff; border-radius: 20px;
+      padding: 28px 32px 32px; width: 90%; max-width: 720px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.25);
       animation: modal-in 0.2s ease;
+      position: relative;
     }
     body.dark-mode #search-modal-box { background: #1e2736; }
     @keyframes modal-in {
-      from { opacity:0; transform: translateY(-20px); }
-      to   { opacity:1; transform: translateY(0); }
+      from { opacity:0; transform: translateY(-16px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
     }
     #search-modal-cats {
       display: flex; gap: 0; border-bottom: 1px solid #eee;
-      margin-bottom: 14px; overflow-x: auto;
+      margin-bottom: 18px; overflow-x: auto;
+      /* 隐藏滚动条上下箭头 */
+      scrollbar-width: none;
     }
+    #search-modal-cats::-webkit-scrollbar { display: none; }
     body.dark-mode #search-modal-cats { border-color: #2a3448; }
     .modal-cat-btn {
       background: none; border: none; border-bottom: 2px solid transparent;
-      padding: 6px 16px; font-size: 0.85rem; font-weight: 600;
+      padding: 8px 20px; font-size: 0.92rem; font-weight: 600;
       color: #888; cursor: pointer; white-space: nowrap;
       transition: all 0.15s; margin-bottom: -1px;
+      outline: none !important;
     }
     .modal-cat-btn:hover { color: #1677ff; }
     .modal-cat-btn.active { color: #1677ff; border-bottom-color: #1677ff; }
     body.dark-mode .modal-cat-btn { color: #6a7a8a; }
     body.dark-mode .modal-cat-btn.active { color: #4da6ff; border-bottom-color: #4da6ff; }
-    #search-modal-engines { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    #search-modal-engines { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
     .modal-engine-btn {
-      padding: 4px 14px; border-radius: 14px; border: 1px solid #e0e0e0;
+      padding: 5px 16px; border-radius: 14px; border: 1px solid #e0e0e0;
       background: #f5f5f5; color: #555;
-      font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+      outline: none !important;
     }
     .modal-engine-btn:hover, .modal-engine-btn.active { background: #1677ff; color: #fff; border-color: #1677ff; }
     body.dark-mode .modal-engine-btn { background: #263045; border-color: #2a3448; color: #aaa; }
     body.dark-mode .modal-engine-btn.active { background: #1677ff; color: #fff; }
     #search-modal-form {
       display: flex; align-items: center; gap: 10px;
-      border: 1.5px solid #e0e0e0; border-radius: 10px;
-      padding: 4px 6px 4px 16px; transition: border-color 0.2s;
+      border: 1.5px solid #e0e0e0; border-radius: 12px;
+      padding: 6px 8px 6px 20px; transition: border-color 0.2s;
     }
     #search-modal-form:focus-within { border-color: #1677ff; }
     body.dark-mode #search-modal-form { border-color: #2a3448; background: #263045; }
     #search-modal-input {
       flex: 1; border: none; outline: none; background: transparent;
-      font-size: 1rem; color: #222; padding: 10px 0;
+      font-size: 1.05rem; color: #222; padding: 10px 0;
     }
     body.dark-mode #search-modal-input { color: #ddd; }
     #search-modal-input::placeholder { color: #aaa; }
     #search-modal-submit {
       background: #1677ff; border: none; color: #fff;
-      width: 38px; height: 38px; border-radius: 8px;
-      font-size: 0.9rem; cursor: pointer; flex-shrink: 0;
+      width: 42px; height: 42px; border-radius: 10px;
+      font-size: 1rem; cursor: pointer; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
+      transition: background 0.2s; outline: none !important;
     }
     #search-modal-submit:hover { background: #0958d9; }
     #search-modal-close {
-      position: fixed; top: calc(100px + 160px);
-      left: 50%; transform: translateX(-50%);
-      background: none; border: none; color: rgba(255,255,255,0.8);
-      font-size: 2rem; cursor: pointer; margin-top: 20px;
+      position: absolute; top: -48px; left: 50%; transform: translateX(-50%);
+      background: none; border: none; color: rgba(255,255,255,0.85);
+      font-size: 2rem; cursor: pointer;
       transition: color 0.2s; z-index: 10001;
+      outline: none !important;
     }
     #search-modal-close:hover { color: #fff; }
   </style>
@@ -507,7 +446,7 @@
 <div id="sidebar" class="sidebar-nav" style="width:180px;">
   <div class="sidebar-nav-inner">
     <div class="sidebar-logo">
-      <img src="assets/images/logo.png" alt="logo" onerror="this.style.display='none'">
+      <img id="sidebar-logo-img" src="assets/images/logo.png" alt="logo" onerror="this.style.display='none'">
       <span id="sidebar-logo-text">王五导航</span>
     </div>
     <div class="sidebar-menu flex-fill">
@@ -542,7 +481,6 @@
 <div class="page-container">
   <div id="content-wrap" style="margin-left:180px;">
     <div id="top-bar-spacer"></div>
-
     <div class="header-big post-top" id="search-bg">
       <div class="banner-bg" id="banner-bg-layer"></div>
       <div class="banner-overlay"></div>
@@ -552,8 +490,7 @@
         </div>
         <form class="super-search-fm" onsubmit="doSearch(event)">
           <input type="text" id="search-text" class="form-control search-key"
-                 placeholder="搜索网页…"
-                 autocomplete="off"
+                 placeholder="搜索网页…" autocomplete="off"
                  onkeydown="onSearchKeydown(event)" />
           <button class="submit" type="submit">
             <i class="fas fa-search"></i>
@@ -562,7 +499,6 @@
         <div class="quick-engines" id="quick-engines"></div>
       </div>
     </div>
-
     <div id="content" class="content-site customize-site">
       <p style="color:#999;text-align:center;padding:3rem;">加载中...</p>
     </div>
@@ -575,6 +511,9 @@
 
 <div id="search-modal" onclick="closeSearchModal(event)">
   <div id="search-modal-box">
+    <button id="search-modal-close" onclick="closeSearchModal()">
+      <i class="fas fa-times-circle"></i>
+    </button>
     <div id="search-modal-cats"></div>
     <div id="search-modal-engines"></div>
     <div id="search-modal-form">
@@ -585,9 +524,6 @@
       </button>
     </div>
   </div>
-  <button id="search-modal-close" onclick="closeSearchModal()">
-    <i class="fas fa-times-circle"></i>
-  </button>
 </div>
 
 <div id="float-tools">
@@ -604,6 +540,30 @@
 <script src="assets/js/lazyload.min-12.4.0.js"></script>
 <script src="main.js"></script>
 <script>
+/* ── 用行内style强制设置Logo图标大小（优先级最高，无法被CSS覆盖） ── */
+(function() {
+  function fixLogoImg() {
+    const img = document.getElementById('sidebar-logo-img');
+    if (!img) return;
+    img.style.cssText = [
+      'width:52px',
+      'height:52px',
+      'min-width:52px',
+      'min-height:52px',
+      'max-width:52px',
+      'max-height:52px',
+      'border-radius:10px',
+      'object-fit:contain',
+      'flex-shrink:0',
+      'display:block'
+    ].join('!important;') + '!important';
+  }
+  fixLogoImg();
+  document.addEventListener('DOMContentLoaded', fixLogoImg);
+  window.addEventListener('load', fixLogoImg);
+})();
+
+/* ── 侧边栏 ── */
 (function() {
   const EXPANDED_W = '180px', MINI_W = '60px';
   const sidebar = document.getElementById('sidebar');
@@ -626,7 +586,6 @@
     }
     if (!animate) requestAnimationFrame(() => sidebar.style.transition = '');
   }
-
   window.toggleSidebar = function() {
     isExpanded = !isExpanded;
     localStorage.setItem('sidebarExpanded', isExpanded ? '1' : '0');
@@ -657,6 +616,7 @@
   popup.addEventListener('mouseleave', () => popup.classList.remove('show'));
 })();
 
+/* ── 暗色模式 ── */
 function toggleDark() {
   const isDark = document.body.classList.toggle('dark-mode');
   localStorage.setItem('darkMode', isDark ? '1' : '0');
@@ -671,6 +631,7 @@ window.toggleDark = toggleDark;
   }
 })();
 
+/* ── Banner背景 ── */
 (function() {
   const layer = document.getElementById('banner-bg-layer');
   if (!layer) return;
@@ -678,6 +639,7 @@ window.toggleDark = toggleDark;
   requestAnimationFrame(() => layer.classList.add('loaded'));
 })();
 
+/* ── 格言（只有点击才切换，去掉定时器和汉堡触发） ── */
 (function() {
   let quotes = [], currentIdx = -1;
   async function loadQuotes() {
@@ -687,15 +649,13 @@ window.toggleDark = toggleDark;
       showQuote();
     } catch(e) { console.warn('quotes.json 加载失败', e); }
   }
-  function showQuote(forceIdx) {
+  function showQuote() {
     if (!quotes.length) return;
     const el = document.getElementById('top-quote');
     if (!el) return;
-    let idx = forceIdx;
-    if (idx === undefined) {
-      do { idx = Math.floor(Math.random() * quotes.length); }
-      while (idx === currentIdx && quotes.length > 1);
-    }
+    let idx;
+    do { idx = Math.floor(Math.random() * quotes.length); }
+    while (idx === currentIdx && quotes.length > 1);
     currentIdx = idx;
     el.classList.add('fade-out');
     setTimeout(() => {
@@ -704,11 +664,12 @@ window.toggleDark = toggleDark;
       el.classList.add('fade-in');
     }, 350);
   }
+  /* 只有点击格言本身才切换 */
   document.getElementById('top-quote')?.addEventListener('click', () => showQuote());
   loadQuotes();
-  setInterval(() => showQuote(), 60000);
 })();
 
+/* ── 顶部栏透明 ── */
 (function() {
   const bar = document.getElementById('top-bar');
   function checkScroll() { bar.classList.toggle('at-top', window.scrollY < 10); }
@@ -716,12 +677,14 @@ window.toggleDark = toggleDark;
   checkScroll();
 })();
 
+/* ── 回顶部 ── */
 function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 window.scrollToTop = scrollToTop;
 window.addEventListener('scroll', function() {
   document.getElementById('go-top')?.classList.toggle('visible', window.scrollY > 300);
 });
 
+/* ── 搜索键盘 ── */
 function onSearchKeydown(e) {
   if (e.key === 'Escape') {
     const input = document.getElementById('search-text');
@@ -730,6 +693,7 @@ function onSearchKeydown(e) {
 }
 window.onSearchKeydown = onSearchKeydown;
 
+/* ── 搜索模态框 ── */
 function openSearchModal() {
   const modal = document.getElementById('search-modal');
   if (!modal) return;
