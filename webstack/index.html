@@ -780,5 +780,39 @@ document.addEventListener('keydown', function(e) {
   }
 });
 </script>
+// ── webstack/index.html 修改说明 ──
+//
+// 1. 找到标题元素（王五导航 或 #sidebar-logo-text），加上 id="site-title"
+//    以及 style="cursor:pointer;" title="点击切换模式"
+//
+// 2. 在 <script> 末尾加入以下代码：
+//
+// ─────────────────────────────────────────────
+(function() {
+  const MODES      = ['normal', 'webstack', 'easy', 'nav'];
+  const MODE_PATHS = {
+    normal:   '../normal/index.html',
+    webstack: '../webstack/index.html',
+    easy:     '../easy/index.html',
+    nav:      '../nav/index.html',
+  };
+  function switchMode() {
+    const cur  = 'webstack';
+    const next = MODES[(MODES.indexOf(cur) + 1) % MODES.length];
+    localStorage.setItem('navMode', next);
+    window.location.href = MODE_PATHS[next];
+  }
+  // 页面加载时记录当前模式
+  localStorage.setItem('navMode', 'webstack');
+  // 绑定标题点击
+  const title = document.getElementById('sidebar-logo-text');
+  if (title) {
+    title.style.cursor = 'pointer';
+    title.title = '点击切换模式';
+    title.addEventListener('click', switchMode);
+  }
+})();
+// ─────────────────────────────────────────────
+
 </body>
 </html>
