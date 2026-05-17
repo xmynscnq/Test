@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>王五导航</title>
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; user-select:none; }
+html, body{ width:100%; height:100%; overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:#000; }
+
+#background-container{ position:fixed; inset:0; z-index:0; overflow:hidden; background:#000; }
+.bg-media{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none; display:block; }
+#background-container::after{ content:""; position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:1; }
+
+.main-wrapper{ position:relative; z-index:2; width:100%; height:100%;
+  display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px; }
+
+.site-title{
+  font-size:4rem; font-weight:300; color:#fff; letter-spacing:8px;
+  margin-bottom:2.5rem; text-shadow:0 6px 18px rgba(0,0,0,0.5);
+  cursor:pointer; transition:opacity 0.2s;
+}
+.site-title:hover{ opacity:0.8; }
+
+.search-box-container{
+  position:relative; width:100%; max-width:700px;
+  display:flex; align-items:center; padding:6px 10px 6px 14px;
+  border-radius:32px; background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.3); transition:0.3s;
+}
+.search-box-container:focus-within{
+  transform:translateY(-2px); background:rgba(255,255,255,0.12);
+  border-color:rgba(255,255,255,0.3); box-shadow:0 14px 40px rgba(0,0,0,0.45);
+}
+
+.engine-selector{ display:flex; align-items:center; gap:6px; padding:8px 12px;
+  border-radius:18px; cursor:pointer; color:#fff; transition:0.2s; flex-shrink:0; }
+.engine-selector:hover{ background:rgba(255,255,255,0.12); }
+.engine-icon{ width:18px; height:18px; object-fit:contain; border-radius:4px; }
+
+.search-input{ flex:1; border:none; outline:none; background:none;
+  color:#fff; font-size:1.08rem; padding:12px; width:100%; }
+.search-input::placeholder{ color:rgba(255,255,255,0.45); }
+
+.action-btn{ width:38px; height:38px; display:flex; justify-content:center;
+  align-items:center; border-radius:50%; cursor:pointer;
+  color:rgba(255,255,255,0.7); transition:0.2s; flex-shrink:0; }
+.action-btn:hover{ background:rgba(255,255,255,0.15); color:#fff; }
+.clear-btn{ opacity:0; pointer-events:none; }
+.clear-btn.show{ opacity:1; pointer-events:auto; }
+
+.engine-dropdown{
+  position:absolute; top:calc(100% + 12px); left:0; width:100%;
+  padding:18px; border-radius:22px; background:rgba(15,15,15,0.7);
+  border:1px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+  box-shadow:0 15px 45px rgba(0,0,0,0.6);
+  display:none; flex-direction:column; gap:16px; z-index:100;
+}
+.engine-dropdown.show{ display:flex; animation:fadeIn .22s ease-out; }
+.category-row{ display:flex; flex-direction:column; gap:8px; }
+.category-title{ color:rgba(255,255,255,0.4); font-size:.75rem;
+  letter-spacing:1.5px; text-transform:uppercase; padding-left:4px; }
+.engine-list{ display:flex; flex-wrap:wrap; gap:10px; }
+.engine-item{ display:flex; align-items:center; gap:6px; padding:7px 14px;
+  border-radius:14px; background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.05); color:rgba(255,255,255,0.85);
+  cursor:pointer; transition:.2s; }
+.engine-item:hover{ background:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.15); color:#fff; }
+
+@keyframes fadeIn{ from{ opacity:0; transform:translateY(-10px); } to{ opacity:1; transform:translateY(0); } }
+
+@media (max-width:768px){
+  .site-title{ font-size:2.8rem; letter-spacing:5px; }
+  .search-box-container{ border-radius:24px; }
+  .engine-selector{ font-size:.88rem; }
+  .search-input{ font-size:1rem; }
+}
+</style>
+</head>
+<body>
+<div id="background-container"></div>
+<div class="main-wrapper">
+  <h1 class="site-title" id="site-title">SPACE</h1>
+  <div class="search-box-container">
+    <div class="engine-selector" id="engine-selector">
+      <span id="current-engine-icon-slot"></span>
+      <span id="current-engine-name">百度</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </div>
+    <input type="text" class="search-input" id="search-input" placeholder="输入搜索内容..." autocomplete="off" />
+    <div class="action-btn clear-btn" id="clear-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </div>
+    <div class="action-btn search-btn" id="search-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </div>
+    <div class="engine-dropdown" id="engine-dropdown"></div>
+  </div>
+</div>
+
+<script>
+// ── 模式切换 ────────────────────────────────────────────────
+const MODES      = ['normal', 'webstack', 'easy', 'nav'];
+const MODE_PATHS = {
+  normal:   '../normal/index.html',
+  webstack: '../webstack/index.html',
+  easy:     '../easy/index.html',
+  nav:      '../nav/index.html',
+};
+function switchMode() {
+  const cur  = 'easy';
+  const next = MODES[(MODES.indexOf(cur) + 1) % MODES.length];
+  localStorage.setItem('navMode', next);
+  window.location.href = MODE_PATHS[next];
+}
+document.getElementById('site-title').addEventListener('click', switchMode);
+
+// ── 配置 ────────────────────────────────────────────────────
+const CONFIG = {
+  title: "SPACE",
+  background: {
+    type: "image",
+    url: "https://images.wallpaperscraft.com/image/single/photographer_camera_dark_133781_1280x720.jpg"
+  },
+  categories: [
+    {
+      name: "",
+      engines: [
+        { name:"百度",    url:"https://www.baidu.com/s?wd=",                    icon:"image/baidu.ico" },
+        { name:"谷歌",    url:"https://www.google.com/search?q=",               icon:"image/google.ico" },
+        { name:"GitHub",  url:"https://github.com/search?q=",                   icon:"image/github.png" },
+        { name:"哔哩哔哩",url:"https://search.bilibili.com/all?keyword=",        icon:"image/bilibili.ico" },
+        { name:"QQ音乐",  url:"https://y.qq.com/n/ryqq/search?w=",              icon:"image/QQmusic.ico" }
+      ]
+    }
+  ]
+};
+
+let currentEngine = CONFIG.categories[0].engines[0];
+
+function initPage() {
+  document.getElementById("site-title").innerText = CONFIG.title;
+  initBackground();
+  initDropdown();
+  updateCurrentEngine(currentEngine);
+}
+
+function initBackground() {
+  const bg = document.getElementById("background-container");
+  if (CONFIG.background.type === "video") {
+    bg.innerHTML = `<video class="bg-media" autoplay muted loop playsinline><source src="${CONFIG.background.url}" type="video/mp4"></video>`;
+  } else {
+    const img = document.createElement("img");
+    img.className = "bg-media";
+    img.src = CONFIG.background.url;
+    img.onerror = () => { bg.style.background = "#111"; };
+    bg.appendChild(img);
+  }
+}
+
+function initDropdown() {
+  const dropdown = document.getElementById("engine-dropdown");
+  CONFIG.categories.forEach(category => {
+    const row  = document.createElement("div");
+    row.className = "category-row";
+    row.innerHTML = `<div class="category-title">${category.name}</div>`;
+    const list = document.createElement("div");
+    list.className = "engine-list";
+    category.engines.forEach(engine => {
+      const item = document.createElement("div");
+      item.className = "engine-item";
+      item.innerHTML = engine.icon ? `<img src="${engine.icon}" class="engine-icon" onerror="this.style.display='none'"><span>${engine.name}</span>` : `<span>${engine.name}</span>`;
+      item.addEventListener("click", e => {
+        e.stopPropagation();
+        updateCurrentEngine(engine);
+        dropdown.classList.remove("show");
+        searchInput.focus();
+      });
+      list.appendChild(item);
+    });
+    row.appendChild(list);
+    dropdown.appendChild(row);
+  });
+}
+
+function updateCurrentEngine(engine) {
+  currentEngine = engine;
+  document.getElementById("current-engine-name").innerText = engine.name;
+  const slot = document.getElementById("current-engine-icon-slot");
+  slot.innerHTML = engine.icon ? `<img src="${engine.icon}" class="engine-icon" onerror="this.style.display='none'">` : "";
+}
+
+function triggerSearch() {
+  const query = searchInput.value.trim();
+  if (!query) return;
+  window.open(currentEngine.url + encodeURIComponent(query), "_blank");
+}
+
+const searchInput    = document.getElementById("search-input");
+const clearBtn       = document.getElementById("clear-btn");
+const searchBtn      = document.getElementById("search-btn");
+const engineSelector = document.getElementById("engine-selector");
+const dropdown       = document.getElementById("engine-dropdown");
+
+searchInput.addEventListener("input", () => {
+  clearBtn.classList.toggle("show", searchInput.value.trim().length > 0);
+});
+clearBtn.addEventListener("click", e => {
+  e.stopPropagation(); searchInput.value = ""; clearBtn.classList.remove("show"); searchInput.focus();
+});
+searchBtn.addEventListener("click", e => { e.stopPropagation(); triggerSearch(); });
+searchInput.addEventListener("keydown", e => { if (e.key === "Enter") triggerSearch(); });
+engineSelector.addEventListener("click", e => { e.stopPropagation(); dropdown.classList.toggle("show"); });
+document.addEventListener("click", () => { dropdown.classList.remove("show"); });
+
+window.addEventListener("DOMContentLoaded", () => {
+  localStorage.setItem('navMode', 'easy');
+  initPage();
+});
+</script>
+</body>
+</html>
