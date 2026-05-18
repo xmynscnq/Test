@@ -35,7 +35,7 @@ function updateNetBtn() {
   if (!btn) return;
   const label = btn.querySelector('.menu-label');
   const emoji = btn.querySelector('.sidebar-emoji');
-  if (label) label.textContent = isIntranet ? '切换外网' : '切换内网';
+  if (label) label.textContent = isIntranet ? '内网模式' : '外网模式';
   if (emoji) emoji.textContent = isIntranet ? '🏠' : '🌐';
   btn.classList.toggle('intranet-active', isIntranet);
 }
