@@ -55,57 +55,36 @@ let isMobileView = window.innerWidth < MOBILE_BP;
 
 function applyMobileState() {
   isMobileView = window.innerWidth < MOBILE_BP;
-  const sidebar   = document.getElementById('sidebar');
-  const wrap      = document.getElementById('content-wrap');
-  const topBar    = document.getElementById('top-bar');
-  const overlay   = document.getElementById('mobile-overlay');
+  const sidebar = document.getElementById('sidebar');
+  const wrap    = document.getElementById('content-wrap');
+  const topBar  = document.getElementById('top-bar');
+  const overlay = document.getElementById('mobile-overlay');
   if (!sidebar) return;
 
   if (isMobileView) {
-    // 移动端：侧边栏默认收起到屏幕外
-    sidebar.style.transform  = 'translateX(-100%)';
-    sidebar.style.width      = '220px';
-    sidebar.style.transition = 'transform 0.25s ease';
-    wrap.style.marginLeft    = '0';
-    topBar.style.left        = '0';
-  } else {
-    // 桌面端：恢复正常
-    const expanded = localStorage.getItem('sidebarExpanded') !== '0';
-    sidebar.style.transform  = '';
-    sidebar.style.width      = expanded ? '180px' : '60px';
-    wrap.style.marginLeft    = expanded ? '180px' : '60px';
-    topBar.style.left        = expanded ? '180px' : '60px';
+    sidebar.classList.remove('mobile-open');
     if (overlay) overlay.classList.remove('show');
+    wrap.style.marginLeft = '0';
+    topBar.style.left     = '0';
+  } else {
+    sidebar.classList.remove('mobile-open');
+    if (overlay) overlay.classList.remove('show');
+    const expanded = localStorage.getItem('sidebarExpanded') !== '0';
+    sidebar.style.transform = '';
+    sidebar.classList.toggle('mini-sidebar', !expanded);
+    sidebar.style.width   = expanded ? '180px' : '60px';
+    wrap.style.marginLeft = expanded ? '180px' : '60px';
+    topBar.style.left     = expanded ? '180px' : '60px';
   }
 }
 
-function openMobileSidebar() {
-  const sidebar  = document.getElementById('sidebar');
-  const overlay  = document.getElementById('mobile-overlay');
-  sidebar.style.transform = 'translateX(0)';
-  if (overlay) overlay.classList.add('show');
-}
-
-function closeMobileSidebar() {
-  const sidebar  = document.getElementById('sidebar');
-  const overlay  = document.getElementById('mobile-overlay');
-  sidebar.style.transform = 'translateX(-100%)';
-  if (overlay) overlay.classList.remove('show');
-}
-
-window.addEventListener('resize', () => {
-  const wasMobile = isMobileView;
-  applyMobileState();
-  if (wasMobile !== isMobileView) applyMobileState();
-});
-
+window.addEventListener('resize', applyMobileState);
 // ── 覆盖原侧边栏切换逻辑 ────────────────────────────────────
 function toggleSidebar() {
   const sidebar  = document.getElementById('sidebar');
   const wrap     = document.getElementById('content-wrap');
   const topBar   = document.getElementById('top-bar');
   const overlay  = document.getElementById('mobile-overlay');
-  const EXPANDED_W = '180px', MINI_W = '60px';
 
   if (isMobileView) {
     const isOpen = sidebar.classList.contains('mobile-open');
@@ -116,9 +95,9 @@ function toggleSidebar() {
     const next     = !expanded;
     localStorage.setItem('sidebarExpanded', next ? '1' : '0');
     sidebar.classList.toggle('mini-sidebar', !next);
-    sidebar.style.width   = next ? EXPANDED_W : MINI_W;
-    wrap.style.marginLeft = next ? EXPANDED_W : MINI_W;
-    topBar.style.left     = next ? EXPANDED_W : MINI_W;
+    sidebar.style.width   = next ? '180px' : '60px';
+    wrap.style.marginLeft = next ? '180px' : '60px';
+    topBar.style.left     = next ? '180px' : '60px';
   }
 }
 window.toggleSidebar = toggleSidebar;
@@ -320,7 +299,11 @@ function renderSidebar(sections) {
       document.querySelectorAll('#main-menu li').forEach(l => l.classList.remove('active'));
       this.parentElement.classList.add('active');
       // 移动端点击后关闭侧边栏
-      if (isMobileView) closeMobileSidebar();
+      if (isMobileView) {
+        sidebar.classList.remove('mobile-open');
+        const overlay = document.getElementById('mobile-overlay');
+        if (overlay) overlay.classList.remove('show');
+      }
     });
   });
 }
