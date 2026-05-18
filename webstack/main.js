@@ -62,15 +62,19 @@ function applyMobileState() {
   if (!sidebar) return;
 
   if (isMobileView) {
-    sidebar.classList.remove('mobile-open');
+    // 移动端：清除所有JS内联样式，让CSS的transform和width完全接管
+    sidebar.style.transform  = '';
+    sidebar.style.width      = '';
+    sidebar.style.transition = '';
+    sidebar.classList.remove('mobile-open', 'mini-sidebar');
     if (overlay) overlay.classList.remove('show');
     wrap.style.marginLeft = '0';
     topBar.style.left     = '0';
   } else {
     sidebar.classList.remove('mobile-open');
     if (overlay) overlay.classList.remove('show');
-    const expanded = localStorage.getItem('sidebarExpanded') !== '0';
     sidebar.style.transform = '';
+    const expanded = localStorage.getItem('sidebarExpanded') !== '0';
     sidebar.classList.toggle('mini-sidebar', !expanded);
     sidebar.style.width   = expanded ? '180px' : '60px';
     wrap.style.marginLeft = expanded ? '180px' : '60px';
