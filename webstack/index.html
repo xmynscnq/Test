@@ -732,7 +732,8 @@
   const topBar  = document.getElementById('top-bar');
 
   if (window.innerWidth < MOBILE_BP) {
-    /* 移动端：用 setProperty 设置初始隐藏，与 openMobileSidebar 保持一致 */
+    /* 移动端：清除 mini-sidebar，设置初始隐藏 */
+    sidebar.classList.remove('mini-sidebar');
     sidebar.style.setProperty('transform', 'translateX(-100%)', 'important');
     wrap.style.marginLeft = '0';
     topBar.style.display = 'none';
