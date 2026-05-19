@@ -55,14 +55,15 @@ function openMobileSidebar() {
   s.style.setProperty('display', 'flex', 'important');
   s.classList.add('mobile-open');
   getOverlay()?.classList.add('show');
-  document.getElementById('mobile-top-bar').style.display = 'none'; 
+  document.getElementById('mobile-top-bar').style.setProperty('display', 'none', 'important'); // 新增
 }
+
 function closeMobileSidebar() {
   const s = getSidebar();
   s.classList.remove('mobile-open');
   s.style.setProperty('display', 'flex', 'important');
   getOverlay()?.classList.remove('show');
-  document.getElementById('mobile-top-bar').style.display = 'flex';
+  document.getElementById('mobile-top-bar').style.setProperty('display', 'flex', 'important'); // 新增
 }
 
 // ── 侧边栏切换 ────────────────────────────────────────────
