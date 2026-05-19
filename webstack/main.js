@@ -50,8 +50,8 @@ function isMobile()   { return window.innerWidth < 768; }
 function openMobileSidebar() {
   const s = getSidebar();
   s.classList.remove('mini-sidebar');
-  s.style.removeProperty('transform');  // 清掉所有残留 transform
-  s.style.removeProperty('width');
+  s.style.removeProperty('transform');
+  s.style.removeProperty('width');      // ← 清除 mini-sidebar 留下的 width:60px
   s.classList.add('mobile-open');
   getOverlay()?.classList.add('show');
 }
@@ -372,10 +372,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     wrap.style.marginLeft = expanded ? '180px' : '60px';
     topBar.style.left     = expanded ? '180px' : '60px';
   } else {
-    // 移动端确保清除 mini-sidebar
-    getSidebar().classList.remove('mini-sidebar');
-    getSidebar().style.removeProperty('width'); 
-  }
+  // 移动端确保清除 mini-sidebar
+  getSidebar().classList.remove('mini-sidebar');
+  getSidebar().style.removeProperty('width');   // ← 加这行
+}
 
   // 遮罩关闭侧边栏（唯一绑定点，index.html 里不再重复绑定）
   getOverlay()?.addEventListener('click', closeMobileSidebar);
