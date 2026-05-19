@@ -46,17 +46,16 @@ function getSidebar() { return document.getElementById('sidebar'); }
 function getOverlay() { return document.getElementById('mobile-overlay'); }
 function isMobile()   { return window.innerWidth < 768; }
 
-// 移动端侧边栏开关：移除 mini-sidebar 确保宽度正确，transform 强制写入
+// 移动端侧边栏：用 class 控制 left，CSS 里定义 left:-240px / left:0
 function openMobileSidebar() {
   const s = getSidebar();
-  s.classList.remove('mini-sidebar');   // ← 关键：移除 mini-sidebar，宽度恢复 240px
-  s.style.setProperty('transform', 'translateX(0)', 'important');
+  s.classList.remove('mini-sidebar');
+  s.style.removeProperty('transform');  // 清掉所有残留 transform
   s.classList.add('mobile-open');
   getOverlay()?.classList.add('show');
 }
 function closeMobileSidebar() {
   const s = getSidebar();
-  s.style.setProperty('transform', 'translateX(-100%)', 'important');
   s.classList.remove('mobile-open');
   getOverlay()?.classList.remove('show');
 }
@@ -89,7 +88,8 @@ window.addEventListener('resize', () => {
   if (!isMobile()) {
     // 从移动端切回桌面端时，清理移动端状态
     const _s = getSidebar();
-    _s.style.removeProperty('transform'); // 清掉移动端设的内联 transform
+    _s.style.removeProperty('transform');
+    _s.style.removeProperty('left');
     _s.classList.remove('mobile-open');
     getOverlay()?.classList.remove('show');
     const expanded = localStorage.getItem('sidebarExpanded') !== '0';
