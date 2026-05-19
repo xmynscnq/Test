@@ -136,7 +136,7 @@ const SEARCH_CATEGORIES = [
       { name: 'Brave',      url: 'https://search.brave.com/search?q=',    domain: 'search.brave.com' },
       { name: '搜狗',       url: 'https://www.sogou.com/web?query=',      domain: 'sogou.com' },
       { name: 'Bing',       url: 'https://www.bing.com/search?q=',        domain: 'bing.com' },
-      { name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=',            domain: 'duckduckgo.com' },
+      { name: 'DuckDuck', url: 'https://duckduckgo.com/?q=',            domain: 'duckduckgo.com' },
       { name: '360',        url: 'https://www.so.com/s?q=',               domain: 'so.com' },
       { name: '夸克',       url: 'https://www.quark.cn/s?q=',             domain: 'quark.cn' },
     ]
