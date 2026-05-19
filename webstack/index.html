@@ -561,21 +561,22 @@
         text-overflow: ellipsis !important;
       }
 
-      /* 快捷引擎：强制一行，允许超出文字缩小，不可滑动 */
+      /* 快捷引擎：可横向滚动，不压缩不截断，少量居中 */
       .quick-engines {
         flex-wrap: nowrap !important;
-        justify-content: space-around !important;
-        overflow: hidden !important;
+        justify-content: center !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
         margin-top: 8px !important;
-        padding: 0 !important;
+        padding: 0 4px !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
       }
+      .quick-engines::-webkit-scrollbar { display: none !important; }
       .quick-engine-btn {
-        flex: 1 !important;
-        font-size: 0.62rem !important;
-        padding: 4px 0px 2px !important;
-        min-width: 0 !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
+        flex: 0 0 auto !important;
+        font-size: 0.78rem !important;
+        padding: 4px 8px 2px !important;
         white-space: nowrap !important;
       }
       .quick-engine-btn::before { font-size: 0.55rem !important; }
