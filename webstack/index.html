@@ -518,12 +518,15 @@
       #mobile-top-bar.at-top #mobile-logo-text { color: rgba(255,255,255,0.92) !important; }
       #mobile-top-bar.at-top #mobile-hamburger { color: rgba(255,255,255,0.85) !important; }
 
-      /* 侧边栏：默认隐藏，transform 由 JS setProperty 控制，CSS 不加 !important 避免覆盖 */
+      /* 侧边栏：用 left 控制显隐，完全脱离 transform 干扰 */
       #sidebar {
         width: 240px !important;
-        transition: transform 0.25s ease !important;
+        left: -240px !important;
+        transform: none !important;
+        transition: left 0.25s ease !important;
         z-index: 1091 !important;
       }
+      #sidebar.mobile-open { left: 0 !important; }
 
       /* 内容区不留侧边栏空间 */
       #content-wrap { margin-left: 0 !important; }
@@ -561,25 +564,25 @@
         text-overflow: ellipsis !important;
       }
 
-      /* 快捷引擎：可横向滚动，不压缩不截断，少量居中 */
+      /* 快捷引擎：固定布局，均分宽度，字号自适应，不截断 */
       .quick-engines {
         flex-wrap: nowrap !important;
-        justify-content: center !important;
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
+        justify-content: space-between !important;
+        overflow: visible !important;
         margin-top: 8px !important;
-        padding: 0 4px !important;
-        -webkit-overflow-scrolling: touch !important;
-        scrollbar-width: none !important;
+        padding: 0 !important;
       }
-      .quick-engines::-webkit-scrollbar { display: none !important; }
       .quick-engine-btn {
-        flex: 0 0 auto !important;
-        font-size: 0.78rem !important;
-        padding: 4px 8px 2px !important;
+        flex: 1 1 0 !important;
+        font-size: 0.6rem !important;
+        padding: 4px 2px 2px !important;
+        min-width: 0 !important;
         white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: clip !important;
+        letter-spacing: -0.02em !important;
       }
-      .quick-engine-btn::before { font-size: 0.55rem !important; }
+      .quick-engine-btn::before { font-size: 0.5rem !important; }
 
       /* 搜索框 */
       .super-search-fm { padding: 0 8px 0 14px; }
@@ -732,9 +735,9 @@
   const topBar  = document.getElementById('top-bar');
 
   if (window.innerWidth < MOBILE_BP) {
-    /* 移动端：清除 mini-sidebar，设置初始隐藏 */
+    /* 移动端：清除 mini-sidebar 和所有 transform，left 由 CSS 控制 */
     sidebar.classList.remove('mini-sidebar');
-    sidebar.style.setProperty('transform', 'translateX(-100%)', 'important');
+    sidebar.style.removeProperty('transform');
     wrap.style.marginLeft = '0';
     topBar.style.display = 'none';
   } else {
