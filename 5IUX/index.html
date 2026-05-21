@@ -192,6 +192,12 @@ const WORKER_URL   = 'https://ico.xmynscnq.dpdns.org';
 const LINKS_FILE   = '../links.json';
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
+/* ══ 内外网 & 工具函数 ══ */
+let isIntranet = localStorage.getItem('netMode') === 'intranet';
+function getDomain(url) { try { return new URL(url).hostname; } catch { return null; } }
+function faviconSrc(url) { const d = getDomain(url); return d ? `${WORKER_URL}/?domain=${d}` : DEFAULT_ICON; }
+function getCardUrl(item) { return (isIntranet && item.intranet) ? item.intranet : item.url; }
+
 /* ══ 搜索引擎列表 ══ */
 const ENGINES = [
   { name:'百度',    url:'https://www.baidu.com/s?wd=',           placeholder:'百度一下' },
