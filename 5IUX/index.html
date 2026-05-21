@@ -13,111 +13,67 @@
     a { text-decoration: none; }
     a:hover { text-decoration: none; }
 
-    .banner-video {
-      position: absolute;
-      width: 100%; overflow: hidden;
-      left: 0; top: 0;
-      max-height: 750px;
-    }
+    .banner-video { position: absolute; width: 100%; overflow: hidden; left: 0; top: 0; max-height: 750px; }
     .banner-video video { width: 2048px; float: left; }
-    .bottom-cover {
-      width: 100%; height: 50%;
-      position: absolute; bottom: 0; z-index: 10;
-    }
+    .bottom-cover { width: 100%; height: 50%; position: absolute; bottom: 0; z-index: 10; }
 
     .navbar-light .navbar-nav .nav-link { color: #fff; }
     .navbar-light .navbar-nav .active .nav-link { color: #fff; }
     .navbar-light .navbar-nav .nav-link:hover { color: #fff; }
-    .navbar-brand-text {
-      color: #fff; font-size: 1.1rem; font-weight: 900;
-      letter-spacing: 0.05em; cursor: pointer;
-    }
+    .navbar-brand-text { color: #fff; font-size: 1.1rem; font-weight: 900; letter-spacing: 0.05em; cursor: pointer; }
     .navbar-brand-text:hover { color: #fff; }
 
     #search { width:100%; margin:0; padding:0 0 10px; position:relative; z-index:2000; }
     #search form { position:relative; }
 
-    /* Tab — 原版风格，彩色文字，白底，紧贴搜索框 */
+    /* Tab */
     .search-type {
-      white-space:nowrap; margin:0; padding-left:0; list-style:none;
+      white-space:nowrap; margin:0; padding-left:10px; list-style:none;
       overflow-x:auto; overflow-y:hidden; display:flex;
       scrollbar-width:none; -webkit-overflow-scrolling:touch;
     }
     .search-type::-webkit-scrollbar { display:none; }
     .search-type li { display:inline-block; background:rgba(255,255,255,0.4); border-radius:3px 3px 0 0; margin-right:4px; flex-shrink:0; }
-    .search-type li:first-child { margin-left:0; }
     .search-type li label { display:inline-block; padding:0 11px; font-size:14px; line-height:31px; border-radius:3px 3px 0 0; cursor:pointer; margin:0; font-weight:600; transition:background 0.2s; }
     .search-type input:checked + label,
     .search-type input:hover  + label { background:#fff; }
-    /* 各引擎彩色文字 */
-    .search-type li:nth-child(1) label { color:#2100E0; }
-    .search-type li:nth-child(2) label { color:#3B83FA; }
-    .search-type li:nth-child(3) label { color:#E77E24; }
-    .search-type li:nth-child(4) label { color:#00B4D8; }
-    .search-type li:nth-child(5) label { color:#ff5722; }
-    .search-type li:nth-child(6) label { color:#E91E8C; }
-    .search-type li:nth-child(7) label { color:#4CAF50; }
-    .search-type li:nth-child(8) label { color:#9C27B0; }
+    .search-type li:nth-child(1)  label { color:#2100E0; }
+    .search-type li:nth-child(2)  label { color:#3B83FA; }
+    .search-type li:nth-child(3)  label { color:#FB7A24; }
+    .search-type li:nth-child(4)  label { color:#00B4D8; }
+    .search-type li:nth-child(5)  label { color:#008373; }
+    .search-type li:nth-child(6)  label { color:#ff5722; }
+    .search-type li:nth-child(7)  label { color:#E91E8C; }
+    .search-type li:nth-child(8)  label { color:#9C27B0; }
+    .search-type li:nth-child(9)  label { color:#333; }
+    .search-type li:nth-child(10) label { color:#E6162D; }
+    .search-type li:nth-child(11) label { color:#0066FF; }
+    .search-type li:nth-child(12) label { color:#00A1D6; }
+    .search-type li:nth-child(13) label { color:#FE2C55; }
+    .search-type li:nth-child(14) label { color:#31C27C; }
+    .search-type li:nth-child(15) label { color:#C20C0C; }
+    .search-type li:nth-child(16) label { color:#4CAF50; }
+    .search-type li:nth-child(17) label { color:#FF6B35; }
 
     /* 搜索框 */
-    #search-text { width:100%; height:50px; line-height:50px; text-indent:10px; font-size:16px; border-radius:5px 5px 5px 5px; background:#fff; border:none; box-shadow:0 0.5rem 0.625rem #d4d4d44d; transition:0.3s all linear; outline:0; }
+    #search-text { width:100%; height:50px; line-height:50px; text-indent:10px; font-size:16px; border-radius:5px; background:#fff; border:none; box-shadow:0 0.5rem 0.625rem #d4d4d44d; transition:0.3s all linear; outline:0; }
     #search-text:focus { box-shadow:0 0 24px 0 rgba(50,50,50,0.08); }
     #search button.submit { position:absolute; top:0; right:0; background:none; border:0; width:60px; height:50px; outline:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    #search button.submit img { opacity:0.45; transition:opacity 0.2s; }
-    #search button.submit:hover img { opacity:0.9; }
+    #search button.submit img { opacity:1; transition:opacity 0.2s; }
+    #search button.submit:hover img { opacity:0.7; }
 
-    .mylist {
-      list-style: none; padding: 10px 20px;
-      position: relative; z-index: 1000;
-      margin: 20px 0; border-radius: 15px;
-      background: #fff;
-      box-shadow: 0 0.5rem 0.625rem #d4d4d44d;
-    }
-    .mylist li.title {
-      width: 100%; min-width: auto; margin: 0;
-      height: 35px; font-size: 16px; line-height: 33px;
-      padding: 0 20px 0 10px;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 10px;
-      color: #333; font-weight: 700;
-    }
-    .mylist li.site-item {
-      width: 100px; transition: 0.3s all linear;
-      font-size: 14px; overflow: hidden;
-      padding: 10px 0; border-radius: 10px;
-      display: inline-block;
-    }
-    .mylist li.site-item:hover { background: #eee; }
-    .mylist li.site-item a { color: #555; display: block; text-align: center; }
-    .site-icon-wrap {
-      width: 45px; height: 45px; padding: 8px;
-      background: #fff; border: 1px solid #eee;
-      border-radius: 10px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .site-icon-wrap img { width: 28px; height: 28px; object-fit: contain; border-radius: 4px; }
-    .site-name {
-      width: 100%; display: block;
-      height: 26px; line-height: 26px;
-      text-align: center; font-size: 13px;
-      overflow: hidden; text-overflow: ellipsis;
-      white-space: nowrap; padding: 0 4px;
-    }
+    .mylist { list-style:none; padding:10px 20px; position:relative; z-index:1000; margin:20px 0; border-radius:15px; background:#fff; box-shadow:0 0.5rem 0.625rem #d4d4d44d; }
+    .mylist li.title { width:100%; min-width:auto; margin:0; height:35px; font-size:16px; line-height:33px; padding:0 20px 0 10px; border-bottom:1px solid #eee; margin-bottom:10px; color:#333; font-weight:700; }
+    .mylist li.site-item { width:100px; transition:0.3s all linear; font-size:14px; overflow:hidden; padding:10px 0; border-radius:10px; display:inline-block; }
+    .mylist li.site-item:hover { background:#eee; }
+    .mylist li.site-item a { color:#555; display:block; text-align:center; }
+    .site-icon-wrap { width:45px; height:45px; padding:8px; background:#fff; border:1px solid #eee; border-radius:10px; margin:0 auto; display:flex; align-items:center; justify-content:center; }
+    .site-icon-wrap img { width:28px; height:28px; object-fit:contain; border-radius:4px; }
+    .site-name { width:100%; display:block; height:26px; line-height:26px; text-align:center; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 4px; }
 
-    #net-toggle {
-      position: fixed; top: 12px; right: 16px;
-      z-index: 99999;
-      background: rgba(255,255,255,0.85);
-      border: 1px solid rgba(255,255,255,0.9);
-      color: #333; border-radius: 20px;
-      padding: 4px 14px; font-size: 0.82rem;
-      font-weight: 600; cursor: pointer;
-      backdrop-filter: blur(8px);
-      transition: background 0.2s;
-      outline: none !important;
-    }
-    #net-toggle:focus { outline: none !important; box-shadow: none !important; }
-    #net-toggle:hover { background: rgba(255,255,255,1); }
+    #net-toggle { position:fixed; top:12px; right:16px; z-index:99999; background:rgba(255,255,255,0.85); border:1px solid rgba(255,255,255,0.9); color:#333; border-radius:20px; padding:4px 14px; font-size:0.82rem; font-weight:600; cursor:pointer; backdrop-filter:blur(8px); transition:background 0.2s; outline:none !important; }
+    #net-toggle:focus { outline:none !important; box-shadow:none !important; }
+    #net-toggle:hover { background:rgba(255,255,255,1); }
 
     @media screen and (max-width: 992px) {
       .banner-video video { width: 1200px; }
@@ -168,7 +124,7 @@
       </div>
     </div>
     <form id="search-form" onsubmit="doSearch(event)">
-      <input type="text" id="search-text" placeholder="搜索网页…" autocomplete="off">
+      <input type="text" id="search-text" placeholder="百度一下" autocomplete="off">
       <button class="submit" type="submit"><img src="sou.svg" style="width:20px;height:20px;" alt="搜索"></button>
     </form>
   </div>
@@ -186,7 +142,6 @@
 /* ══ 模式切换 ══ */
 const MODES = ['normal', 'webstack', 'easy', 'nav', '5iux'];
 localStorage.setItem('navMode', '5iux');
-
 document.getElementById('brand-title').addEventListener('click', () => {
   const next = MODES[(MODES.indexOf('5iux') + 1) % MODES.length];
   localStorage.setItem('navMode', next);
@@ -206,17 +161,24 @@ function getCardUrl(item) { return (isIntranet && item.intranet) ? item.intranet
 
 /* ══ 搜索引擎列表 ══ */
 const ENGINES = [
-  { name:'百度',    url:'https://www.baidu.com/s?wd=',           placeholder:'百度一下' },
-  { name:'Google',  url:'https://www.google.com/search?q=',      placeholder:'谷歌搜索' },
-  { name:'Bing',    url:'https://www.bing.com/search?q=',        placeholder:'Bing搜索' },
-  { name:'搜狗',    url:'https://www.sogou.com/web?query=',      placeholder:'搜狗搜索' },
-  { name:'DuckDuck',url:'https://duckduckgo.com/?q=',            placeholder:'隐私搜索' },
-  { name:'知乎',    url:'https://www.zhihu.com/search?q=',       placeholder:'搜索知乎' },
-  { name:'B站',     url:'https://search.bilibili.com/all?keyword=', placeholder:'搜索B站' },
-  { name:'GitHub',  url:'https://github.com/search?q=',          placeholder:'搜索GitHub' },
+  { name:'百度',      url:'https://www.baidu.com/s?wd=',                                                          placeholder:'百度一下' },
+  { name:'Google',    url:'https://www.google.com/search?q=',                                                     placeholder:'谷歌搜索' },
+  { name:'Brave',     url:'https://search.brave.com/search?q=',                                                   placeholder:'Brave搜索' },
+  { name:'搜狗',      url:'https://www.sogou.com/web?query=',                                                     placeholder:'搜狗搜索' },
+  { name:'Bing',      url:'https://www.bing.com/search?q=',                                                       placeholder:'Bing搜索' },
+  { name:'DuckDuckGo',url:'https://duckduckgo.com/?q=',                                                           placeholder:'隐私搜索' },
+  { name:'360',       url:'https://www.so.com/s?q=',                                                              placeholder:'360搜索' },
+  { name:'夸克',      url:'https://www.quark.cn/s?q=',                                                            placeholder:'夸克搜索' },
+  { name:'GitHub',    url:'https://github.com/search?q=',                                                         placeholder:'搜索GitHub' },
+  { name:'微博',      url:'https://s.weibo.com/weibo?q=',                                                         placeholder:'微博搜索' },
+  { name:'知乎',      url:'https://www.zhihu.com/search?q=',                                                      placeholder:'搜索知乎' },
+  { name:'B站',       url:'https://search.bilibili.com/all?keyword=',                                             placeholder:'搜索B站' },
+  { name:'抖音',      url:'https://www.douyin.com/search/',                                                       placeholder:'搜索抖音' },
+  { name:'QQ音乐',    url:'https://y.qq.com/portal/search.html#page=1&searchid=1&remoteplace=txt.yqq.top&t=song&w=', placeholder:'搜索QQ音乐' },
+  { name:'网易云',    url:'https://music.163.com/#/search/m/?s=',                                                 placeholder:'搜索网易云' },
+  { name:'做菜',      url:'https://www.xiachufang.com/search/?keyword=',                                          placeholder:'搜索菜谱' },
+  { name:'翻译',      url:'https://fanyi.baidu.com/#zh/en/',                                                      placeholder:'百度翻译' },
 ];
-
-let currentEngine = ENGINES[0];
 
 function renderEngines() {
   const ul = document.getElementById('search-type-ul');
@@ -227,10 +189,8 @@ function renderEngines() {
     li.innerHTML = `<input ${i===0?'checked':''} hidden type="radio" name="type" id="type-${i}" value="${engine.url}" data-placeholder="${engine.placeholder}"><label for="type-${i}">${engine.name}</label>`;
     ul.appendChild(li);
   });
-  // 绑定切换事件
   ul.querySelectorAll('input[type=radio]').forEach(input => {
     input.addEventListener('change', () => {
-      currentEngine = ENGINES.find(e => e.url === input.value) || ENGINES[0];
       document.getElementById('search-text').placeholder = input.dataset.placeholder;
       document.getElementById('search-text').focus();
     });
@@ -240,7 +200,6 @@ function renderEngines() {
 function doSearch(e) {
   if (e) e.preventDefault();
   const kw = document.getElementById('search-text')?.value.trim();
-  // 读取当前选中的radio
   const checked = document.querySelector('#search-type-ul input[type=radio]:checked');
   const url = checked ? checked.value : ENGINES[0].url;
   if (kw) window.open(url + encodeURIComponent(kw), '_blank');
