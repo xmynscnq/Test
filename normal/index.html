@@ -11,14 +11,12 @@
 <video id="bgLayer" autoplay muted playsinline></video>
 <div id="bgOverlay"></div>
 <div class="container">
-  <!-- 头部 -->
   <div class="header-area">
     <div>
       <h1 id="site-title" title="点击切换模式" style="cursor:pointer;">王五导航</h1>
       <p class="header-subtitle" id="daily-quote" style="opacity:0;transition:opacity 0.4s ease;">沉舟侧畔千帆过，病树前头万木春。</p>
     </div>
   </div>
-  <!-- 搜索区域 -->
   <div class="search-wrapper">
     <div class="search-tabs" id="searchTabs"></div>
     <div class="search-box">
@@ -42,5 +40,62 @@
   <div id="main-content"></div>
 </div>
 <script src="main.js"></script>
+<script>
+  const cursor = document.createElement('div');
+  cursor.style.cssText = `
+    position: fixed;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.0) 45%),
+      radial-gradient(circle at 70% 75%, rgba(255,255,255,0.15) 0%, transparent 40%);
+    border: 1.5px solid rgba(255,255,255,0.6);
+    box-shadow:
+      0 0 8px rgba(255,255,255,0.2),
+      inset 0 0 6px rgba(255,255,255,0.08);
+    backdrop-filter: blur(1px);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  `;
+  document.body.appendChild(cursor);
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let glowX = mouseX;
+  let glowY = mouseY;
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    cursor.style.display = 'none';
+  }
+  function animateCursor() {
+    const ease = 0.03;
+    glowX += (mouseX - glowX) * ease;
+    glowY += (mouseY - glowY) * ease;
+    cursor.style.left = glowX + 'px';
+    cursor.style.top  = glowY + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+  // 双击回顶部
+  let _lastClick = 0;
+  document.addEventListener('mousedown', () => {
+    const now = Date.now();
+    if (now - _lastClick < 350) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      cursor.style.transform = 'translate(-50%, -50%) scale(1.8)';
+      cursor.style.boxShadow = '0 0 24px rgba(255,255,255,0.8), inset 0 0 10px rgba(255,255,255,0.3)';
+      setTimeout(() => {
+        cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+        cursor.style.boxShadow = '0 0 8px rgba(255,255,255,0.2), inset 0 0 6px rgba(255,255,255,0.08)';
+      }, 300);
+    }
+    _lastClick = now;
+  });
+</script>
 </body>
 </html>
