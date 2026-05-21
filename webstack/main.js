@@ -16,7 +16,8 @@ const MODE_PATHS = {
   '5iux':   '../5IUX/index.html',
 };
 function switchMode() {
-  const next = MODES[(MODES.indexOf('webstack') + 1) % MODES.length];
+  const cur  = 'webstack';
+  const next = MODES[(MODES.indexOf(cur) + 1) % MODES.length];
   localStorage.setItem('navMode', next);
   window.location.href = MODE_PATHS[next];
 }
