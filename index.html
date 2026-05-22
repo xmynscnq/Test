@@ -6,7 +6,7 @@
 </head>
 <body>
 <script>
-const MODES = ['normal', 'webstack', 'easy', 'nav', '5iux'];
+const MODES = ['normal', 'webstack', 'easy', 'nav', '5iux', 'kim'];
 const DEFAULT_MODE = 'normal';
 const params = new URLSearchParams(location.search);
 const urlMode = params.get('mode');
@@ -14,7 +14,6 @@ let mode = MODES.includes(urlMode)
   ? urlMode
   : (localStorage.getItem('navMode') || DEFAULT_MODE);
 if (!MODES.includes(mode)) mode = DEFAULT_MODE;
-
 if (mode === 'webstack') {
   location.replace('webstack/index.html');
 } else if (mode === 'normal') {
@@ -25,6 +24,8 @@ if (mode === 'webstack') {
   location.replace('nav/index.html');
 } else if (mode === '5iux') {
   location.replace('5IUX/index.html');
+} else if (mode === 'kim') {
+  location.replace('kim/index.html');
 }
 </script>
 </body>
