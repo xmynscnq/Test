@@ -10,28 +10,22 @@
 body{font-family:'微软雅黑',-apple-system,sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden;}
 a{text-decoration:none;color:inherit;}
 
-/* 背景 */
-#bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,#a8edea,#fed6e3);transition:background 0.5s;}
-#bg-layer.bg-1{background:linear-gradient(135deg,#f5af19,#f12711);}
-#bg-layer.bg-2{background:linear-gradient(135deg,#43cea2,#185a9d);}
-#bg-layer.bg-3{background:linear-gradient(135deg,#c471ed,#f64f59);}
-#bg-layer.bg-4{background:linear-gradient(135deg,#f7971e,#ffd200);}
-#bg-layer.bg-5{background:linear-gradient(135deg,#11998e,#38ef7d);}
-#bg-layer.bg-6{background:linear-gradient(135deg,#2c3e50,#4ca1af);}
-#bg-layer.bg-img{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;}
+/* 背景层 */
+#bg-canvas{position:fixed;inset:0;z-index:0;display:none;}
+#bg-video{position:fixed;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;display:none;}
+#bg-color{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,#a8edea,#fed6e3);transition:background 0.4s;}
 
 /* 顶部栏 */
 #topbar{position:fixed;top:0;left:0;right:0;height:40px;z-index:200;background:rgba(0,0,0,0.12);display:flex;align-items:center;padding:0 14px;gap:10px;}
 #site-title{color:#fff;font-size:1rem;font-weight:900;cursor:pointer;letter-spacing:0.05em;user-select:none;margin-right:auto;}
 #site-title:hover{opacity:0.8;}
-/* 换背景按钮 */
-#bg-btn{background:none;border:none;cursor:pointer;color:#fff;font-size:1.1rem;opacity:0.85;padding:4px;line-height:1;transition:opacity 0.2s;}
+#bg-btn{background:none;border:none;cursor:pointer;color:#fff;font-size:1.1rem;opacity:0.85;padding:4px;transition:opacity 0.2s;}
 #bg-btn:hover{opacity:1;}
 
 /* 搜索区 */
 #search-area{position:relative;z-index:10;padding:60px 0 24px;text-align:center;}
-#engine-logo{width:210px;height:70px;margin:0 auto 16px;cursor:pointer;user-select:none;}
-#engine-logo img{max-width:210px;max-height:70px;object-fit:contain;display:block;margin:0 auto;}
+#engine-logo{width:210px;height:70px;margin:0 auto 16px;cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:center;}
+#engine-logo img{max-width:210px;max-height:70px;object-fit:contain;display:block;}
 #search-box{display:flex;align-items:center;width:640px;height:44px;margin:0 auto;}
 #search-input{flex:1;height:44px;padding:0 12px;border:1px solid #d7d7d7;border-right:none;border-radius:5px 0 0 5px;font-size:16px;outline:none;background:#fff;}
 #search-btn{width:70px;height:44px;background:#aeaeae;border:1px solid #aeaeae;border-radius:0 5px 5px 0;cursor:pointer;font-size:18px;color:#fff;transition:background 0.2s;}
@@ -40,29 +34,27 @@ a{text-decoration:none;color:inherit;}
 /* 主白卡 */
 #web-site{position:relative;z-index:10;width:894px;margin:0 auto 60px;background:#fafafa;border-radius:5px;box-shadow:0 0 1px #797979;}
 
-/* header: tabs + 内外网开关 */
-#web-site-header{width:100%;height:55px;background:#fafafa;border-radius:5px 5px 0 0;box-shadow:0 1px 4px #e4e4e4;display:flex;align-items:center;padding:0 14px;gap:0;}
-#cat-tabs{flex:1;display:flex;align-items:center;height:36px;overflow:hidden;}
-.cat-tab{min-width:80px;height:34px;line-height:32px;border:1px solid #d7d7d7;background:#f5f5f7;font-size:14px;color:#333;text-align:center;cursor:pointer;user-select:none;transition:background 0.15s;border-right:none;padding:0 8px;white-space:nowrap;}
+/* header */
+#web-site-header{width:100%;height:55px;background:#fafafa;border-radius:5px 5px 0 0;box-shadow:0 1px 4px #e4e4e4;display:flex;align-items:center;justify-content:center;padding:0 14px;gap:0;}
+#cat-tabs{display:flex;align-items:center;height:36px;overflow:hidden;}
+.cat-tab{min-width:80px;height:34px;line-height:32px;border:1px solid #d7d7d7;background:#f5f5f7;font-size:14px;color:#333;text-align:center;cursor:pointer;user-select:none;transition:background 0.15s;border-right:none;padding:0 10px;white-space:nowrap;}
 .cat-tab:first-child{border-radius:5px 0 0 5px;}
 .cat-tab:last-child{border-right:1px solid #d7d7d7;border-radius:0 5px 5px 0;}
 .cat-tab:hover{background:#c9c9c9;}
 .cat-tab.active{background:#c9c9c9;color:#fff;border-color:#aeaeae;box-shadow:inset 1px 1px 8px 1px #aeaeae;}
 
-/* 内外网开关（拨动样式） */
-#net-switch-wrap{flex-shrink:0;display:flex;align-items:center;margin-left:14px;gap:6px;cursor:pointer;user-select:none;}
-#net-switch-label{font-size:12px;color:#666;white-space:nowrap;}
-#net-switch{position:relative;width:52px;height:24px;border-radius:12px;background:#ed5b49;border:1px solid #d2402e;cursor:pointer;transition:background 0.3s,border-color 0.3s;flex-shrink:0;}
+/* 内外网拨动开关 */
+#net-switch-wrap{flex-shrink:0;margin-left:14px;cursor:pointer;user-select:none;}
+#net-switch{position:relative;width:54px;height:24px;border-radius:12px;background:#ed5b49;border:1px solid #d2402e;cursor:pointer;transition:background 0.3s,border-color 0.3s;}
 #net-switch.on{background:#00af2c;border-color:#068506;}
 #net-switch-knob{position:absolute;top:1px;left:1px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #c9c9c9;transition:left 0.3s;}
-#net-switch.on #net-switch-knob{left:29px;}
-#net-switch-text{position:absolute;inset:0;display:flex;align-items:center;font-size:11px;font-weight:600;color:#fff;pointer-events:none;}
-#net-switch.on #net-switch-text{justify-content:flex-start;padding-left:6px;}
-#net-switch:not(.on) #net-switch-text{justify-content:flex-end;padding-right:6px;}
+#net-switch.on #net-switch-knob{left:31px;}
+#net-switch-text{position:absolute;inset:0;display:flex;align-items:center;font-size:11px;font-weight:600;color:#fff;pointer-events:none;padding-right:5px;justify-content:flex-end;}
+#net-switch.on #net-switch-text{justify-content:flex-start;padding-left:5px;padding-right:0;}
 
 /* 内容行 */
 #web-site-body{width:100%;}
-.web-group{display:flex;flex-wrap:wrap;align-items:center;width:100%;min-height:55px;overflow:hidden;}
+.web-group{display:flex;flex-wrap:wrap;width:100%;min-height:55px;padding:4px 0;}
 .web-group:nth-child(odd){background:#f5f5f7;}
 .web-group:nth-child(even){background:#fafafa;}
 .web-group:last-child{border-radius:0 0 5px 5px;}
@@ -73,38 +65,47 @@ a{text-decoration:none;color:inherit;}
 .web-group-icon img{width:24px;height:24px;object-fit:contain;border-radius:4px;display:block;}
 .web-group-name{flex:1;min-width:0;margin-left:6px;font-size:13px;color:#4d4d4d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-/* 换背景面板 */
+/* 背景面板 */
 #bg-panel{display:none;position:fixed;inset:0;z-index:500;background:#fafafa;flex-direction:column;}
 #bg-panel.open{display:flex;}
-#bg-panel-header{position:relative;width:100%;height:50px;background:linear-gradient(90deg,#f12711,#c471ed);display:flex;align-items:center;padding:0 16px;}
-#bg-panel-close{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;line-height:1;}
-#bg-panel-body{flex:1;overflow-y:auto;padding:20px;}
-#bg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-.bg-item{cursor:pointer;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:box-shadow 0.2s;}
+#bg-panel-header{width:100%;height:50px;background:linear-gradient(90deg,#667eea,#764ba2);display:flex;align-items:center;padding:0 16px;flex-shrink:0;}
+#bg-panel-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;margin-right:12px;line-height:1;}
+#bg-panel-title{color:#fff;font-size:1rem;font-weight:700;}
+#bg-panel-body{display:flex;flex:1;overflow:hidden;}
+/* 左侧分类 */
+#bg-cats{width:100px;background:#fff;border-right:1px solid #eee;overflow-y:auto;flex-shrink:0;}
+.bg-cat-btn{display:block;width:100%;padding:12px 0;text-align:center;font-size:14px;color:#555;cursor:pointer;border-bottom:1px solid #f5f5f5;transition:background 0.15s;background:none;border-left:none;border-right:none;border-top:none;}
+.bg-cat-btn:hover{background:#f5f5f7;}
+.bg-cat-btn.active{background:#c9c9c9;color:#fff;font-weight:700;}
+/* 右侧图格 */
+#bg-items-wrap{flex:1;overflow-y:auto;padding:16px;}
+#bg-items{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.bg-item{cursor:pointer;border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:box-shadow 0.2s,outline 0.1s;}
 .bg-item:hover{box-shadow:0 4px 16px rgba(0,0,0,0.25);}
 .bg-item.active{outline:3px solid #1677ff;}
-.bg-preview{width:100%;height:140px;display:block;}
-.bg-name{text-align:center;padding:6px 0;font-size:13px;background:#fff;color:#333;}
+.bg-preview{width:100%;height:120px;display:block;}
+.bg-preview-canvas{width:100%;height:120px;display:block;}
+.bg-name{text-align:center;padding:5px 0;font-size:12px;background:#fff;color:#333;}
 
 /* 响应式 */
-@media(max-width:940px){#search-box{width:92vw;}#web-site{width:100%;border-radius:0;}#bg-grid{grid-template-columns:repeat(2,1fr);}.web-group-item{width:110px;}}
-@media(max-width:600px){#engine-logo{width:140px;height:46px;}#engine-logo img{max-width:140px;max-height:46px;}.web-group-item{width:90px;}.web-group-name{font-size:11px;}.cat-tab{min-width:48px;font-size:12px;padding:0 4px;}#bg-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:940px){#search-box{width:92vw;}#web-site{width:100%;border-radius:0;}#bg-items{grid-template-columns:repeat(3,1fr);}.web-group-item{width:110px;}}
+@media(max-width:600px){#engine-logo{width:140px;height:46px;}#engine-logo img{max-width:140px;max-height:46px;}.web-group-item{width:90px;}.cat-tab{min-width:44px;font-size:12px;padding:0 4px;}#bg-items{grid-template-columns:repeat(2,1fr);}#bg-cats{width:72px;}.bg-cat-btn{font-size:12px;padding:10px 0;}}
 </style>
 </head>
 <body>
-<div id="bg-layer"></div>
 
-<!-- 顶部栏 -->
+<canvas id="bg-canvas"></canvas>
+<video id="bg-video" autoplay loop muted playsinline></video>
+<div id="bg-color"></div>
+
 <div id="topbar">
   <span id="site-title">🧭 王五导航</span>
   <button id="bg-btn" title="更换背景">🖼</button>
 </div>
 
-<!-- 搜索区 -->
 <div id="search-area">
   <div id="engine-logo">
-    <img id="engine-img" src="https://www.baidu.com/img/PCtopnew.png" alt="搜索引擎"
-         onerror="this.src='https://ico.xmynscnq.dpdns.org/?domain=baidu.com'">
+    <img id="engine-img" src="" alt="搜索引擎">
   </div>
   <div id="search-box">
     <input id="search-input" type="text" placeholder="百度一下" autocomplete="off"/>
@@ -112,11 +113,9 @@ a{text-decoration:none;color:inherit;}
   </div>
 </div>
 
-<!-- 主卡片 -->
 <div id="web-site">
   <div id="web-site-header">
     <div id="cat-tabs"></div>
-    <!-- 内外网拨动开关 -->
     <div id="net-switch-wrap">
       <div id="net-switch">
         <div id="net-switch-knob"></div>
@@ -129,179 +128,478 @@ a{text-decoration:none;color:inherit;}
   </div>
 </div>
 
-<!-- 换背景面板 -->
+<!-- 背景面板 -->
 <div id="bg-panel">
   <div id="bg-panel-header">
-    <button id="bg-panel-close">✕</button>
+    <button id="bg-panel-back">←</button>
+    <span id="bg-panel-title">更换背景</span>
   </div>
   <div id="bg-panel-body">
-    <div id="bg-grid"></div>
+    <div id="bg-cats"></div>
+    <div id="bg-items-wrap"><div id="bg-items"></div></div>
   </div>
 </div>
 
 <script>
+// ═══════════════════════════════════════════
+// 常量
+// ═══════════════════════════════════════════
 const WORKER_URL   = 'https://ico.xmynscnq.dpdns.org';
 const LINKS_FILE   = '../links.json';
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
-// ── 模式切换 ──
+// ═══════════════════════════════════════════
+// 模式切换
+// ═══════════════════════════════════════════
 const MODES = ['normal','webstack','easy','nav','5iux','kim'];
 const MODE_PATHS = {normal:'../normal/index.html',webstack:'../webstack/index.html',easy:'../easy/index.html',nav:'../nav/index.html','5iux':'../5IUX/index.html',kim:'../kim/index.html'};
 function switchMode(){const next=MODES[(MODES.indexOf('kim')+1)%MODES.length];localStorage.setItem('navMode',next);location.href=MODE_PATHS[next];}
 document.getElementById('site-title').addEventListener('click',switchMode);
 
-// ── 搜索引擎切换（百度↔Google）──
-const ENGINES=[
-  {name:'百度',url:'https://www.baidu.com/s?wd=',logo:'https://www.baidu.com/img/PCtopnew.png',fallback:'baidu.com'},
-  {name:'Google',url:'https://www.google.com/search?q=',logo:'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',fallback:'google.com'},
+// ═══════════════════════════════════════════
+// 搜索引擎（百度↔Google）
+// ═══════════════════════════════════════════
+const ENGINES = [
+  {name:'百度', url:'https://www.baidu.com/s?wd=',
+   logo:'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 70"><text y="50" font-size="48" font-family="Arial" font-weight="bold"><tspan fill="%232932E1">Bai</tspan><tspan fill="%232932E1">d</tspan><tspan fill="%23E4393C">u</tspan></text></svg>'},
+  {name:'Google', url:'https://www.google.com/search?q=',
+   logo:'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 272 92"><text y="72" font-size="72" font-family="Arial" font-weight="bold"><tspan fill="%234285F4">G</tspan><tspan fill="%23EA4335">o</tspan><tspan fill="%23FBBC05">o</tspan><tspan fill="%234285F4">g</tspan><tspan fill="%2334A853">l</tspan><tspan fill="%23EA4335">e</tspan></text></svg>'},
 ];
-let engineIdx=parseInt(localStorage.getItem('kimEngine')||'0')%ENGINES.length;
+let engineIdx = parseInt(localStorage.getItem('kimEngine')||'0') % ENGINES.length;
 function updateEngine(){
-  const e=ENGINES[engineIdx];
-  const img=document.getElementById('engine-img');
-  img.src=e.logo;
-  img.onerror=function(){this.src=`${WORKER_URL}/?domain=${e.fallback}`;this.onerror=null;};
-  document.getElementById('search-input').placeholder=e.name+'一下';
+  const e = ENGINES[engineIdx];
+  document.getElementById('engine-img').src = e.logo;
+  document.getElementById('search-input').placeholder = e.name + '一下';
 }
 document.getElementById('engine-logo').addEventListener('click',()=>{
-  engineIdx=(engineIdx+1)%ENGINES.length;
-  localStorage.setItem('kimEngine',engineIdx);
+  engineIdx = (engineIdx+1) % ENGINES.length;
+  localStorage.setItem('kimEngine', engineIdx);
   updateEngine();
 });
 updateEngine();
 
-// ── 搜索 ──
-document.getElementById('search-btn').addEventListener('click',doSearch);
-document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
-function doSearch(){const kw=document.getElementById('search-input').value.trim();if(kw)window.open(ENGINES[engineIdx].url+encodeURIComponent(kw),'_blank');}
+document.getElementById('search-btn').addEventListener('click', doSearch);
+document.getElementById('search-input').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+function doSearch(){
+  const kw = document.getElementById('search-input').value.trim();
+  if(kw) window.open(ENGINES[engineIdx].url + encodeURIComponent(kw), '_blank');
+}
 
-// ── 内外网拨动开关 ──
-let isIntranet=localStorage.getItem('netMode')==='intranet';
-let _allData=null;
-function getCardUrl(item){return(isIntranet&&item.intranet)?item.intranet:item.url;}
+// ═══════════════════════════════════════════
+// 内外网
+// ═══════════════════════════════════════════
+let isIntranet = localStorage.getItem('netMode') === 'intranet';
+let _allData = null;
+function getCardUrl(item){return (isIntranet && item.intranet) ? item.intranet : item.url;}
 function getDomain(url){try{return new URL(url).hostname;}catch{return null;}}
 function faviconSrc(url){const d=getDomain(url);return d?`${WORKER_URL}/?domain=${d}`:DEFAULT_ICON;}
 function updateSwitch(){
-  const sw=document.getElementById('net-switch');
-  const txt=document.getElementById('net-switch-text');
-  if(isIntranet){sw.classList.add('on');txt.textContent='内网';}
-  else{sw.classList.remove('on');txt.textContent='外网';}
+  const sw = document.getElementById('net-switch');
+  const tx = document.getElementById('net-switch-text');
+  sw.classList.toggle('on', isIntranet);
+  tx.textContent = isIntranet ? '内网' : '外网';
 }
 document.getElementById('net-switch-wrap').addEventListener('click',()=>{
-  isIntranet=!isIntranet;
-  localStorage.setItem('netMode',isIntranet?'intranet':'internet');
+  isIntranet = !isIntranet;
+  localStorage.setItem('netMode', isIntranet?'intranet':'internet');
   updateSwitch();
-  if(_allData)renderContent(_allData,_activeIdx);
+  if(_allData) renderContent(_allData, _activeIdx);
 });
 updateSwitch();
 
-// ── 背景切换 ──
-const BG_OPTIONS=[
-  {id:'default',name:'流光溢彩',type:'gradient',value:'linear-gradient(135deg,#a8edea,#fed6e3)'},
-  {id:'bg-1',   name:'火焰',    type:'gradient',value:'linear-gradient(135deg,#f5af19,#f12711)'},
-  {id:'bg-2',   name:'深海',    type:'gradient',value:'linear-gradient(135deg,#43cea2,#185a9d)'},
-  {id:'bg-3',   name:'紫霞',    type:'gradient',value:'linear-gradient(135deg,#c471ed,#f64f59)'},
-  {id:'bg-4',   name:'金沙',    type:'gradient',value:'linear-gradient(135deg,#f7971e,#ffd200)'},
-  {id:'bg-5',   name:'翡翠',    type:'gradient',value:'linear-gradient(135deg,#11998e,#38ef7d)'},
-  {id:'bg-6',   name:'夜空',    type:'gradient',value:'linear-gradient(135deg,#2c3e50,#4ca1af)'},
-  {id:'bg-7',   name:'玫瑰',    type:'gradient',value:'linear-gradient(135deg,#ff6a88,#ff99ac)'},
-];
-let currentBg=localStorage.getItem('kimBg')||'default';
-function applyBg(id){
-  const opt=BG_OPTIONS.find(b=>b.id===id)||BG_OPTIONS[0];
-  const layer=document.getElementById('bg-layer');
-  layer.style.background=opt.value;
-  currentBg=id;
-  localStorage.setItem('kimBg',id);
-  document.querySelectorAll('.bg-item').forEach(el=>el.classList.toggle('active',el.dataset.id===id));
+// ═══════════════════════════════════════════
+// Canvas 动态背景
+// ═══════════════════════════════════════════
+let _animFrame = null;
+function stopCanvas(){
+  if(_animFrame){cancelAnimationFrame(_animFrame);_animFrame=null;}
+  const c = document.getElementById('bg-canvas');
+  c.style.display = 'none';
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
 }
-function buildBgPanel(){
-  const grid=document.getElementById('bg-grid');
-  grid.innerHTML='';
-  BG_OPTIONS.forEach(opt=>{
-    const div=document.createElement('div');
-    div.className='bg-item'+(opt.id===currentBg?' active':'');
-    div.dataset.id=opt.id;
-    const preview=document.createElement('div');
-    preview.className='bg-preview';
-    preview.style.background=opt.value;
-    const name=document.createElement('div');
-    name.className='bg-name';
-    name.textContent=opt.name;
-    div.appendChild(preview);
-    div.appendChild(name);
-    div.addEventListener('click',()=>{applyBg(opt.id);});
+
+function resizeCanvas(){
+  const c = document.getElementById('bg-canvas');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+
+// 1. 流光溢彩
+function animFlowColor(){
+  stopCanvas(); resizeCanvas();
+  const c = document.getElementById('bg-canvas'); c.style.display='block';
+  const ctx = c.getContext('2d');
+  let t = 0;
+  function draw(){
+    const w=c.width,h=c.height;
+    ctx.clearRect(0,0,w,h);
+    for(let i=0;i<6;i++){
+      const x=w*(0.2+0.6*Math.sin(t*0.7+i*1.1));
+      const y=h*(0.2+0.6*Math.cos(t*0.5+i*0.9));
+      const r=Math.min(w,h)*(0.25+0.1*Math.sin(t+i));
+      const hue=(t*30+i*60)%360;
+      const g=ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0,`hsla(${hue},90%,65%,0.55)`);
+      g.addColorStop(1,`hsla(${hue},90%,65%,0)`);
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    }
+    t+=0.008; _animFrame=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// 2. 花瓣飘零
+function animPetals(){
+  stopCanvas(); resizeCanvas();
+  const c = document.getElementById('bg-canvas'); c.style.display='block';
+  const ctx = c.getContext('2d');
+  const petals=[];
+  for(let i=0;i<60;i++) petals.push({
+    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
+    r:3+Math.random()*6, vx:-0.5+Math.random(), vy:0.5+Math.random()*1.5,
+    angle:Math.random()*Math.PI*2, va:(-0.02+Math.random()*0.04),
+    hue:330+Math.random()*40, alpha:0.5+Math.random()*0.5
+  });
+  ctx.fillStyle='#1a1a2e';
+  function draw(){
+    const w=c.width,h=c.height;
+    ctx.fillStyle='rgba(26,26,46,0.25)'; ctx.fillRect(0,0,w,h);
+    petals.forEach(p=>{
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.angle);
+      ctx.beginPath();
+      ctx.ellipse(0,0,p.r,p.r*0.5,0,0,Math.PI*2);
+      ctx.fillStyle=`hsla(${p.hue},80%,75%,${p.alpha})`;
+      ctx.fill(); ctx.restore();
+      p.x+=p.vx; p.y+=p.vy; p.angle+=p.va;
+      if(p.y>h+10){p.y=-10;p.x=Math.random()*w;}
+      if(p.x<-10) p.x=w+10;
+      if(p.x>w+10) p.x=-10;
+    });
+    _animFrame=requestAnimationFrame(draw);
+  }
+  ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,c.width,c.height);
+  draw();
+}
+
+// 3. 线条
+function animLines(){
+  stopCanvas(); resizeCanvas();
+  const c = document.getElementById('bg-canvas'); c.style.display='block';
+  const ctx = c.getContext('2d');
+  const lines=[];
+  for(let i=0;i<20;i++) lines.push({
+    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
+    vx:-1+Math.random()*2, vy:-1+Math.random()*2,
+    len:80+Math.random()*120, hue:Math.random()*360, alpha:0.4+Math.random()*0.4,
+    angle:Math.random()*Math.PI*2, va:0.005+Math.random()*0.01
+  });
+  function draw(){
+    const w=c.width,h=c.height;
+    ctx.fillStyle='rgba(15,20,40,0.2)'; ctx.fillRect(0,0,w,h);
+    lines.forEach(l=>{
+      const x2=l.x+Math.cos(l.angle)*l.len;
+      const y2=l.y+Math.sin(l.angle)*l.len;
+      const g=ctx.createLinearGradient(l.x,l.y,x2,y2);
+      g.addColorStop(0,`hsla(${l.hue},90%,65%,0)`);
+      g.addColorStop(0.5,`hsla(${l.hue},90%,65%,${l.alpha})`);
+      g.addColorStop(1,`hsla(${l.hue},90%,65%,0)`);
+      ctx.strokeStyle=g; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(l.x,l.y); ctx.lineTo(x2,y2); ctx.stroke();
+      l.x+=l.vx; l.y+=l.vy; l.angle+=l.va; l.hue=(l.hue+0.3)%360;
+      if(l.x<-200||l.x>w+200){l.vx*=-1;}
+      if(l.y<-200||l.y>h+200){l.vy*=-1;}
+    });
+    _animFrame=requestAnimationFrame(draw);
+  }
+  ctx.fillStyle='#0f1428'; ctx.fillRect(0,0,c.width,c.height);
+  draw();
+}
+
+// 4. 丝带
+function animRibbons(){
+  stopCanvas(); resizeCanvas();
+  const c = document.getElementById('bg-canvas'); c.style.display='block';
+  const ctx = c.getContext('2d');
+  const ribbons=[];
+  for(let i=0;i<8;i++) ribbons.push({
+    points:[], hue:i*45, t:i*0.8, speed:0.003+Math.random()*0.003
+  });
+  function getPoint(t,idx){
+    const w=c.width,h=c.height;
+    return {
+      x:w*(0.5+0.45*Math.sin(t*0.7+idx*1.3)),
+      y:h*(0.5+0.45*Math.cos(t*0.5+idx*0.9))
+    };
+  }
+  function draw(){
+    const w=c.width,h=c.height;
+    ctx.fillStyle='rgba(20,10,40,0.15)'; ctx.fillRect(0,0,w,h);
+    ribbons.forEach((rb,idx)=>{
+      rb.t += rb.speed;
+      const pts=[];
+      for(let i=0;i<8;i++) pts.push(getPoint(rb.t-i*0.15,idx));
+      ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
+      for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
+      const g=ctx.createLinearGradient(pts[0].x,pts[0].y,pts[pts.length-1].x,pts[pts.length-1].y);
+      g.addColorStop(0,`hsla(${rb.hue},85%,65%,0.8)`);
+      g.addColorStop(1,`hsla(${rb.hue},85%,65%,0)`);
+      ctx.strokeStyle=g; ctx.lineWidth=3+idx*0.5;
+      ctx.lineCap='round'; ctx.stroke();
+      rb.hue=(rb.hue+0.2)%360;
+    });
+    _animFrame=requestAnimationFrame(draw);
+  }
+  ctx.fillStyle='#140a28'; ctx.fillRect(0,0,c.width,c.height);
+  draw();
+}
+
+const CANVAS_ANIMS = [animFlowColor, animPetals, animLines, animRibbons];
+
+// ═══════════════════════════════════════════
+// 背景数据
+// ═══════════════════════════════════════════
+const BG_CATS = [
+  {id:'dynamic', name:'动态'},
+  {id:'scenery', name:'风景'},
+  {id:'elegant', name:'素雅'},
+  {id:'beauty',  name:'唯美'},
+  {id:'pure',    name:'纯色'},
+  {id:'still',   name:'静物'},
+  {id:'star',    name:'星空'},
+  {id:'city',    name:'城市'},
+];
+
+// 动态背景定义（canvas或视频）
+// video字段填写视频路径即可自动切换为视频模式
+const BG_DYNAMIC = [
+  {id:'anim-0', name:'流光溢彩', type:'canvas', animIdx:0, previewGrad:'linear-gradient(135deg,#a8edea,#fed6e3,#f5af19)'},
+  {id:'anim-1', name:'花瓣飘零', type:'canvas', animIdx:1, previewGrad:'linear-gradient(135deg,#1a1a2e,#ff6a88,#ffb347)', video:''},
+  {id:'anim-2', name:'线条',     type:'canvas', animIdx:2, previewGrad:'linear-gradient(135deg,#0f1428,#11998e,#38ef7d)', video:''},
+  {id:'anim-3', name:'丝带',     type:'canvas', animIdx:3, previewGrad:'linear-gradient(135deg,#140a28,#c471ed,#f64f59)', video:''},
+];
+
+// 静态图片背景（放图片路径即可）
+const BG_IMAGES = {
+  scenery: [
+    {id:'sc-1', name:'风景1', src:'bg/scenery/1.jpg'},
+    {id:'sc-2', name:'风景2', src:'bg/scenery/2.jpg'},
+    {id:'sc-3', name:'风景3', src:'bg/scenery/3.jpg'},
+    {id:'sc-4', name:'风景4', src:'bg/scenery/4.jpg'},
+  ],
+  elegant: [
+    {id:'el-1', name:'素雅1', src:'bg/elegant/1.jpg'},
+    {id:'el-2', name:'素雅2', src:'bg/elegant/2.jpg'},
+    {id:'el-3', name:'素雅3', src:'bg/elegant/3.jpg'},
+    {id:'el-4', name:'素雅4', src:'bg/elegant/4.jpg'},
+  ],
+  beauty: [
+    {id:'be-1', name:'唯美1', src:'bg/beauty/1.jpg'},
+    {id:'be-2', name:'唯美2', src:'bg/beauty/2.jpg'},
+    {id:'be-3', name:'唯美3', src:'bg/beauty/3.jpg'},
+    {id:'be-4', name:'唯美4', src:'bg/beauty/4.jpg'},
+  ],
+  still: [
+    {id:'st-1', name:'静物1', src:'bg/still/1.jpg'},
+    {id:'st-2', name:'静物2', src:'bg/still/2.jpg'},
+    {id:'st-3', name:'静物3', src:'bg/still/3.jpg'},
+    {id:'st-4', name:'静物4', src:'bg/still/4.jpg'},
+  ],
+  star: [
+    {id:'sr-1', name:'星空1', src:'bg/star/1.jpg'},
+    {id:'sr-2', name:'星空2', src:'bg/star/2.jpg'},
+    {id:'sr-3', name:'星空3', src:'bg/star/3.jpg'},
+    {id:'sr-4', name:'星空4', src:'bg/star/4.jpg'},
+  ],
+  city: [
+    {id:'cy-1', name:'城市1', src:'bg/city/1.jpg'},
+    {id:'cy-2', name:'城市2', src:'bg/city/2.jpg'},
+    {id:'cy-3', name:'城市3', src:'bg/city/3.jpg'},
+    {id:'cy-4', name:'城市4', src:'bg/city/4.jpg'},
+  ],
+};
+
+const BG_PURE = [
+  {id:'pu-0', name:'流光',  grad:'linear-gradient(135deg,#a8edea,#fed6e3)'},
+  {id:'pu-1', name:'火焰',  grad:'linear-gradient(135deg,#f5af19,#f12711)'},
+  {id:'pu-2', name:'深海',  grad:'linear-gradient(135deg,#43cea2,#185a9d)'},
+  {id:'pu-3', name:'紫霞',  grad:'linear-gradient(135deg,#c471ed,#f64f59)'},
+  {id:'pu-4', name:'金沙',  grad:'linear-gradient(135deg,#f7971e,#ffd200)'},
+  {id:'pu-5', name:'翡翠',  grad:'linear-gradient(135deg,#11998e,#38ef7d)'},
+  {id:'pu-6', name:'夜空',  grad:'linear-gradient(135deg,#2c3e50,#4ca1af)'},
+  {id:'pu-7', name:'玫瑰',  grad:'linear-gradient(135deg,#ff6a88,#ff99ac)'},
+];
+
+// ═══════════════════════════════════════════
+// 应用背景
+// ═══════════════════════════════════════════
+let _currentBgId = localStorage.getItem('kimBg') || 'anim-0';
+
+function applyBg(id){
+  _currentBgId = id;
+  localStorage.setItem('kimBg', id);
+
+  const colorLayer = document.getElementById('bg-color');
+  const videoEl    = document.getElementById('bg-video');
+  stopCanvas();
+  videoEl.style.display = 'none';
+  videoEl.pause();
+  colorLayer.style.background = '';
+
+  // 动态
+  const dynItem = BG_DYNAMIC.find(b=>b.id===id);
+  if(dynItem){
+    // 如果配了video且不为空，用视频
+    if(dynItem.video){
+      videoEl.src = dynItem.video;
+      videoEl.style.display = 'block';
+      videoEl.play().catch(()=>{});
+      colorLayer.style.background = '#000';
+    } else {
+      colorLayer.style.background = '#000';
+      CANVAS_ANIMS[dynItem.animIdx]();
+    }
+    return;
+  }
+  // 纯色
+  const pureItem = BG_PURE.find(b=>b.id===id);
+  if(pureItem){ colorLayer.style.background = pureItem.grad; return; }
+  // 图片
+  for(const cat of Object.values(BG_IMAGES)){
+    const img = cat.find(b=>b.id===id);
+    if(img){ colorLayer.style.background=`url('${img.src}') center/cover no-repeat`; return; }
+  }
+}
+
+// ═══════════════════════════════════════════
+// 背景面板
+// ═══════════════════════════════════════════
+let _bgCatActive = 'dynamic';
+
+function buildBgCats(){
+  const wrap = document.getElementById('bg-cats');
+  wrap.innerHTML = '';
+  BG_CATS.forEach(cat=>{
+    const btn = document.createElement('button');
+    btn.className = 'bg-cat-btn' + (cat.id===_bgCatActive?' active':'');
+    btn.textContent = cat.name;
+    btn.addEventListener('click',()=>{
+      _bgCatActive = cat.id;
+      document.querySelectorAll('.bg-cat-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      buildBgItems(cat.id);
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function buildBgItems(catId){
+  const grid = document.getElementById('bg-items');
+  grid.innerHTML = '';
+  let items = [];
+
+  if(catId==='dynamic') items = BG_DYNAMIC.map(b=>({id:b.id, name:b.name, grad:b.previewGrad, type:'canvas'}));
+  else if(catId==='pure') items = BG_PURE.map(b=>({id:b.id, name:b.name, grad:b.grad, type:'grad'}));
+  else items = (BG_IMAGES[catId]||[]).map(b=>({id:b.id, name:b.name, src:b.src, type:'img'}));
+
+  items.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'bg-item' + (item.id===_currentBgId?' active':'');
+    div.dataset.id = item.id;
+
+    const preview = document.createElement('div');
+    preview.className = 'bg-preview';
+    if(item.type==='img'){
+      preview.style.cssText = `background:url('${item.src}') center/cover no-repeat;width:100%;height:120px;`;
+    } else {
+      preview.style.cssText = `background:${item.grad};width:100%;height:120px;`;
+    }
+    const name = document.createElement('div');
+    name.className = 'bg-name'; name.textContent = item.name;
+
+    div.appendChild(preview); div.appendChild(name);
+    div.addEventListener('click',()=>{
+      applyBg(item.id);
+      document.querySelectorAll('.bg-item').forEach(el=>el.classList.remove('active'));
+      div.classList.add('active');
+    });
     grid.appendChild(div);
   });
 }
+
 document.getElementById('bg-btn').addEventListener('click',()=>{
-  buildBgPanel();
+  buildBgCats(); buildBgItems(_bgCatActive);
   document.getElementById('bg-panel').classList.add('open');
 });
-document.getElementById('bg-panel-close').addEventListener('click',()=>{
+document.getElementById('bg-panel-back').addEventListener('click',()=>{
   document.getElementById('bg-panel').classList.remove('open');
 });
-applyBg(currentBg);
 
-// ── 分类Tab ──
-let _activeIdx=0;
+// 启动时应用背景
+applyBg(_currentBgId);
+
+// ═══════════════════════════════════════════
+// 导航tab + 渲染
+// ═══════════════════════════════════════════
+let _activeIdx = 0;
+
+function sectionLabel(s){ return s.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}]+/u,'').trim(); }
+
 function renderTabs(sections){
-  const tabs=document.getElementById('cat-tabs');
-  tabs.innerHTML='';
+  const tabs = document.getElementById('cat-tabs');
+  tabs.innerHTML = '';
   sections.forEach(({section},i)=>{
-    const btn=document.createElement('div');
-    btn.className='cat-tab'+(i===_activeIdx?' active':'');
-    btn.textContent=section.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}]+/u,'').trim();
+    const btn = document.createElement('div');
+    btn.className = 'cat-tab' + (i===_activeIdx?' active':'');
+    btn.textContent = sectionLabel(section);
     btn.addEventListener('click',()=>{
-      _activeIdx=i;
+      _activeIdx = i;
       document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
       btn.classList.add('active');
-      renderContent(sections,i);
+      renderContent(sections, i);
     });
     tabs.appendChild(btn);
   });
 }
 
-// ── 渲染内容（只显示当前tab） ──
-function renderContent(sections,idx){
-  const body=document.getElementById('web-site-body');
-  body.innerHTML='';
-  const {items}=sections[idx];
-  const group=document.createElement('div');
-  group.className='web-group';
-  const spacer=document.createElement('div');
-  spacer.className='web-group-spacer';
+function renderContent(sections, idx){
+  const body = document.getElementById('web-site-body');
+  body.innerHTML = '';
+  const {items} = sections[idx];
+  const group = document.createElement('div');
+  group.className = 'web-group';
+  const spacer = document.createElement('div');
+  spacer.className = 'web-group-spacer';
   group.appendChild(spacer);
   items.forEach(item=>{
-    const url=getCardUrl(item);
-    const iconSrc=item.icon||faviconSrc(url);
-    const title=item.title||'';
-    const a=document.createElement('a');
-    a.className='web-group-item';
-    a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.title=item.desc||title;
-    const iconWrap=document.createElement('div');
-    iconWrap.className='web-group-icon';
-    const img=document.createElement('img');
-    img.src=iconSrc;img.alt=title;img.loading='lazy';
+    const url = getCardUrl(item);
+    const iconSrc = item.icon || faviconSrc(url);
+    const title = item.title || '';
+    const a = document.createElement('a');
+    a.className='web-group-item'; a.href=url; a.target='_blank'; a.rel='noopener noreferrer'; a.title=item.desc||title;
+    const iconWrap = document.createElement('div'); iconWrap.className='web-group-icon';
+    const img = document.createElement('img');
+    img.src=iconSrc; img.alt=title; img.loading='lazy';
     img.onerror=function(){this.src=DEFAULT_ICON;this.onerror=null;};
     iconWrap.appendChild(img);
-    const name=document.createElement('span');
-    name.className='web-group-name';name.textContent=title;
-    a.appendChild(iconWrap);a.appendChild(name);
+    const name = document.createElement('span'); name.className='web-group-name'; name.textContent=title;
+    a.appendChild(iconWrap); a.appendChild(name);
     group.appendChild(a);
   });
   body.appendChild(group);
 }
 
-// ── 入口 ──
+// ═══════════════════════════════════════════
+// 入口
+// ═══════════════════════════════════════════
 (async()=>{
   localStorage.setItem('navMode','kim');
   try{
-    const res=await fetch(LINKS_FILE);
-    const data=await res.json();
-    _allData=data;
+    const res = await fetch(LINKS_FILE);
+    const data = await res.json();
+    _allData = data;
     renderTabs(data);
-    renderContent(data,0);
+    renderContent(data, 0);
   }catch(e){
     document.getElementById('web-site-body').innerHTML='<p style="color:#999;text-align:center;padding:2rem;">链接数据加载失败</p>';
   }
