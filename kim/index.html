@@ -11,7 +11,7 @@ body{font-family:'微软雅黑',-apple-system,sans-serif;font-size:14px;min-heig
 a{text-decoration:none;color:inherit;}
 
 /* 背景层 */
-#bg-video{position:fixed;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+#bg-video{position:fixed;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;transition:opacity 0.3s;}
 #bg-color{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,#a8edea,#fed6e3);transition:background 0.4s;}
 
 /* 顶部栏 */
@@ -30,6 +30,12 @@ a{text-decoration:none;color:inherit;}
 #search-btn{width:52px;height:44px;background:#aeaeae;border:1px solid #aeaeae;border-radius:0 5px 5px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
 #search-btn:hover{background:#999;}
 #search-btn svg{display:block;}
+
+/* 搜索联想词 */
+#suggest-box{position:absolute;top:44px;left:0;right:52px;background:#fff;border:1px solid #d7d7d7;border-top:none;border-radius:0 0 5px 5px;box-shadow:0 4px 12px rgba(0,0,0,0.12);z-index:999;display:none;}
+#suggest-box.show{display:block;}
+.suggest-item{padding:9px 14px;font-size:15px;color:#333;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.suggest-item:hover,.suggest-item.active{background:#f0f4ff;color:#1677ff;}
 
 /* 主白卡 */
 #web-site{position:relative;z-index:10;width:894px;margin:70px auto 60px;background:#fafafa;border-radius:5px;box-shadow:0 0 1px #797979;}
@@ -105,11 +111,12 @@ a{text-decoration:none;color:inherit;}
   <div id="engine-logo">
     <img id="engine-img" src="" alt="搜索引擎">
   </div>
-  <div id="search-box">
+  <div id="search-box" style="position:relative;">
     <input id="search-input" type="text" placeholder="百度一下" autocomplete="off"/>
     <button id="search-btn">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </button>
+    <div id="suggest-box"></div>
   </div>
 </div>
 
@@ -179,10 +186,89 @@ document.getElementById('engine-logo').addEventListener('click',()=>{
 updateEngine();
 
 document.getElementById('search-btn').addEventListener('click', doSearch);
-document.getElementById('search-input').addEventListener('keydown', e=>{ if(e.key==='Enter') doSearch(); });
+document.getElementById('search-input').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ hideSuggest(); doSearch(); }
+  else if(e.key==='ArrowDown') moveSuggest(1);
+  else if(e.key==='ArrowUp')   moveSuggest(-1);
+  else if(e.key==='Escape')    hideSuggest();
+});
+document.getElementById('search-input').addEventListener('input', onSuggestInput);
+document.addEventListener('click', e=>{
+  if(!document.getElementById('search-box').contains(e.target)) hideSuggest();
+});
 function doSearch(){
   const kw = document.getElementById('search-input').value.trim();
   if(kw) window.open(ENGINES[engineIdx].url + encodeURIComponent(kw), '_blank');
+}
+
+// ── 联想词 ──
+let _suggestTimer = null;
+let _suggestActive = -1;
+let _suggestItems = [];
+
+function onSuggestInput(){
+  const kw = document.getElementById('search-input').value.trim();
+  clearTimeout(_suggestTimer);
+  if(!kw){ hideSuggest(); return; }
+  _suggestTimer = setTimeout(()=> fetchSuggest(kw), 200);
+}
+
+function fetchSuggest(kw){
+  const cbName = 'baiduSuggest_' + Date.now();
+  const script = document.createElement('script');
+  script.src = `https://suggestion.baidu.com/su?wd=${encodeURIComponent(kw)}&cb=${cbName}&t=${Date.now()}`;
+  window[cbName] = (data)=>{
+    delete window[cbName];
+    document.head.removeChild(script);
+    const words = (data && data.s) ? data.s.slice(0,8) : [];
+    renderSuggest(words);
+  };
+  script.onerror = ()=>{ delete window[cbName]; try{ document.head.removeChild(script); }catch{} };
+  document.head.appendChild(script);
+}
+
+function renderSuggest(words){
+  const box = document.getElementById('suggest-box');
+  _suggestItems = words;
+  _suggestActive = -1;
+  if(!words.length){ hideSuggest(); return; }
+  box.innerHTML = '';
+  words.forEach((w, i)=>{
+    const div = document.createElement('div');
+    div.className = 'suggest-item';
+    div.textContent = w;
+    div.addEventListener('mousedown', e=>{ e.preventDefault(); selectSuggest(i); });
+    div.addEventListener('mouseover', ()=>{ setActiveSuggest(i); });
+    box.appendChild(div);
+  });
+  box.classList.add('show');
+}
+
+function hideSuggest(){
+  document.getElementById('suggest-box').classList.remove('show');
+  _suggestActive = -1;
+}
+
+function setActiveSuggest(idx){
+  _suggestActive = idx;
+  document.querySelectorAll('.suggest-item').forEach((el,i)=>{
+    el.classList.toggle('active', i===idx);
+  });
+}
+
+function moveSuggest(dir){
+  if(!document.getElementById('suggest-box').classList.contains('show')) return;
+  const next = Math.max(-1, Math.min(_suggestItems.length-1, _suggestActive+dir));
+  setActiveSuggest(next);
+  const input = document.getElementById('search-input');
+  input.value = next>=0 ? _suggestItems[next] : input.dataset.origin||'';
+  if(next===-1 && input.dataset.origin) input.value = input.dataset.origin;
+}
+
+function selectSuggest(idx){
+  document.getElementById('search-input').value = _suggestItems[idx];
+  hideSuggest();
+  doSearch();
 }
 
 // ═══════════════════════════════════════════
