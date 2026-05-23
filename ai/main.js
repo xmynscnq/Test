@@ -32,7 +32,7 @@ const PH_JSON  = '../wallpapers/ph.js';
 const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
 async function changeBackground() {
-  const video   = document.getElementById('bgLayer');
+  const video = document.getElementById('bgLayer');
   if (!video) return;
   const list = await fetch(isMobile ? PH_JSON : PC_JSON).then(r => r.json()).catch(() => null);
   if (!list?.length) return;
@@ -47,7 +47,7 @@ function reloadBackground() {
   video.src = src; video.load(); video.play().catch(() => {});
 }
 
-// ── 天气 / 格言（复用 normal 逻辑）────────────────────────
+// ── 天气 / 格言 ───────────────────────────────────────────
 function getWeatherIcon(c) { return c===0?'☀️':c<=2?'🌤':c===3?'☁️':c<=49?'🌫':c<=59?'🌦':c<=69?'🌧':c<=79?'❄️':c<=84?'🌧':c<=99?'⛈':'🌈'; }
 function getWeatherText(c) { return c===0?'晴':c<=2?'少云':c===3?'阴':c<=49?'雾':c<=59?'毛毛雨':c<=69?'雨':c<=79?'雪':c<=84?'阵雨':c<=99?'雷雨':'未知'; }
 function getWindDir(d) { return ['北','东北','东','东南','南','西南','西','西北'][Math.round(d/45)%8]; }
@@ -131,15 +131,16 @@ function toggleModel(id) {
 }
 window.toggleModel = toggleModel;
 
-// ── 快捷导航（从 links.json 读取）────────────────────────
+// ── 快捷导航 ──────────────────────────────────────────────
 function renderShortcuts(sections) {
   const grid = document.getElementById('shortcutGrid');
   if (!grid) return;
-  // 取前20个链接平铺展示
   const items = sections.flatMap(s => s.items).slice(0, 20);
   grid.innerHTML = items.map(item => {
     const url  = getCardUrl(item);
-    const icon = item.icon ? `<img src="${item.icon}" onerror="this.parentElement.textContent='${(item.title||'?').charAt(0).toUpperCase()}';this.onerror=null;">` : (item.url ? `<img src="${faviconSrc(url)}" onerror="this.parentElement.textContent='${(item.title||'?').charAt(0).toUpperCase()}';this.onerror=null;">` : (item.title||'?').charAt(0).toUpperCase());
+    const icon = item.icon
+      ? `<img src="${item.icon}" onerror="this.parentElement.textContent='${(item.title||'?').charAt(0).toUpperCase()}';this.onerror=null;">`
+      : `<img src="${faviconSrc(url)}" onerror="this.parentElement.textContent='${(item.title||'?').charAt(0).toUpperCase()}';this.onerror=null;">`;
     return `
       <a href="${url}" target="_blank" class="shortcut-card" rel="noopener noreferrer">
         <div class="shortcut-avatar">${icon}</div>
@@ -182,13 +183,12 @@ function createModelSection(model, query) {
   div.className = 'ai-model-section';
   div.innerHTML = `
     <div class="ai-model-header">
-      <h2><i class="fa-solid fa-robot"></i> ${model.name}</h2>
+      <h2>🤖 ${model.name}</h2>
       <span>"${query}"</span>
     </div>
     <div id="cards-${model.id}" class="ai-cards">${buildLoadingCard()}</div>
     <div style="display:flex;align-items:center;gap:.75rem;padding-top:.25rem;">
       <button id="dialog-btn-${model.id}" class="ai-dialog-btn" onclick="toggleDialog('${model.id}')">
-        <i class="fa-solid fa-comments"></i>
         <span id="dialog-btn-text-${model.id}"></span>
       </button>
     </div>
@@ -225,11 +225,11 @@ async function callModel(model, sectionEl) {
     btn.classList.add('show');
     if (data.needsClarification) {
       btn.className = 'ai-dialog-btn show clarify';
-      text.textContent = '深入对话（AI有疑问）';
+      text.textContent = '💬 深入对话（AI有疑问）';
       appendBubble(model.id, data.question, 'ai');
     } else {
       btn.className = 'ai-dialog-btn show explore';
-      text.textContent = '继续探索';
+      text.textContent = '🔍 继续探索';
       appendBubble(model.id, '推荐结果已就绪，你可以继续提问来优化结果。', 'ai');
     }
   } catch(err) {
@@ -253,8 +253,7 @@ async function sendChat(modelId) {
   appendBubble(modelId, text, 'user');
   conversations[modelId].push({ role:'user', content:text });
   const loadingId = 'loading-'+Date.now();
-  appendBubble(modelId, '<i class="fa-solid fa-spinner fa-spin"></i> 分析中...', 'ai', loadingId);
-  const model   = ALL_MODELS.find(m=>m.id===modelId);
+  appendBubble(modelId, '⏳ 分析中...', 'ai', loadingId);
   const cardsEl = document.getElementById(`cards-${modelId}`);
   cardsEl.innerHTML = buildLoadingCard();
   const timer = setTimeout(() => {
@@ -278,10 +277,10 @@ async function sendChat(modelId) {
     const btn  = document.getElementById(`dialog-btn-${modelId}`);
     const btnT = document.getElementById(`dialog-btn-text-${modelId}`);
     if (data.needsClarification) {
-      btn.className='ai-dialog-btn show clarify'; btnT.textContent='深入对话（AI有疑问）';
+      btn.className='ai-dialog-btn show clarify'; btnT.textContent='💬 深入对话（AI有疑问）';
       appendBubble(modelId, data.question, 'ai');
     } else {
-      btn.className='ai-dialog-btn show explore'; btnT.textContent='继续探索';
+      btn.className='ai-dialog-btn show explore'; btnT.textContent='🔍 继续探索';
       appendBubble(modelId,'结果已更新，可继续提问。','ai');
     }
   } catch(err) {
@@ -308,10 +307,11 @@ function appendBubble(modelId, text, role, id) {
 
 function buildLoadingCard() {
   return `<div class="ai-card ai-card-loading">
-    <div class="ai-card-meta"><span style="color:#475569;font-size:.7rem;"><i class="fa-solid fa-spinner fa-spin"></i> 正在检索分析...</span></div>
+    <div class="ai-card-meta"><span style="color:#475569;font-size:.7rem;">⏳ 正在检索分析...</span></div>
     <div class="pulse w3"></div><div class="pulse w2"></div>
   </div>`;
 }
+
 function buildResultCard(data, index) {
   return `<div class="ai-card">
     <div>
@@ -323,11 +323,12 @@ function buildResultCard(data, index) {
     <div class="ai-card-footer">
       <span>④ 直达通道</span>
       ${data.link && data.link!=='#'
-        ? `<a href="${data.link}" target="_blank" rel="noopener noreferrer">访问网站 <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:.65rem;"></i></a>`
+        ? `<a href="${data.link}" target="_blank" rel="noopener noreferrer">访问网站 ↗</a>`
         : `<span style="color:#334155;font-size:.72rem;">无法访问</span>`}
     </div>
   </div>`;
 }
+
 function buildErrorCard(msg, tag) {
   return `<div class="ai-card ai-card-error">
     <div><span class="ai-card-error-tag">${tag}</span></div>
@@ -344,7 +345,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   changeBackground();
   loadHeaderSubtitle();
 
-  // 背景视频守护（复用 normal 逻辑）
   const video = document.getElementById('bgLayer');
   let _bgErrorCount=0, _bgPlayedOnce=false;
   if (video) {
