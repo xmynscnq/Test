@@ -163,13 +163,50 @@ function createModelSection(model, query) {
     <div id="dialog-panel-${model.id}" class="ai-dialog-panel">
       <div id="chat-history-${model.id}" class="ai-chat-history"></div>
       <div class="ai-chat-input-row">
-        <input type="text" id="chat-input-${model.id}" placeholder="继续补充描述或回答问题..."
+        <input type="text" id="chat-input-${model.id}" placeholder="继续筛选，或询问某个网站的详细用法..."
                onkeydown="if(event.key==='Enter') sendChat('${model.id}')">
         <button onclick="sendChat('${model.id}')">发送</button>
       </div>
     </div>
   `;
   return div;
+}
+
+// ── 处理模型响应（推荐 or 解答）─────────────────────────
+function handleModelResponse(data, modelId) {
+  const cardsEl = document.getElementById(`cards-${modelId}`);
+  const btn     = document.getElementById(`dialog-btn-${modelId}`);
+  const btnT    = document.getElementById(`dialog-btn-text-${modelId}`);
+
+  // 解答模式：显示文字气泡，不替换卡片
+  if (data.type === 'answer' && data.answer) {
+    conversations[modelId].push({ role:'assistant', content: data.answer });
+    appendBubble(modelId, data.answer, 'ai');
+    btn.classList.add('show');
+    btn.className = 'ai-dialog-btn show explore';
+    btnT.textContent = '🔍 继续探索';
+    return;
+  }
+
+  // 推荐模式：更新卡片列表
+  const siteNames = (data.sites||[]).map(s=>s.siteName).join('、');
+  conversations[modelId].push({ role:'assistant', content: data.needsClarification
+    ? `我已推荐了以下网站：${siteNames}。但我还需要了解：${data.question}`
+    : `我已推荐了以下网站：${siteNames}。` });
+
+  if (cardsEl) {
+    cardsEl.innerHTML = (data.sites||[]).map((item,i) => buildResultCard(item, i+1)).join('');
+  }
+  btn.classList.add('show');
+  if (data.needsClarification) {
+    btn.className = 'ai-dialog-btn show clarify';
+    btnT.textContent = '💬 深入对话（AI有疑问）';
+    appendBubble(modelId, data.question, 'ai');
+  } else {
+    btn.className = 'ai-dialog-btn show explore';
+    btnT.textContent = '🔍 继续探索';
+    appendBubble(modelId, '推荐结果已就绪，可继续筛选，或直接问某个网站怎么用。', 'ai');
+  }
 }
 
 async function callModel(model, sectionEl) {
@@ -183,23 +220,7 @@ async function callModel(model, sectionEl) {
     clearTimeout(timer);
     if (!res.ok) throw new Error(await res.text());
     const data = safeParseJSON(await res.text());
-    const siteNames = (data.sites||[]).map(s=>s.siteName).join('、');
-    conversations[model.id].push({ role:'assistant', content: data.needsClarification
-      ? `我已推荐了以下网站：${siteNames}。但我还需要了解：${data.question}`
-      : `我已推荐了以下网站：${siteNames}。` });
-    cardsEl.innerHTML = (data.sites||[]).map((item,i)=>buildResultCard(item,i+1)).join('');
-    const btn  = document.getElementById(`dialog-btn-${model.id}`);
-    const text = document.getElementById(`dialog-btn-text-${model.id}`);
-    btn.classList.add('show');
-    if (data.needsClarification) {
-      btn.className = 'ai-dialog-btn show clarify';
-      text.textContent = '💬 深入对话（AI有疑问）';
-      appendBubble(model.id, data.question, 'ai');
-    } else {
-      btn.className = 'ai-dialog-btn show explore';
-      text.textContent = '🔍 继续探索';
-      appendBubble(model.id, '推荐结果已就绪，你可以继续提问来优化结果。', 'ai');
-    }
+    handleModelResponse(data, model.id);
   } catch(err) {
     clearTimeout(timer);
     cardsEl.innerHTML = buildErrorCard(err.message||'请求失败','获取失败');
@@ -222,12 +243,15 @@ async function sendChat(modelId) {
   conversations[modelId].push({ role:'user', content:text });
   const loadingId = 'loading-'+Date.now();
   appendBubble(modelId, '⏳ 分析中...', 'ai', loadingId);
+
+  // 解答模式不清空卡片，推荐模式才清空
   const cardsEl = document.getElementById(`cards-${modelId}`);
-  cardsEl.innerHTML = buildLoadingCard();
+
   const timer = setTimeout(() => {
     document.getElementById(loadingId)?.remove();
     appendBubble(modelId,'响应超时，请重试','ai');
   }, 30000);
+
   try {
     const res = await fetch(AI_WORKER_URL, {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -237,25 +261,18 @@ async function sendChat(modelId) {
     document.getElementById(loadingId)?.remove();
     if (!res.ok) throw new Error(await res.text());
     const data = safeParseJSON(await res.text());
-    const siteNames = (data.sites||[]).map(s=>s.siteName).join('、');
-    conversations[modelId].push({ role:'assistant', content: data.needsClarification
-      ? `我已推荐了以下网站：${siteNames}。但我还需要了解：${data.question}`
-      : `我已推荐了以下网站：${siteNames}。` });
-    cardsEl.innerHTML = (data.sites||[]).map((item,i)=>buildResultCard(item,i+1)).join('');
-    const btn  = document.getElementById(`dialog-btn-${modelId}`);
-    const btnT = document.getElementById(`dialog-btn-text-${modelId}`);
-    if (data.needsClarification) {
-      btn.className='ai-dialog-btn show clarify'; btnT.textContent='💬 深入对话（AI有疑问）';
-      appendBubble(modelId, data.question, 'ai');
+
+    // 只有推荐模式才显示 loading 并刷新卡片
+    if (data.type !== 'answer') {
+      cardsEl.innerHTML = buildLoadingCard();
+      setTimeout(() => handleModelResponse(data, modelId), 0);
     } else {
-      btn.className='ai-dialog-btn show explore'; btnT.textContent='🔍 继续探索';
-      appendBubble(modelId,'结果已更新，可继续提问。','ai');
+      handleModelResponse(data, modelId);
     }
   } catch(err) {
     clearTimeout(timer);
     document.getElementById(loadingId)?.remove();
     appendBubble(modelId,`错误：${err.message}`,'ai');
-    cardsEl.innerHTML = buildErrorCard(err.message,'获取失败');
   }
 }
 window.sendChat = sendChat;
@@ -266,11 +283,16 @@ function appendBubble(modelId, text, role, id) {
   const div = document.createElement('div');
   if (id) div.id = id;
   div.className = `chat-bubble ${role}`;
+  // 解答内容支持换行显示
+  const formatted = text.replace(/\n/g, '<br>');
   div.innerHTML = `<div class="bubble-inner ${role==='ai'?'ai-style':'user-style'}">
-    ${role==='ai'?'<span class="bubble-tag">AI</span>':''}${text}
+    ${role==='ai'?'<span class="bubble-tag">AI</span>':''}${formatted}
   </div>`;
   history.appendChild(div);
   history.scrollTop = history.scrollHeight;
+  // 有新气泡时自动展开对话面板
+  const panel = document.getElementById(`dialog-panel-${modelId}`);
+  if (panel && !panel.classList.contains('open')) panel.classList.add('open');
 }
 
 function buildLoadingCard() {
