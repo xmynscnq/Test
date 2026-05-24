@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<button id="netModeBtn" onclick="toggleNetMode()" class="net-mode-btn">🌐 外网</button>
 <div class="container">
   <div class="header-area">
     <h1 id="site-title" title="点击切换模式">AI 检索</h1>
@@ -22,9 +23,6 @@
     <div class="ai-model-bar">
       <span class="ai-model-label">参与检索的模型</span>
       <div id="modelContainer"></div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;">
-      <button id="netModeBtn" onclick="toggleNetMode()" class="net-mode-btn">🌐 外网</button>
     </div>
   </div>
   <main id="aiResultsSection" class="ai-results hidden"></main>
