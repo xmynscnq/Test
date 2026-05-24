@@ -148,32 +148,87 @@ body {
 }
 .ai-model-header h2 { font-size: 1rem; font-weight: 700; color: #a5b4fc; }
 .ai-model-header span { font-size: 0.72rem; background: rgba(30,32,48,.8); padding: 0.2rem 0.75rem; border-radius: 9999px; color: #64748b; }
-.ai-cards { display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 1rem; }
+.ai-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem; }
 
 /* ── 结果卡片 ── */
 .ai-card {
   background: rgba(255,255,255,.03);
   border: 1px solid rgba(255,255,255,.07);
-  border-top: 3px solid #6366f1;
-  border-radius: 1rem;
-  padding: 1.1rem;
-  display: flex; flex-direction: column; justify-content: space-between;
-  gap: 0.75rem;
-  transition: box-shadow .2s;
+  border-left: 3px solid #6366f1;
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  transition: background .15s, box-shadow .2s;
 }
-.ai-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.35); }
-.ai-card-meta { display: flex; justify-content: space-between; font-size: 0.65rem; color: #475569; }
-.ai-card-live { color: #34d399; background: rgba(6,78,59,.3); border: 1px solid rgba(6,78,59,.5); padding: 0.1rem 0.5rem; border-radius: 4px; }
-.ai-card-label { font-size: 0.68rem; color: #475569; display: block; margin-bottom: 0.15rem; }
-.ai-card-name { font-size: 1rem; font-weight: 700; color: #e2e8f0; }
-.ai-card-desc { font-size: 0.82rem; color: #94a3b8; line-height: 1.5; margin: 0; }
-.ai-card-fee { font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(6,78,59,.25); color: #34d399; font-weight: 600; }
-.ai-card-footer { border-top: 1px solid rgba(51,65,85,.5); padding-top: 0.6rem; display: flex; align-items: center; justify-content: space-between; }
-.ai-card-footer > span { font-size: 0.68rem; color: #334155; }
-.ai-card-footer a { font-size: 0.75rem; color: #818cf8; font-weight: 600; text-decoration: none; }
-.ai-card-footer a:hover { color: #a5b4fc; }
-.ai-card-error { border-top-color: rgba(127,29,29,.6); }
-.ai-card-error .ai-card-error-tag { font-size: 0.65rem; color: #f87171; background: rgba(127,29,29,.25); border: 1px solid rgba(127,29,29,.4); padding: 0.1rem 0.5rem; border-radius: 4px; }
+.ai-card:hover {
+  background: rgba(99,102,241,.05);
+  box-shadow: 0 4px 24px rgba(0,0,0,.3);
+}
+
+/* 卡片顶部：网站名 + 付费标签 */
+.ai-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.ai-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #a5b4fc;
+  text-decoration: none;
+  transition: color .15s;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ai-card-name:hover { color: #c7d2fe; }
+.ai-card-name.no-link { color: #e2e8f0; cursor: default; }
+
+.ai-card-fee {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: rgba(6,78,59,.25);
+  color: #34d399;
+}
+.ai-card-fee.paid { background: rgba(124,58,237,.2); color: #a78bfa; }
+
+/* 介绍 */
+.ai-card-desc {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* 网址 */
+.ai-card-url {
+  margin-top: 0.1rem;
+}
+.ai-card-url a,
+.ai-card-url span {
+  font-size: 0.72rem;
+  color: #475569;
+  text-decoration: none;
+  word-break: break-all;
+  transition: color .15s;
+}
+.ai-card-url a:hover { color: #818cf8; }
+
+/* 错误卡片 */
+.ai-card-error { border-left-color: rgba(127,29,29,.6); }
+.ai-card-error .ai-card-error-tag {
+  font-size: 0.65rem; color: #f87171;
+  background: rgba(127,29,29,.25); border: 1px solid rgba(127,29,29,.4);
+  padding: 0.1rem 0.5rem; border-radius: 4px;
+}
 
 /* ── 对话按钮 ── */
 .ai-dialog-btn {
@@ -272,75 +327,26 @@ body {
   .shortcut-name { font-size: 0.78rem; }
   .shortcut-avatar { width: 2.6rem; height: 2.6rem; }
   .shortcut-grid { grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); }
-  .ai-card-name { font-size: 1.05rem; }
   .ai-card-desc { font-size: 0.88rem; }
   .shortcut-category-title { font-size: 0.88rem; }
 }
 
 /* ── 移动端适配 ── */
 @media (max-width: 600px) {
-  .container {
-    padding: 1rem 1rem 3rem;
-  }
-  #site-title {
-    font-size: 1.6rem;
-  }
-  .net-mode-btn {
-    top: 0.75rem;
-    right: 0.75rem;
-    font-size: 0.72rem;
-    padding: 0.3rem 0.8rem;
-  }
-  .ai-search-box {
-    flex-wrap: wrap;
-    padding: 0.5rem 0.75rem;
-    gap: 0.4rem;
-  }
-  .ai-search-box input {
-    width: 100%;
-    padding: 0.5rem 0;
-    font-size: max(16px, 0.95rem);
-  }
-  .ai-search-box button {
-    width: 100%;
-    padding: 0.65rem;
-    border-radius: 0.65rem;
-  }
-  .ai-model-bar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.75rem;
-  }
-  .ai-cards {
-    grid-template-columns: 1fr;
-  }
-  .ai-model-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.3rem;
-  }
-  .bubble-inner {
-    max-width: 92%;
-  }
-  .ai-chat-input-row button {
-    flex-shrink: 0;
-    padding: 0.5rem 0.85rem;
-  }
-  .ai-chat-input-row input {
-    font-size: max(16px, 0.85rem);
-  }
-  .shortcut-grid {
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-    gap: 0.5rem;
-  }
-  .shortcut-name {
-    font-size: 0.62rem;
-  }
-  .ai-dialog-panel.open {
-    max-height: 480px;
-  }
-  .ai-chat-history {
-    max-height: 12rem;
-  }
+  .container { padding: 1rem 1rem 3rem; }
+  #site-title { font-size: 1.6rem; }
+  .net-mode-btn { top: 0.75rem; right: 0.75rem; font-size: 0.72rem; padding: 0.3rem 0.8rem; }
+  .ai-search-box { flex-wrap: wrap; padding: 0.5rem 0.75rem; gap: 0.4rem; }
+  .ai-search-box input { width: 100%; padding: 0.5rem 0; font-size: max(16px, 0.95rem); }
+  .ai-search-box button { width: 100%; padding: 0.65rem; border-radius: 0.65rem; }
+  .ai-model-bar { flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 0.75rem; }
+  .ai-cards { grid-template-columns: 1fr; }
+  .ai-model-header { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+  .bubble-inner { max-width: 92%; }
+  .ai-chat-input-row button { flex-shrink: 0; padding: 0.5rem 0.85rem; }
+  .ai-chat-input-row input { font-size: max(16px, 0.85rem); }
+  .shortcut-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 0.5rem; }
+  .shortcut-name { font-size: 0.62rem; }
+  .ai-dialog-panel.open { max-height: 480px; }
+  .ai-chat-history { max-height: 12rem; }
 }
