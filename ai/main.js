@@ -195,7 +195,7 @@ function handleModelResponse(data, modelId) {
     : `我已推荐了以下网站：${siteNames}。` });
 
   if (cardsEl) {
-    cardsEl.innerHTML = (data.sites||[]).map((item,i) => buildResultCard(item, i+1)).join('');
+    cardsEl.innerHTML = (data.sites||[]).map((item, i) => buildResultCard(item, i + 1)).join('');
   }
   btn.classList.add('show');
   if (data.needsClarification) {
@@ -243,15 +243,11 @@ async function sendChat(modelId) {
   conversations[modelId].push({ role:'user', content:text });
   const loadingId = 'loading-'+Date.now();
   appendBubble(modelId, '⏳ 分析中...', 'ai', loadingId);
-
-  // 解答模式不清空卡片，推荐模式才清空
   const cardsEl = document.getElementById(`cards-${modelId}`);
-
   const timer = setTimeout(() => {
     document.getElementById(loadingId)?.remove();
     appendBubble(modelId,'响应超时，请重试','ai');
   }, 30000);
-
   try {
     const res = await fetch(AI_WORKER_URL, {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -261,8 +257,6 @@ async function sendChat(modelId) {
     document.getElementById(loadingId)?.remove();
     if (!res.ok) throw new Error(await res.text());
     const data = safeParseJSON(await res.text());
-
-    // 只有推荐模式才显示 loading 并刷新卡片
     if (data.type !== 'answer') {
       cardsEl.innerHTML = buildLoadingCard();
       setTimeout(() => handleModelResponse(data, modelId), 0);
@@ -283,14 +277,12 @@ function appendBubble(modelId, text, role, id) {
   const div = document.createElement('div');
   if (id) div.id = id;
   div.className = `chat-bubble ${role}`;
-  // 解答内容支持换行显示
   const formatted = text.replace(/\n/g, '<br>');
   div.innerHTML = `<div class="bubble-inner ${role==='ai'?'ai-style':'user-style'}">
     ${role==='ai'?'<span class="bubble-tag">AI</span>':''}${formatted}
   </div>`;
   history.appendChild(div);
   history.scrollTop = history.scrollHeight;
-  // 有新气泡时自动展开对话面板
   const panel = document.getElementById(`dialog-panel-${modelId}`);
   if (panel && !panel.classList.contains('open')) panel.classList.add('open');
 }
@@ -303,18 +295,19 @@ function buildLoadingCard() {
 }
 
 function buildResultCard(data, index) {
+  const hasLink = data.link && data.link !== '#';
   return `<div class="ai-card">
-    <div>
-      <div class="ai-card-meta"><span>#${index}</span><span class="ai-card-live">实时分析</span></div>
-      <div style="margin:.5rem 0 .25rem"><span class="ai-card-label">① 网站名称</span><span class="ai-card-name">${data.siteName}</span></div>
-      <div style="margin:.5rem 0 .25rem"><span class="ai-card-label">② 推荐理由 & 提示</span><p class="ai-card-desc">${data.function}</p></div>
-      <div><span class="ai-card-label">③ 收费情况</span><span class="ai-card-fee">${data.fee}</span></div>
+    <div class="ai-card-top">
+      ${hasLink
+        ? `<a href="${data.link}" target="_blank" rel="noopener noreferrer" class="ai-card-name">${data.siteName}</a>`
+        : `<span class="ai-card-name no-link">${data.siteName}</span>`}
+      <span class="ai-card-fee">${data.fee}</span>
     </div>
-    <div class="ai-card-footer">
-      <span>④ 直达通道</span>
-      ${data.link && data.link!=='#'
-        ? `<a href="${data.link}" target="_blank" rel="noopener noreferrer">访问网站 ↗</a>`
-        : `<span style="color:#1e293b;font-size:.72rem;">无法访问</span>`}
+    <p class="ai-card-desc">${data.function}</p>
+    <div class="ai-card-url">
+      ${hasLink
+        ? `<a href="${data.link}" target="_blank" rel="noopener noreferrer">${data.link}</a>`
+        : `<span>暂无链接</span>`}
     </div>
   </div>`;
 }
