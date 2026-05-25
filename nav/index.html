@@ -161,25 +161,28 @@
   }
 
   async function init(){
-    // 先用缓存
     const cached = sessionStorage.getItem('wx_nav');
     if(cached){ try{ const o=JSON.parse(cached); if(Date.now()-o.ts<5*60*1000){ iconEl.textContent=o.icon; tempEl.textContent=o.temp; descEl.textContent=o.desc; cityEl.textContent=o.city||'长春'; return; } }catch{} }
-    // 用存储坐标
     const savedCoord = localStorage.getItem(COORD_KEY);
     const savedCity  = localStorage.getItem(CITY_KEY) || '长春';
     if(savedCoord){
       try{ const c=JSON.parse(savedCoord); await fetchWeather(c.lat, c.lon, c.name||savedCity); return; }catch{}
     }
-    // 默认长春
     await fetchWeather(43.8868, 125.3245, '长春').catch(()=>{ descEl.textContent='获取失败'; });
   }
 
-  // 点击城市名进入编辑
-  cityEl.addEventListener('click', ()=>{
+  /* ── 修复②：城市点击编辑，同时绑 click + touchend，兼容移动端 ── */
+  function openCityEdit() {
     inputEl.value = cityEl.textContent;
     cityEl.style.display = 'none';
     inputEl.style.display = 'inline-block';
-    inputEl.focus();
+    // 延迟 focus，兼容 iOS Safari 的虚拟键盘弹出时序
+    setTimeout(() => inputEl.focus(), 50);
+  }
+  cityEl.addEventListener('click', openCityEdit);
+  cityEl.addEventListener('touchend', function(e) {
+    e.preventDefault(); // 阻止 300ms 延迟 & ghost click
+    openCityEdit();
   });
 
   async function confirmCity(){
@@ -208,7 +211,6 @@
     }
   }
 
-  // 天气加载完后同步
   const origFetch = fetchWeather;
   fetchWeather = async function(...args){
     await origFetch(...args);
@@ -265,7 +267,6 @@
 
 /* ===== 音乐播放器 ===== */
 (function(){
-  /* 自定义歌单（留空走随机接口） */
   const CUSTOM_PLAYLIST = [
     // { name:'歌曲名', artist:'歌手', cover:'封面URL', url:'音频URL' },
   ];
@@ -290,18 +291,18 @@
   const musicBody    = document.getElementById('music-body');
 
   let playlist = [...CUSTOM_PLAYLIST];
-  let cur=0, muted=false, loading=false;
+  let cur = 0, muted = false, loading = false;
 
-  /* 移动端默认折叠 */
-  if(window.innerWidth <= 600){
-    collapsed = true;
+  /* ── 修复③：先声明 collapsed，再根据屏幕决定初始值 ── */
+  let collapsed = window.innerWidth <= 600;
+  if (collapsed) {
     musicBody.style.display = 'none';
     collapseBtn.textContent = '▲';
   }
+
   const useCustom = CUSTOM_PLAYLIST.length > 0;
 
-  /* 折叠/展开（移动端） */
-  let collapsed = false;
+  /* 折叠/展开 */
   collapseBtn.addEventListener('click', ()=>{
     collapsed = !collapsed;
     musicBody.style.display  = collapsed ? 'none' : '';
@@ -315,7 +316,6 @@
     const data = await res.json();
     if(!data || data.code !== 0 || !data.data) throw new Error('接口异常');
     const d = data.data;
-    // 强制 https，避免混合内容被浏览器拦截
     const musicUrl = (d.url||'').replace(/^http:\/\//, 'https://');
     const coverUrl = (d.pic||'').replace(/^http:\/\//, 'https://');
     return { name: d.name||'未知歌曲', artist: d.singer||'', cover: coverUrl, url: musicUrl };
