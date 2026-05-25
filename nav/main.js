@@ -337,30 +337,52 @@ function renderCards(sections) {
   bindTouchTooltip();
 }
 
+/* =============================================
+   main.js 修复④：长按卡片无内容弹出
+   将此函数替换掉原 bindTouchTooltip 整体
+   ============================================= */
+
 function bindTouchTooltip() {
   if (!window.matchMedia('(hover: none)').matches) return;
   let timer = null, activeCard = null;
+
   function clearActive() {
     if (activeCard) { activeCard.classList.remove('touch-active'); activeCard = null; }
     clearTimeout(timer); timer = null;
   }
+
   document.querySelectorAll('.card').forEach(card => {
+    // 先把 info-popup 的初始内容存为域名（供 fallback 用）
+    const popup = card.querySelector('.info-popup');
+    const domainText = popup ? popup.textContent.trim() : '';
+    if (popup) card.dataset._domain = domainText; // 缓存域名
+
     card.addEventListener('touchstart', () => {
       clearActive();
       timer = setTimeout(() => {
-        // 长按时把 info-popup 内容改为 desc 描述
         const popup = card.querySelector('.info-popup');
         if (popup) {
-          const desc = card.dataset.desc || '';
-          popup.textContent = desc || card.querySelector('.title')?.textContent || '';
+          // 优先 desc → title → 缓存的域名
+          const desc   = (card.dataset.desc  || '').trim();
+          const title  = (card.querySelector('.title')?.textContent || '').trim();
+          const domain = (card.dataset._domain || '').trim();
+          popup.textContent = desc || title || domain || '无描述';
+
+          // 强制重绘（部分安卓 WebView 需要）
+          popup.style.display = 'none';
+          void popup.offsetHeight; // trigger reflow
+          popup.style.display = '';
         }
-        card.classList.add('touch-active'); activeCard = card;
-        setTimeout(clearActive, 2000);
+        card.classList.add('touch-active');
+        activeCard = card;
+        setTimeout(clearActive, 2500); // 延长显示时间到 2.5s
       }, 500);
     }, { passive: true });
-    card.addEventListener('touchend',  () => { if (timer) clearTimeout(timer); });
+
+    card.addEventListener('touchend',  () => { if (timer) { clearTimeout(timer); timer = null; } });
     card.addEventListener('touchmove', () => { clearTimeout(timer); timer = null; }, { passive: true });
   });
+
   document.addEventListener('touchstart', e => {
     if (activeCard && !activeCard.contains(e.target)) clearActive();
   }, { passive: true });
