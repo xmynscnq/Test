@@ -287,7 +287,10 @@
     const data = await res.json();
     if(!data || data.code !== 0 || !data.data) throw new Error('接口异常');
     const d = data.data;
-    return { name: d.name||'未知歌曲', artist: d.singer||'', cover: d.pic||'', url: d.url||'' };
+    // 强制 https，避免混合内容被浏览器拦截
+    const musicUrl = (d.url||'').replace(/^http:\/\//, 'https://');
+    const coverUrl = (d.pic||'').replace(/^http:\/\//, 'https://');
+    return { name: d.name||'未知歌曲', artist: d.singer||'', cover: coverUrl, url: musicUrl };
   }
 
   function renderList(){
