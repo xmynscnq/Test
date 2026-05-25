@@ -11,12 +11,18 @@
 <div id="bgLayer"></div>
 <div id="bgOverlay"></div>
 
+<!-- 夜间模式切换 -->
+<button id="dark-toggle" title="切换夜间模式">🌙</button>
+
 <!-- 左上：天气 -->
 <div class="widget-corner" id="widget-tl">
   <div class="widget-box" id="weather-widget">
     <div id="weather-main">
       <span id="weather-icon">🌤</span>
-      <span id="weather-temp">--°C</span>
+      <div id="weather-right">
+        <span id="weather-temp">--°C</span>
+        <span id="weather-city">长春</span>
+      </div>
     </div>
     <div id="weather-desc">加载中…</div>
   </div>
@@ -52,6 +58,14 @@
     <div id="music-vol-row">
       <span id="music-vol-icon">🔈</span>
       <input type="range" id="music-volume" min="0" max="1" step="0.05" value="0.7">
+      <!-- 榜单选择 -->
+      <select id="music-sort">
+        <option value="热歌榜">热歌榜</option>
+        <option value="新歌榜">新歌榜</option>
+        <option value="飙升榜">飙升榜</option>
+        <option value="抖音榜">抖音榜</option>
+        <option value="电音榜">电音榜</option>
+      </select>
     </div>
     <button id="music-list-btn">▤ 歌单列表</button>
     <div id="music-list-panel"></div>
@@ -92,123 +106,208 @@
 
 <script src="main.js"></script>
 <script>
+/* ===== 夜间模式 ===== */
+(function(){
+  const btn = document.getElementById('dark-toggle');
+  const DARK_KEY = 'nav_dark_mode';
+  function applyDark(on){
+    document.body.classList.toggle('dark-mode', on);
+    btn.textContent = on ? '☀️' : '🌙';
+    localStorage.setItem(DARK_KEY, on ? '1' : '0');
+  }
+  btn.addEventListener('click', () => applyDark(!document.body.classList.contains('dark-mode')));
+  applyDark(localStorage.getItem(DARK_KEY) === '1');
+})();
+
 /* ===== 天气 ===== */
 (function(){
-  const iconEl=document.getElementById('weather-icon');
-  const tempEl=document.getElementById('weather-temp');
-  const descEl=document.getElementById('weather-desc');
+  const iconEl = document.getElementById('weather-icon');
+  const tempEl = document.getElementById('weather-temp');
+  const descEl = document.getElementById('weather-desc');
   function wIcon(c){if(c===0)return'☀️';if(c<=2)return'🌤';if(c===3)return'☁️';if(c<=49)return'🌫';if(c<=59)return'🌦';if(c<=69)return'🌧';if(c<=79)return'❄️';if(c<=84)return'🌧';if(c<=99)return'⛈';return'🌈';}
   function wText(c){if(c===0)return'晴';if(c<=2)return'少云';if(c===3)return'阴';if(c<=49)return'雾';if(c<=59)return'毛毛雨';if(c<=69)return'雨';if(c<=79)return'雪';if(c<=84)return'阵雨';if(c<=99)return'雷雨';return'未知';}
-  const cached=sessionStorage.getItem('wx2');
-  if(cached){try{const o=JSON.parse(cached);if(Date.now()-o.ts<5*60*1000){iconEl.textContent=o.icon;tempEl.textContent=o.temp;descEl.textContent=o.desc;return;}}catch{}}
+  const cached = sessionStorage.getItem('wx_nav');
+  if(cached){ try{ const o=JSON.parse(cached); if(Date.now()-o.ts<5*60*1000){ iconEl.textContent=o.icon; tempEl.textContent=o.temp; descEl.textContent=o.desc; return; } }catch{} }
   fetch('https://api.open-meteo.com/v1/forecast?latitude=43.8868&longitude=125.3245&current=temperature_2m,weathercode,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FShanghai&forecast_days=1')
     .then(r=>r.json()).then(d=>{
-      const code=d.current.weathercode,t=Math.round(d.current.temperature_2m);
-      const tmax=Math.round(d.daily.temperature_2m_max[0]),tmin=Math.round(d.daily.temperature_2m_min[0]);
+      const code=d.current.weathercode, t=Math.round(d.current.temperature_2m);
+      const tmax=Math.round(d.daily.temperature_2m_max[0]), tmin=Math.round(d.daily.temperature_2m_min[0]);
       const humid=d.current.relative_humidity_2m;
-      const icon=wIcon(code),desc=`${wText(code)}  ${tmin}~${tmax}°C  💧${humid}%`;
-      iconEl.textContent=icon;tempEl.textContent=t+'°C';descEl.textContent=desc;
-      sessionStorage.setItem('wx2',JSON.stringify({icon,temp:t+'°C',desc,ts:Date.now()}));
-    }).catch(()=>{descEl.textContent='获取失败';});
+      const icon=wIcon(code), desc=`${wText(code)}  ${tmin}~${tmax}°C  💧${humid}%`;
+      iconEl.textContent=icon; tempEl.textContent=t+'°C'; descEl.textContent=desc;
+      sessionStorage.setItem('wx_nav', JSON.stringify({icon, temp:t+'°C', desc, ts:Date.now()}));
+    }).catch(()=>{ descEl.textContent='获取失败'; });
 })();
 
 /* ===== 格言 ===== */
 (function(){
-  let quotes=[],idx=-1;
-  const tEl=document.getElementById('quote-text'),fEl=document.getElementById('quote-from');
-  function show(){if(!quotes.length)return;let ni;do{ni=Math.floor(Math.random()*quotes.length);}while(ni===idx&&quotes.length>1);idx=ni;const q=quotes[idx];tEl.textContent=q.text||'';fEl.textContent=q.from?'——'+q.from:'';}
-  fetch('../quotes.json').then(r=>r.json()).then(d=>{quotes=d;show();}).catch(()=>{tEl.textContent='';});
-  document.getElementById('quote-widget').addEventListener('click',show);
+  let quotes=[], idx=-1;
+  const tEl=document.getElementById('quote-text'), fEl=document.getElementById('quote-from');
+  function show(){ if(!quotes.length)return; let ni; do{ ni=Math.floor(Math.random()*quotes.length); }while(ni===idx&&quotes.length>1); idx=ni; const q=quotes[idx]; tEl.textContent=q.text||''; fEl.textContent=q.from?'——'+q.from:''; }
+  fetch('../quotes.json').then(r=>r.json()).then(d=>{ quotes=d; show(); }).catch(()=>{ tEl.textContent=''; });
+  document.getElementById('quote-widget').addEventListener('click', show);
 })();
 
 /* ===== 音乐播放器 ===== */
 (function(){
-  /* ---- 在此处配置歌单 ---- */
-  const PLAYLIST = [
-    /* 示例：
-    {
-      name: '歌曲名',
-      artist: '艺术家',
-      cover: '封面图片URL（可选）',
-      url: '音频文件URL'
-    },
-    */
+  /* ----------------------------------------------------------------
+     自定义歌单（优先播放，填写后走本地列表；留空则走随机接口）
+     格式：{ name, artist, cover, url }
+  ---------------------------------------------------------------- */
+  const CUSTOM_PLAYLIST = [
+    // 示例：
+    // { name: '歌曲名', artist: '歌手', cover: '封面URL', url: '音频URL' },
   ];
-  /* ---- 配置结束 ---- */
 
-  const audio=document.getElementById('bg-audio');
-  const playBtn=document.getElementById('music-play');
-  const prevBtn=document.getElementById('music-prev');
-  const nextBtn=document.getElementById('music-next');
-  const titleEl=document.getElementById('music-title');
-  const artistEl=document.getElementById('music-artist');
-  const coverEl=document.getElementById('music-cover');
-  const progressBar=document.getElementById('music-progress-bar');
+  const UOMG_API = 'https://api.uomg.com/api/rand.music?format=json&sort=';
+
+  const audio      = document.getElementById('bg-audio');
+  const playBtn    = document.getElementById('music-play');
+  const prevBtn    = document.getElementById('music-prev');
+  const nextBtn    = document.getElementById('music-next');
+  const titleEl    = document.getElementById('music-title');
+  const artistEl   = document.getElementById('music-artist');
+  const coverEl    = document.getElementById('music-cover');
+  const progressBar= document.getElementById('music-progress-bar');
   const progressWrap=document.getElementById('music-progress-wrap');
-  const timeEl=document.getElementById('music-time');
-  const volInput=document.getElementById('music-volume');
-  const volIcon=document.getElementById('music-vol-icon');
-  const listBtn=document.getElementById('music-list-btn');
-  const listPanel=document.getElementById('music-list-panel');
+  const timeEl     = document.getElementById('music-time');
+  const volInput   = document.getElementById('music-volume');
+  const volIcon    = document.getElementById('music-vol-icon');
+  const sortSelect = document.getElementById('music-sort');
+  const listBtn    = document.getElementById('music-list-btn');
+  const listPanel  = document.getElementById('music-list-panel');
 
-  let cur=0, muted=false;
+  // 运行时歌单（自定义 + 随机拉取的历史）
+  let playlist = [...CUSTOM_PLAYLIST];
+  let cur = 0;
+  let muted = false;
+  let loading = false;
+  const useCustom = CUSTOM_PLAYLIST.length > 0;
 
-  function fmt(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+  function fmt(s){ const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
 
+  /* 从 uomg 随机拉一首 */
+  async function fetchRandom(){
+    const sort = sortSelect.value;
+    const res  = await fetch(UOMG_API + encodeURIComponent(sort));
+    const data = await res.json();
+    if(data.code !== 1) throw new Error('接口返回异常');
+    return {
+      name:   data.data.name,
+      artist: '',
+      cover:  data.data.picurl || '',
+      url:    data.data.url
+    };
+  }
+
+  /* 渲染歌单列表面板 */
   function renderList(){
-    listPanel.innerHTML='';
-    PLAYLIST.forEach((t,i)=>{
-      const div=document.createElement('div');
-      div.className='music-list-item'+(i===cur?' active':'');
-      div.innerHTML=`<img class="music-list-item-cover" src="${t.cover||''}" onerror="this.style.display='none'" alt=""><span class="music-list-item-name">${t.name||'音轨'+(i+1)}</span>`;
-      div.addEventListener('click',()=>{loadTrack(i);});
+    listPanel.innerHTML = '';
+    playlist.forEach((t, i)=>{
+      const div = document.createElement('div');
+      div.className = 'music-list-item' + (i===cur?' active':'');
+      div.innerHTML = `<img class="music-list-item-cover" src="${t.cover||''}" onerror="this.style.display='none'" alt=""><span class="music-list-item-name">${t.name||'音轨'+(i+1)}</span>`;
+      div.addEventListener('click', ()=>{ cur=i; playTrack(playlist[i]); renderList(); });
       listPanel.appendChild(div);
     });
   }
 
-  function loadTrack(i){
-    if(!PLAYLIST.length)return;
-    cur=(i+PLAYLIST.length)%PLAYLIST.length;
-    const t=PLAYLIST[cur];
-    audio.src=t.url;
-    titleEl.textContent=t.name||'音轨'+(cur+1);
-    artistEl.textContent=t.artist||'';
-    if(t.cover){coverEl.src=t.cover;coverEl.style.display='block';}
-    else{coverEl.src='';coverEl.style.display='none';}
-    audio.load();audio.play().catch(()=>{});
+  /* 播放指定 track 对象 */
+  function playTrack(t){
+    audio.src = t.url;
+    titleEl.textContent  = t.name   || '未知歌曲';
+    artistEl.textContent = t.artist || '';
+    if(t.cover){ coverEl.src=t.cover; coverEl.style.display='block'; }
+    else        { coverEl.src='';     coverEl.style.display='none';  }
+    audio.load();
+    audio.play().catch(()=>{});
+  }
+
+  /* 加载指定索引（仅自定义模式） */
+  function loadIndex(i){
+    cur = (i + playlist.length) % playlist.length;
+    playTrack(playlist[cur]);
     renderList();
   }
 
-  function togglePlay(){
-    if(!PLAYLIST.length)return;
-    if(audio.paused){audio.play();} else{audio.pause();}
+  /* 下一曲：自定义走列表，随机走接口 */
+  async function nextTrack(){
+    if(loading) return;
+    if(useCustom){
+      loadIndex(cur + 1);
+    } else {
+      loading = true;
+      titleEl.textContent  = '加载中…';
+      artistEl.textContent = '';
+      try {
+        const t = await fetchRandom();
+        playlist.push(t);
+        cur = playlist.length - 1;
+        playTrack(t);
+        renderList();
+      } catch(e){
+        titleEl.textContent = '加载失败，重试中…';
+        setTimeout(nextTrack, 2000);
+      } finally { loading = false; }
+    }
   }
 
-  audio.addEventListener('play',()=>{playBtn.textContent='⏸';coverEl.classList.add('spinning');});
-  audio.addEventListener('pause',()=>{playBtn.textContent='▶';coverEl.classList.remove('spinning');});
-  audio.addEventListener('ended',()=>loadTrack(cur+1));
-  audio.addEventListener('timeupdate',()=>{
-    if(audio.duration){progressBar.style.width=(audio.currentTime/audio.duration*100)+'%';}
-    timeEl.textContent=fmt(audio.currentTime)+(audio.duration?' / '+fmt(audio.duration):'');
+  /* 上一曲 */
+  function prevTrack(){
+    if(useCustom){
+      loadIndex(cur - 1);
+    } else {
+      if(cur > 0){ cur--; playTrack(playlist[cur]); renderList(); }
+      else { nextTrack(); }
+    }
+  }
+
+  function togglePlay(){
+    if(!audio.src){ nextTrack(); return; }
+    audio.paused ? audio.play() : audio.pause();
+  }
+
+  audio.addEventListener('play',  ()=>{ playBtn.textContent='⏸'; coverEl.classList.add('spinning'); });
+  audio.addEventListener('pause', ()=>{ playBtn.textContent='▶'; coverEl.classList.remove('spinning'); });
+  audio.addEventListener('ended', ()=> nextTrack());
+  audio.addEventListener('timeupdate', ()=>{
+    if(audio.duration) progressBar.style.width=(audio.currentTime/audio.duration*100)+'%';
+    timeEl.textContent = fmt(audio.currentTime) + (audio.duration?' / '+fmt(audio.duration):'');
   });
 
-  progressWrap.addEventListener('click',e=>{
-    if(!audio.duration)return;
-    const r=progressWrap.getBoundingClientRect();
-    audio.currentTime=((e.clientX-r.left)/r.width)*audio.duration;
+  progressWrap.addEventListener('click', e=>{
+    if(!audio.duration) return;
+    const r = progressWrap.getBoundingClientRect();
+    audio.currentTime = ((e.clientX-r.left)/r.width) * audio.duration;
   });
 
-  volInput.value=audio.volume=0.7;
-  volInput.addEventListener('input',()=>{audio.volume=volInput.value;muted=audio.volume===0;volIcon.textContent=muted?'🔇':'🔈';});
-  volIcon.addEventListener('click',()=>{muted=!muted;audio.volume=muted?0:parseFloat(volInput.value)||0.7;volIcon.textContent=muted?'🔇':'🔈';});
+  volInput.value = audio.volume = 0.7;
+  volInput.addEventListener('input', ()=>{ audio.volume=parseFloat(volInput.value); muted=audio.volume===0; volIcon.textContent=muted?'🔇':'🔈'; });
+  volIcon.addEventListener('click', ()=>{ muted=!muted; audio.volume=muted?0:parseFloat(volInput.value)||0.7; volIcon.textContent=muted?'🔇':'🔈'; });
 
-  playBtn.addEventListener('click',togglePlay);
-  prevBtn.addEventListener('click',()=>loadTrack(cur-1));
-  nextBtn.addEventListener('click',()=>loadTrack(cur+1));
-  listBtn.addEventListener('click',()=>{listPanel.classList.toggle('open');listBtn.textContent=listPanel.classList.contains('open')?'▲ 收起列表':'▤ 歌单列表';});
+  playBtn.addEventListener('click', togglePlay);
+  prevBtn.addEventListener('click', prevTrack);
+  nextBtn.addEventListener('click', nextTrack);
 
-  if(PLAYLIST.length){titleEl.textContent=PLAYLIST[0].name||'音轨 1';artistEl.textContent=PLAYLIST[0].artist||'';if(PLAYLIST[0].cover){coverEl.src=PLAYLIST[0].cover;}renderList();}
-  else{titleEl.textContent='暂无歌曲';artistEl.textContent='在 main.js 中配置 PLAYLIST';}
+  listBtn.addEventListener('click', ()=>{
+    listPanel.classList.toggle('open');
+    listBtn.textContent = listPanel.classList.contains('open') ? '▲ 收起列表' : '▤ 歌单列表';
+  });
+
+  sortSelect.addEventListener('change', ()=>{
+    if(!useCustom) nextTrack();
+  });
+
+  /* 初始化 */
+  if(useCustom){
+    titleEl.textContent  = CUSTOM_PLAYLIST[0].name   || '音轨 1';
+    artistEl.textContent = CUSTOM_PLAYLIST[0].artist || '';
+    if(CUSTOM_PLAYLIST[0].cover){ coverEl.src=CUSTOM_PLAYLIST[0].cover; }
+    renderList();
+  } else {
+    titleEl.textContent  = '点击 ▶ 开始播放';
+    artistEl.textContent = '随机' + sortSelect.value;
+  }
 })();
 </script>
 </body>
