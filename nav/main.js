@@ -290,18 +290,27 @@ function filterLinks() {
 }
 window.filterLinks = filterLinks;
 
+// ── 工具：从 section 字段提取纯文字（去掉开头 emoji）────────
+function sectionLabel(s) {
+  return s.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u{20E3}\uFE0F\u{1F1E0}-\u{1F1FF}]+/gu, '').trim();
+}
+
+// ── 渲染卡片：左大图标 + 右侧上标题下描述 ───────────────────
 function renderCards(sections) {
   const main = document.getElementById('main-content');
   main.innerHTML = '';
   sections.forEach(({ section, items }) => {
-    const sec  = document.createElement('div');
+    const sec = document.createElement('div');
     sec.className = 'section';
-    const h2   = document.createElement('h2');
+
+    const h2 = document.createElement('h2');
     h2.className   = 'section-title';
-    h2.textContent = section;
+    h2.textContent = sectionLabel(section);  // 去掉 emoji，只显示文字
     sec.appendChild(h2);
+
     const grid = document.createElement('div');
     grid.className = 'link-container';
+
     items.forEach(item => {
       const a = document.createElement('a');
       a.href         = getCardUrl(item);
@@ -310,8 +319,11 @@ function renderCards(sections) {
       a.dataset.desc = item['data-desc'] ?? item.desc ?? '';
       a.rel          = 'noopener noreferrer';
       if (item.intranet) { a.dataset.url = item.url; a.dataset.intranet = item.intranet; }
+
+      // 左侧大图标
       const img = document.createElement('img');
-      img.className = 'favicon'; img.loading = 'lazy';
+      img.className = 'favicon';
+      img.loading   = 'lazy';
       img.src = item.icon ? item.icon : faviconSrc(item.url);
       img.onerror = function () {
         const domain = getDomain(item.url);
@@ -320,21 +332,33 @@ function renderCards(sections) {
           this.src = `https://${domain}/favicon.ico`;
         } else { this.src = DEFAULT_ICON; this.onerror = null; }
       };
-      const top = document.createElement('div');
-      top.className = 'card-top';
+
+      // 右侧信息列：上标题 + 下描述
+      const info = document.createElement('div');
+      info.className = 'card-info';
+
       const titleEl = document.createElement('span');
       titleEl.className   = 'title';
       titleEl.textContent = item.title;
-      top.appendChild(img); top.appendChild(titleEl);
-      const desc = document.createElement('div');
-      desc.className   = 'desc';
-      desc.textContent = item.desc ?? '';
+
+      const descEl = document.createElement('div');
+      descEl.className   = 'desc';
+      descEl.textContent = item.desc ?? '';
+
+      info.appendChild(titleEl);
+      info.appendChild(descEl);
+
+      // tooltip
       const popup = document.createElement('div');
       popup.className   = 'info-popup';
       popup.textContent = getDomain(getCardUrl(item)) ?? getCardUrl(item);
-      a.appendChild(top); a.appendChild(desc); a.appendChild(popup);
+
+      a.appendChild(img);
+      a.appendChild(info);
+      a.appendChild(popup);
       grid.appendChild(a);
     });
+
     sec.appendChild(grid);
     main.appendChild(sec);
   });
