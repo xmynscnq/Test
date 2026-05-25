@@ -354,38 +354,49 @@ h1::after{
 @media(max-width:900px){.link-container{grid-template-columns:repeat(3,minmax(0,1fr));}}
 
 @media(max-width:600px){
-  /* 移动端每行3个 */
-  .link-container{grid-template-columns:repeat(3,minmax(0,1fr));gap:0.5rem;}
-  .card{padding:8px 6px;gap:6px;min-height:56px;}
-  .card img.favicon{width:32px;height:32px;border-radius:8px;padding:3px;}
-  .card .title{font-size:0.75rem;}
-  .card .desc{font-size:0.62rem;}
-
-  /* 左侧组件隐藏 */
+  /* 天气组件隐藏，改为标题下方行内显示 */
   #widget-tl,#widget-bl{display:none;}
 
-  /* 右下播放器横向排列，折叠后只显示 header */
+  /* 播放器右下，折叠后紧凑 */
   #widget-br{bottom:0.6rem;right:0.6rem;align-items:flex-end;}
-  #music-widget{min-width:160px;max-width:200px;}
-  #music-cover{width:32px;height:32px;}
-  #music-title{font-size:0.72rem;}
+  #music-widget{min-width:0;max-width:190px;padding:8px 10px;}
+  #music-cover{width:30px;height:30px;}
+  #music-title{font-size:0.7rem;}
   #music-artist{display:none;}
   #music-time{display:none;}
+  #music-vol-row{display:none;}
 
+  /* 搜索 Tab 缩小单行滚动 */
   .search-tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;width:100%;scrollbar-width:none;padding-bottom:2px;}
   .search-tabs::-webkit-scrollbar{display:none;}
-  .search-tab{flex-shrink:0;padding:6px 12px;font-size:0.82rem;}
-  .engine-list{flex-wrap:wrap;justify-content:center;}
-  .engine-btn{padding:4px 9px;font-size:0.74rem;}
+  .search-tab{flex-shrink:0;padding:5px 10px;font-size:0.78rem;}
+
+  /* 引擎按钮缩小 */
+  .engine-list{flex-wrap:wrap;justify-content:center;gap:5px;}
+  .engine-btn{padding:3px 8px;font-size:0.7rem;gap:3px;}
+  .engine-btn img{width:12px;height:12px;}
+
+  /* 卡片：图标+名称，每行3个，去掉描述 */
+  .link-container{grid-template-columns:repeat(3,minmax(0,1fr));gap:0.45rem;}
+  .card{
+    flex-direction:column;align-items:center;justify-content:center;
+    padding:8px 4px;gap:4px;min-height:72px;text-align:center;
+  }
+  .card img.favicon{width:36px;height:36px;border-radius:10px;padding:3px;}
+  .card-info{align-items:center;}
+  .card .title{font-size:0.72rem;text-align:center;}
+  .card .desc{display:none;}  /* 描述隐藏，长按通过 tooltip 显示 */
+
   .container{padding:0.75rem 0.75rem 4rem;}
-  .net-toggle-btn{top:0.5rem;right:0.5rem;font-size:0.75rem;padding:0.28rem 0.65rem;}
+  .net-toggle-btn{top:0.5rem;right:0.5rem;font-size:0.72rem;padding:0.25rem 0.6rem;}
   #sug-list li{padding:8px 12px;font-size:0.85rem;}
-  h1{font-size:clamp(1.6rem,7vw,2.4rem);letter-spacing:0.08em;}
-  .header-icon{font-size:1.5rem;}
+  h1{font-size:clamp(1.5rem,7vw,2.2rem);letter-spacing:0.08em;}
+  .header-icon{font-size:1.4rem;}
+  .header-area{gap:12px;margin-bottom:0.5rem;}
 }
 
 @media(max-width:400px){
   .link-container{grid-template-columns:repeat(3,minmax(0,1fr));gap:0.35rem;}
-  .card img.favicon{width:28px;height:28px;}
-  .card .title{font-size:0.7rem;}
+  .card img.favicon{width:30px;height:30px;}
+  .card .title{font-size:0.68rem;}
 }
