@@ -72,9 +72,9 @@ h1::after{
 .search-wrapper{display:flex;flex-direction:column;align-items:center;margin-bottom:2rem;gap:12px;width:100%;}
 
 /* 分类 Tab */
-.search-tabs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;}
+.search-tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;}
 .search-tab{
-  display:flex;align-items:center;padding:8px 20px;
+  display:flex;align-items:center;padding:8px 22px;
   border-radius:24px;border:1px solid rgba(255,255,255,0.14);
   background:rgba(10,8,30,0.35);color:rgba(255,255,255,0.65);
   cursor:pointer;font-family:var(--font-main);font-size:0.95rem;font-weight:700;
@@ -354,8 +354,16 @@ h1::after{
 @media(max-width:900px){.link-container{grid-template-columns:repeat(3,minmax(0,1fr));}}
 
 @media(max-width:600px){
-  /* 天气组件隐藏，改为标题下方行内显示 */
-  #widget-tl,#widget-bl{display:none;}
+  /* 天气保留在左上角，格言隐藏节省空间 */
+  #widget-bl{display:none;}
+  /* 手机端天气组件略微缩小 */
+  #widget-tl{top:0.6rem;left:0.6rem;}
+  #weather-widget{padding:7px 10px;min-width:110px;max-width:160px;}
+  #weather-icon{font-size:1.1rem;}
+  #weather-temp{font-size:1rem;}
+  #weather-desc{font-size:0.62rem;}
+  /* 手机端行内天气隐藏（天气已在左上角显示） */
+  #weather-inline{display:none !important;}
 
   /* 播放器右下，折叠后紧凑 */
   #widget-br{bottom:0.6rem;right:0.6rem;align-items:flex-end;}
@@ -366,23 +374,30 @@ h1::after{
   #music-time{display:none;}
   #music-vol-row{display:none;}
 
-  /* ── 修复①：Search Tab 居中 + 尺寸更合理 ── */
-  .search-tabs {
-    flex-wrap: wrap !important;           /* 允许换行 */
-    overflow-x: unset !important;         /* 取消横向滚动 */
-    justify-content: center !important;   /* 居中 */
-    gap: 6px !important;
-    padding-bottom: 0 !important;
+  /* ── Tab：单行横向滚动，大小介于PC和引擎按钮之间 ── */
+  .search-tabs{
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    padding-bottom: 2px !important;
+    /* 隐藏滚动条但保留滚动功能 */
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    /* 左右留一点边距让两端tab不贴边 */
+    padding-left: 2px;
+    padding-right: 2px;
   }
-  .search-tab {
-    flex-shrink: 0;
-    padding: 7px 14px !important;         /* 比原来 4px 9px 更大 */
-    font-size: 0.82rem !important;        /* 比原来 0.72rem 更大 */
-    border-radius: 20px !important;
+  .search-tabs::-webkit-scrollbar{ display:none; }
+  .search-tab{
+    flex-shrink: 0 !important;
+    padding: 6px 13px !important;   /* 比引擎按钮(3px 7px)大，比PC(8px 22px)小 */
+    font-size: 0.78rem !important;
+    border-radius: 18px !important;
   }
-  .tab-label { font-size: 0.82rem !important; }
+  .tab-label{ font-size: 0.78rem !important; }
 
-  /* 引擎按钮缩小 */
+  /* 引擎按钮 */
   .engine-list{flex-wrap:wrap;justify-content:center;gap:4px;}
   .engine-btn{padding:3px 7px;font-size:0.68rem;gap:3px;border-radius:12px;}
   .engine-btn img{width:11px;height:11px;}
@@ -398,17 +413,19 @@ h1::after{
   .card .title{font-size:0.72rem;text-align:center;}
   .card .desc{display:none;}
 
-  /* ── 修复②：城市点击热区扩大，兼容移动端 ── */
-  #weather-city {
+  /* ── 城市点击：扩大热区，兼容移动端触摸 ── */
+  #weather-city{
     display: inline-block;
     min-width: 44px;
-    padding: 3px 6px;
-    -webkit-tap-highlight-color: rgba(124,111,247,0.25);
+    min-height: 24px;
+    padding: 4px 6px;
+    -webkit-tap-highlight-color: rgba(124,111,247,0.3);
     cursor: pointer;
+    /* 移动端去掉 pointer-events 干扰 */
+    pointer-events: auto;
   }
-  /* 修复 iOS input font-size < 16px 导致自动缩放 */
-  #weather-city-input {
-    font-size: 16px !important;
+  #weather-city-input{
+    font-size: 16px !important;   /* 防止iOS自动缩放页面 */
     width: 80px !important;
     padding: 3px 6px !important;
     -webkit-appearance: none;
