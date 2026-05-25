@@ -56,11 +56,12 @@
       <span id="music-vol-icon">🔈</span>
       <input type="range" id="music-volume" min="0" max="1" step="0.05" value="0.7">
       <select id="music-sort">
-        <option value="热歌榜">热歌榜</option>
-        <option value="新歌榜">新歌榜</option>
-        <option value="飙升榜">飙升榜</option>
-        <option value="抖音榜">抖音榜</option>
-        <option value="电音榜">电音榜</option>
+        <option value="热歌榜">周杰伦</option>
+        <option value="新歌榜">邓紫棋</option>
+        <option value="飙升榜">薛之谦</option>
+        <option value="抖音榜">五月天</option>
+        <option value="电音榜">陈奕迅</option>
+        <option value="随机">随机歌手</option>
       </select>
     </div>
     <button id="music-list-btn">▤ 歌单列表</button>
@@ -248,39 +249,25 @@
 
   function fmt(s){ const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
 
-  /* uomg 随机接口——用 JSONP 避免跨域 */
-  function fetchRandom(){
-    return new Promise((resolve, reject)=>{
-      const cbName = '__uomgMusic' + Date.now();
-      const script  = document.createElement('script');
-      const sort    = encodeURIComponent(sortSelect.value);
-      const timeout = setTimeout(()=>{
-        delete window[cbName];
-        try{ document.head.removeChild(script); }catch{}
-        reject(new Error('timeout'));
-      }, 8000);
+  /* 酷狗随机音乐接口 */
+  const KG_ARTISTS = ['周杰伦','邓紫棋','薛之谦','林俊杰','陈奕迅','Taylor Swift','五月天','张学友','王菲','刘德华'];
+  const KG_SORT_MAP = {
+    '热歌榜':'周杰伦','新歌榜':'邓紫棋','飙升榜':'薛之谦','抖音榜':'五月天','电音榜':'陈奕迅'
+  };
 
-      window[cbName] = function(data){
-        clearTimeout(timeout);
-        delete window[cbName];
-        try{ document.head.removeChild(script); }catch{}
-        if(data && data.code === 1 && data.data){
-          resolve({ name: data.data.name, artist:'', cover: data.data.picurl||'', url: data.data.url });
-        } else {
-          reject(new Error('接口返回异常'));
-        }
-      };
-
-      script.onerror = function(){
-        clearTimeout(timeout);
-        delete window[cbName];
-        try{ document.head.removeChild(script); }catch{}
-        reject(new Error('script error'));
-      };
-
-      script.src = `https://api.uomg.com/api/rand.music?sort=${sort}&format=jsonp&callback=${cbName}`;
-      document.head.appendChild(script);
-    });
+  async function fetchRandom(){
+    const artist = KG_SORT_MAP[sortSelect.value] || KG_ARTISTS[Math.floor(Math.random()*KG_ARTISTS.length)];
+    const n = Math.floor(Math.random() * 20) + 1;
+    const url = `https://www.hhlqilongzhu.cn/api/dg_kugouSQ.php?msg=${encodeURIComponent(artist)}&n=${n}&type=json&quality=128`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    if(!data || !data.music_url) throw new Error('接口返回异常');
+    return {
+      name:   data.title  || artist,
+      artist: data.singer || '',
+      cover:  data.cover  || '',
+      url:    data.music_url
+    };
   }
 
   function renderList(){
