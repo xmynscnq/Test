@@ -47,9 +47,9 @@ body.dark-mode .search-tab{background:rgba(5,3,18,0.55);}
 
 /* 左侧装饰GIF：无浮动，无点击效果 */
 .header-gif{
-  height: 56px;
-  max-width: 80px;
-  min-width: 36px;
+  height: 72px;
+  max-width: 100px;
+  min-width: 48px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
