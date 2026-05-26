@@ -43,23 +43,41 @@ body.dark-mode .search-tab{background:rgba(5,3,18,0.55);}
 .container{max-width:1400px;margin:0 auto;padding:1.2rem 1.2rem 5rem;width:100%;}
 
 /* 头部 */
-.header-area{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:1.8rem;width:100%;}
+.header-area{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.8rem;
+  width: 100%;
+  min-height: 120px; /* 与gif高度一致，防止塌陷 */
+}
 
-/* 左侧装饰GIF：无浮动，无点击效果 */
+/* 左侧装饰GIF：绝对定位，不影响标题居中 */
 .header-gif{
+  position: absolute;
+  left: 0;
   height: 120px;
   max-width: 160px;
   min-width: 80px;
   width: auto;
   object-fit: contain;
-  flex-shrink: 0;
   user-select: none;
   border-radius: 8px;
-  pointer-events: none; /* 纯装饰，不响应点击 */
+  pointer-events: none;
 }
 
-/* 右侧太阳/月亮：保留浮动和点击 */
-.header-icon{font-size:2rem;flex-shrink:0;animation:float 3s ease-in-out infinite;user-select:none;transition:transform 0.2s;cursor:pointer;}
+/* 右侧太阳/月亮：绝对定位 */
+.header-icon{
+  position: absolute;
+  right: 0;
+  font-size: 2rem;
+  flex-shrink: 0;
+  animation: float 3s ease-in-out infinite;
+  user-select: none;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
 .header-icon:hover{transform:scale(1.25);}
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
 
@@ -433,9 +451,9 @@ h1::after{
   .net-toggle-btn{top:0.5rem;right:0.5rem;font-size:0.72rem;padding:0.25rem 0.6rem;}
   #sug-list li{padding:8px 12px;font-size:0.85rem;}
   h1{font-size:clamp(1.5rem,7vw,2.2rem);letter-spacing:0.08em;}
-  .header-gif{ height: 40px; max-width: 56px; }
+  .header-area{ min-height: 60px; margin-bottom: 0.5rem; }
+  .header-gif{ height: 60px; max-width: 80px; }
   .header-icon{ font-size: 1.4rem; }
-  .header-area{gap:12px;margin-bottom:0.5rem;}
 }
 
 @media(max-width:400px){
