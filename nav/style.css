@@ -440,3 +440,4 @@ h1::after{
   .card img.favicon{width:30px;height:30px;}
   .card .title{font-size:0.68rem;}
 }
+#cityResults button:hover { background: rgba(124,111,247,0.2) !important; }
