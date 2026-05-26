@@ -75,10 +75,10 @@ function getWindDirection(deg) {
   return dirs[Math.round(deg / 45) % 8];
 }
 
-function makeWeatherLink(text) {
+function makeWeatherLink(text, cityName) {
   const a = document.createElement('a');
   a.textContent = text;
-  a.href   = 'https://www.weather.com.cn/weather1d/101060101.shtml';
+  a.href   = '#';
   a.target = '_blank';
   a.rel    = 'noopener noreferrer';
   a.style.cssText = `
@@ -87,33 +87,42 @@ function makeWeatherLink(text) {
     transition:color .2s,border-color .2s;
   `;
   a.addEventListener('mouseover', () => {
-    a.style.color            = '#a8f5ab';
+    a.style.color             = '#a8f5ab';
     a.style.borderBottomColor = '#a8f5ab';
   });
   a.addEventListener('mouseout', () => {
-    a.style.color            = '';
+    a.style.color             = '';
     a.style.borderBottomColor = 'rgba(255,255,255,0.45)';
+  });
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    showCityEditor();
   });
   return a;
 }
 
 async function loadWeather(el) {
-  el.textContent  = '📍 长春';
+  const saved = JSON.parse(localStorage.getItem('weather_city') || 'null');
+  const cityName = saved?.name || '长春';
+  const lon      = saved?.lon  || 125.3245;
+  const lat      = saved?.lat  || 43.8868;
+
+  el.textContent   = `📍 ${cityName}`;
   el.style.opacity = '1';
 
-  const cached = sessionStorage.getItem('weather_cache');
+  const cacheKey = `weather_cache_${lat}_${lon}`;
+  const cached   = sessionStorage.getItem(cacheKey);
   if (cached) {
     try {
       const { text, ts } = JSON.parse(cached);
       if (Date.now() - ts < 5 * 60 * 1000) {
         el.innerHTML = '';
-        el.appendChild(makeWeatherLink(text));
+        el.appendChild(makeWeatherLink(text, cityName));
         return;
       }
     } catch {}
   }
 
-  const lon = 125.3245, lat = 43.8868;
   try {
     const res  = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
@@ -129,10 +138,10 @@ async function loadWeather(el) {
     const winddir = getWindDirection(data.current.winddirection_10m);
     const icon    = getWeatherIcon(code);
     const wtxt    = getWeatherText(code);
-    const text    = `📍 长春  ${icon} ${wtxt}  ${temp}°C（今日 ${tmin}~${tmax}°C）  💧${humid}%  💨 ${winddir}风`;
-    sessionStorage.setItem('weather_cache', JSON.stringify({ text, ts: Date.now() }));
+    const text    = `📍 ${cityName}  ${icon} ${wtxt}  ${temp}°C（今日 ${tmin}~${tmax}°C）  💧${humid}%  💨 ${winddir}风`;
+    sessionStorage.setItem(cacheKey, JSON.stringify({ text, ts: Date.now() }));
     el.innerHTML = '';
-    el.appendChild(makeWeatherLink(text));
+    el.appendChild(makeWeatherLink(text, cityName));
   } catch (e) {
     console.error('天气错误:', e);
     el.textContent = '⚠️ 天气获取失败，请稍后刷新';
@@ -554,3 +563,53 @@ document.addEventListener('DOMContentLoaded', async () => {
       '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:2rem;">链接数据加载失败，请检查 links.json 文件。</p>';
   }
 });
+   function showCityEditor() {
+  const saved = JSON.parse(localStorage.getItem('weather_city') || 'null');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+  `;
+  overlay.innerHTML = `
+    <div style="background:rgba(20,20,20,0.95);border:1px solid rgba(255,255,255,0.15);
+      border-radius:14px;padding:1.5rem 2rem;min-width:300px;color:#fff;font-family:inherit;">
+      <p style="margin:0 0 1rem;font-size:1rem;font-weight:600;">📍 修改天气城市</p>
+      <input id="cityNameInput" placeholder="城市名（如：长春）" value="${saved?.name||''}"
+        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);
+        background:rgba(255,255,255,0.08);color:#fff;font-size:0.9rem;margin-bottom:8px;box-sizing:border-box;">
+      <input id="cityLatInput" placeholder="纬度（如：43.8868）" value="${saved?.lat||''}"
+        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);
+        background:rgba(255,255,255,0.08);color:#fff;font-size:0.9rem;margin-bottom:8px;box-sizing:border-box;">
+      <input id="cityLonInput" placeholder="经度（如：125.3245）" value="${saved?.lon||''}"
+        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);
+        background:rgba(255,255,255,0.08);color:#fff;font-size:0.9rem;margin-bottom:1rem;box-sizing:border-box;">
+      <p style="margin:0 0 1rem;font-size:0.75rem;color:rgba(255,255,255,0.45);">
+        经纬度可在 <a href="https://www.latlong.net" target="_blank" style="color:#a8f5ab;">latlong.net</a> 查询
+      </p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="cityCancelBtn" style="padding:6px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);
+          background:transparent;color:#fff;cursor:pointer;font-family:inherit;">取消</button>
+        <button id="citySaveBtn" style="padding:6px 16px;border-radius:8px;border:none;
+          background:#4CAF50;color:#fff;cursor:pointer;font-family:inherit;font-weight:600;">保存</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#cityCancelBtn').onclick = () => overlay.remove();
+  overlay.querySelector('#citySaveBtn').onclick = () => {
+    const name = overlay.querySelector('#cityNameInput').value.trim();
+    const lat  = parseFloat(overlay.querySelector('#cityLatInput').value);
+    const lon  = parseFloat(overlay.querySelector('#cityLonInput').value);
+    if (!name || isNaN(lat) || isNaN(lon)) {
+      alert('请填写完整的城市名和经纬度');
+      return;
+    }
+    localStorage.setItem('weather_city', JSON.stringify({ name, lat, lon }));
+    sessionStorage.clear();
+    overlay.remove();
+    const el = document.getElementById('daily-quote');
+    if (el) loadWeather(el);
+  };
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
