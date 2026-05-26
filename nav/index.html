@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>王五导航</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.loli.net">
+  <link href="https://fonts.loli.net/css2?family=Rajdhani:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -249,41 +248,37 @@
 
 /* ===== 音乐播放器 ===== */
 (function(){
+  // 使用 Pixabay 免版权音乐直链，无跨域问题，稳定可播放
   const CUSTOM_PLAYLIST = [
-    // { name:'歌曲名', artist:'歌手', cover:'封面URL', url:'音频URL' },
-  ];
-
-  // 多个随机音乐API，依次尝试
-  const MUSIC_APIS = [
     {
-      url: 'https://api.uomg.com/api/rand.music?sort=热歌榜&format=json',
-      parse: d => ({
-        name:   d.data?.name   || '未知歌曲',
-        artist: d.data?.artistsname || '',
-        cover:  (d.data?.picurl || '').replace(/^http:\/\//, 'https://'),
-        audio:  (d.data?.url   || '').replace(/^http:\/\//, 'https://'),
-      }),
-      check: d => d.code === 1 && d.data?.url,
+      name: 'Inspiring Cinematic',
+      artist: 'Pixabay',
+      cover: '',
+      url: 'https://cdn.pixabay.com/audio/2023/10/30/audio_0625d0c52b.mp3',
     },
     {
-      url: 'https://api.uomg.com/api/rand.music?sort=新歌榜&format=json',
-      parse: d => ({
-        name:   d.data?.name   || '未知歌曲',
-        artist: d.data?.artistsname || '',
-        cover:  (d.data?.picurl || '').replace(/^http:\/\//, 'https://'),
-        audio:  (d.data?.url   || '').replace(/^http:\/\//, 'https://'),
-      }),
-      check: d => d.code === 1 && d.data?.url,
+      name: 'Lofi Study',
+      artist: 'Pixabay',
+      cover: '',
+      url: 'https://cdn.pixabay.com/audio/2024/02/15/audio_29e37ad994.mp3',
     },
     {
-      url: 'https://api.uomg.com/api/rand.music?sort=飙升榜&format=json',
-      parse: d => ({
-        name:   d.data?.name   || '未知歌曲',
-        artist: d.data?.artistsname || '',
-        cover:  (d.data?.picurl || '').replace(/^http:\/\//, 'https://'),
-        audio:  (d.data?.url   || '').replace(/^http:\/\//, 'https://'),
-      }),
-      check: d => d.code === 1 && d.data?.url,
+      name: 'Chill Background',
+      artist: 'Pixabay',
+      cover: '',
+      url: 'https://cdn.pixabay.com/audio/2023/06/08/audio_29e37ad994.mp3',
+    },
+    {
+      name: 'Ambient Piano',
+      artist: 'Pixabay',
+      cover: '',
+      url: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946bc0e067.mp3',
+    },
+    {
+      name: 'Corporate Background',
+      artist: 'Pixabay',
+      cover: '',
+      url: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
     },
   ];
 
@@ -422,13 +417,10 @@
   });
 
   if(useCustom){
-    titleEl.textContent=CUSTOM_PLAYLIST[0].name||'音轨 1';
-    artistEl.textContent=CUSTOM_PLAYLIST[0].artist||'';
-    if(CUSTOM_PLAYLIST[0].cover) coverEl.src=CUSTOM_PLAYLIST[0].cover;
+    titleEl.textContent  = CUSTOM_PLAYLIST[0].name || '音轨 1';
+    artistEl.textContent = CUSTOM_PLAYLIST[0].artist || '';
+    if(CUSTOM_PLAYLIST[0].cover) coverEl.src = CUSTOM_PLAYLIST[0].cover;
     renderList();
-  } else {
-    titleEl.textContent='点击 ▶ 开始播放';
-    artistEl.textContent='网易云随机';
   }
 })();
 </script>
