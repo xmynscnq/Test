@@ -178,7 +178,7 @@ try {
 } catch {
   await fetchWeather(43.8868, 125.3245, '长春').catch(()=>{ descEl.textContent='获取失败'; });
 }
-
+  }
   function showCityEditor(){
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -245,11 +245,11 @@ try {
   saveBtn.disabled = false;
   saveBtn.style.opacity = '1';
   resultsEl.querySelectorAll('button').forEach(b => {
-    btn.style.background = 'rgba(124,111,247,0.25)';
-    btn.style.border = '1px solid rgba(124,111,247,0.6)';
+    b.style.background = 'rgba(124,111,247,0.08)';
+    b.style.border = '1px solid rgba(124,111,247,0.2)';
   });
-  btn.style.background = 'rgba(76,175,80,0.25)';
-  btn.style.border = '1px solid rgba(76,175,80,0.6)';
+  btn.style.background = 'rgba(124,111,247,0.25)';
+  btn.style.border = '1px solid rgba(124,111,247,0.6)';
 });
           resultsEl.appendChild(btn);
         });
