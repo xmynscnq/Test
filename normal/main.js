@@ -103,9 +103,20 @@ function makeWeatherLink(text, cityName) {
 
 async function loadWeather(el) {
   const saved = JSON.parse(localStorage.getItem('weather_city') || 'null');
-  const cityName = saved?.name || '长春';
-  const lon      = saved?.lon  || 125.3245;
-  const lat      = saved?.lat  || 43.8868;
+let cityName, lat, lon;
+if (saved) {
+  cityName = saved.name; lat = saved.lat; lon = saved.lon;
+} else {
+  try {
+    const ipRes  = await fetch('https://ipapi.co/json/');
+    const ipData = await ipRes.json();
+    cityName = ipData.city || '长春';
+    lat      = ipData.latitude  || 43.8868;
+    lon      = ipData.longitude || 125.3245;
+  } catch {
+    cityName = '长春'; lat = 43.8868; lon = 125.3245;
+  }
+}
 
   el.textContent   = `📍 ${cityName}`;
   el.style.opacity = '1';
