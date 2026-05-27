@@ -163,13 +163,21 @@
   async function init(){
     const cached = sessionStorage.getItem('wx_nav');
     if(cached){ try{ const o=JSON.parse(cached); if(Date.now()-o.ts<5*60*1000){ iconEl.textContent=o.icon; tempEl.textContent=o.temp; descEl.textContent=o.desc; cityEl.textContent=o.city||'长春'; return; } }catch{} }
-    const savedCoord = localStorage.getItem('nav_weather_coord');
-    const savedCity  = localStorage.getItem('nav_weather_city') || '长春';
-    if(savedCoord){
-      try{ const c=JSON.parse(savedCoord); await fetchWeather(c.lat, c.lon, c.name||savedCity); return; }catch{}
-    }
-    await fetchWeather(43.8868, 125.3245, '长春').catch(()=>{ descEl.textContent='获取失败'; });
-  }
+const savedCoord = localStorage.getItem('nav_weather_coord');
+const savedCity  = localStorage.getItem('nav_weather_city');
+if(savedCoord){
+  try{ const c=JSON.parse(savedCoord); await fetchWeather(c.lat, c.lon, c.name||savedCity); return; }catch{}
+}
+try {
+  const ipRes  = await fetch('https://ipapi.co/json/');
+  const ipData = await ipRes.json();
+  const city   = ipData.city || '长春';
+  const lt     = ipData.latitude  || 43.8868;
+  const lg     = ipData.longitude || 125.3245;
+  await fetchWeather(lt, lg, city);
+} catch {
+  await fetchWeather(43.8868, 125.3245, '长春').catch(()=>{ descEl.textContent='获取失败'; });
+}
 
   function showCityEditor(){
     const overlay = document.createElement('div');
