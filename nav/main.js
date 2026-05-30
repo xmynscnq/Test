@@ -2,7 +2,7 @@
    王五导航 · nav/main.js
    =========================== */
 
-// ── 模式切换 ────────────────────────────────────────────────
+// ── 模式配置 ────────────────────────────────────────────────
 const MODES = ['normal', 'webstack', 'easy', 'nav', '5iux', 'kim', 'ai'];
 const MODE_PATHS = {
   normal:   '../normal/index.html',
@@ -13,11 +13,181 @@ const MODE_PATHS = {
   kim:      '../kim/index.html',
   ai:       '../ai/index.html',
 };
-function switchMode() {
-  const cur  = 'nav';
-  const next = MODES[(MODES.indexOf(cur) + 1) % MODES.length];
-  localStorage.setItem('navMode', next);
-  window.location.href = MODE_PATHS[next];
+const MODE_META = {
+  normal:   { label: 'Normal',   desc: '暗黑风格',  icon: '🌙', color: '#00ff88' },
+  webstack: { label: 'WebStack', desc: '侧栏导航',  icon: '📐', color: '#1677ff' },
+  easy:     { label: 'Easy',     desc: '极简搜索',  icon: '🔲', color: '#aaaaaa' },
+  nav:      { label: 'Nav',      desc: '渐变主题',  icon: '🌊', color: '#a78bfa' },
+  '5iux':   { label: '5IUX',    desc: '亮色简洁',  icon: '✨', color: '#667eea' },
+  kim:      { label: 'Kim',      desc: '极彩背景',  icon: '🎨', color: '#f472b6' },
+  ai:       { label: 'AI',       desc: 'AI 助手',   icon: '🤖', color: '#f59e0b' },
+};
+const CURRENT_MODE = 'nav';
+
+// ── 模式菜单 ────────────────────────────────────────────────
+let _modeMenuOpen = false;
+let _modeMenuEl   = null;
+
+function buildModeMenu() {
+  if (_modeMenuEl) return _modeMenuEl;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #__mode-menu {
+      position: fixed;
+      z-index: 99999;
+      display: none;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 12px;
+      border-radius: 18px;
+      /* 紫色调毛玻璃，贴合 nav 渐变主题 */
+      background: rgba(30, 18, 60, 0.62);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(167, 139, 250, 0.28);
+      box-shadow: 0 12px 40px rgba(80, 40, 180, 0.35), 0 2px 8px rgba(0,0,0,0.4);
+      max-width: 390px;
+    }
+    #__mode-menu.open { display: flex; }
+    #__mode-menu.layout-below {
+      flex-direction: column;
+      max-width: 210px;
+    }
+    /* PC 横排时的小标题 */
+    #__mode-menu-title {
+      width: 100%;
+      padding: 0 3px 7px;
+      font-size: 10px; font-weight: 700;
+      color: rgba(167,139,250,0.5);
+      letter-spacing: 0.14em; text-transform: uppercase;
+      border-bottom: 1px solid rgba(167,139,250,0.18);
+      margin-bottom: 2px;
+    }
+    #__mode-menu.layout-below #__mode-menu-title { display: none; }
+
+    .__mc {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px; border-radius: 11px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: background 0.14s, border-color 0.14s;
+      cursor: pointer;
+    }
+    /* PC 横排：图标在上 */
+    #__mode-menu:not(.layout-below) .__mc {
+      flex-direction: column; align-items: center;
+      gap: 4px; padding: 10px 8px;
+      min-width: 64px; max-width: 64px;
+    }
+    .__mc:hover {
+      background: rgba(167,139,250,0.15);
+      border-color: rgba(167,139,250,0.3);
+    }
+    .__mc.cur {
+      background: rgba(167,139,250,0.22);
+      border-color: rgba(167,139,250,0.5);
+    }
+    .__mc-icon { font-size: 18px; line-height: 1; }
+    .__mc-body { display: flex; flex-direction: column; gap: 2px; }
+    #__mode-menu:not(.layout-below) .__mc-body { align-items: center; }
+    .__mc-label {
+      font-size: 11.5px; font-weight: 700;
+      color: rgba(255,255,255,0.88); line-height: 1;
+    }
+    .__mc.cur .__mc-label { color: #c4b5fd; }
+    .__mc-desc { font-size: 10px; color: rgba(255,255,255,0.38); line-height: 1; }
+    #__mode-menu.layout-below .__mc-check {
+      margin-left: auto; font-size: 11px; color: #a78bfa;
+    }
+    #__mode-menu:not(.layout-below) .__mc-check { display: none; }
+    .__mc-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    #__mode-menu:not(.layout-below) .__mc-dot { display: none; }
+  `;
+  document.head.appendChild(style);
+
+  const menu = document.createElement('div');
+  menu.id = '__mode-menu';
+
+  const titleBar = document.createElement('div');
+  titleBar.id = '__mode-menu-title';
+  titleBar.textContent = '切换模式';
+  menu.appendChild(titleBar);
+
+  MODES.forEach(key => {
+    const m = MODE_META[key];
+    const a = document.createElement('a');
+    a.href      = MODE_PATHS[key];
+    a.className = '__mc' + (key === CURRENT_MODE ? ' cur' : '');
+    a.innerHTML = `
+      <div class="__mc-icon">${m.icon}</div>
+      <div class="__mc-dot" style="background:${m.color}"></div>
+      <div class="__mc-body">
+        <div class="__mc-label">${m.label}</div>
+        <div class="__mc-desc">${m.desc}</div>
+      </div>
+      <div class="__mc-check">${key === CURRENT_MODE ? '✓' : ''}</div>
+    `;
+    menu.appendChild(a);
+  });
+
+  document.body.appendChild(menu);
+  _modeMenuEl = menu;
+  return menu;
+}
+
+function positionModeMenu() {
+  const titleEl = document.getElementById('site-title');
+  const menu    = _modeMenuEl;
+  if (!titleEl || !menu) return;
+
+  const rect   = titleEl.getBoundingClientRect();
+  const mobile = window.innerWidth < 768;
+  const GAP    = 12;
+
+  menu.classList.toggle('layout-below', mobile);
+
+  if (mobile) {
+    const menuW = Math.min(210, window.innerWidth - 24);
+    let left = rect.left + rect.width / 2 - menuW / 2;
+    left = Math.max(12, Math.min(left, window.innerWidth - menuW - 12));
+    menu.style.top      = (rect.bottom + GAP + window.scrollY) + 'px';
+    menu.style.left     = left + 'px';
+    menu.style.right    = 'auto';
+    menu.style.maxWidth = menuW + 'px';
+  } else {
+    menu.style.top      = (rect.top + window.scrollY + rect.height / 2 - 55) + 'px';
+    menu.style.left     = (rect.right + GAP) + 'px';
+    menu.style.right    = 'auto';
+    menu.style.maxWidth = '390px';
+    requestAnimationFrame(() => {
+      const mw = menu.offsetWidth;
+      if (rect.right + GAP + mw > window.innerWidth - 12) {
+        menu.style.left = Math.max(12, rect.left - GAP - mw) + 'px';
+      }
+    });
+  }
+}
+
+function openModeMenu() {
+  buildModeMenu();
+  _modeMenuOpen = true;
+  positionModeMenu();
+  _modeMenuEl.classList.add('open');
+}
+
+function closeModeMenu() {
+  _modeMenuOpen = false;
+  if (_modeMenuEl) _modeMenuEl.classList.remove('open');
+}
+
+function toggleModeMenu(e) {
+  e.stopPropagation();
+  _modeMenuOpen ? closeModeMenu() : openModeMenu();
 }
 
 // ── 图标配置 ────────────────────────────────────────────────
@@ -180,7 +350,7 @@ function renderSearchTabs() {
   });
 }
 
-// ── 引擎面板（始终显示在搜索框下方）────────────────────────
+// ── 引擎面板 ─────────────────────────────────────────────────
 function renderEnginePanel() {
   const panel = document.getElementById('enginePanel');
   if (!panel) return;
@@ -264,7 +434,6 @@ function filterLinks() {
 }
 window.filterLinks = filterLinks;
 
-// ── 分区标题去 emoji ─────────────────────────────────────────
 function sectionLabel(s) {
   return s.replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\u{20E3}\uFE0F\u{1F1E0}-\u{1F1FF}]+/gu, '').trim();
 }
@@ -277,15 +446,12 @@ function renderCards(sections) {
   sections.forEach(({ section, items }) => {
     const sec = document.createElement('div');
     sec.className = 'section';
-
     const h2 = document.createElement('h2');
     h2.className   = 'section-title';
     h2.textContent = sectionLabel(section);
     sec.appendChild(h2);
-
     const grid = document.createElement('div');
     grid.className = 'link-container';
-
     items.forEach(item => {
       const a = document.createElement('a');
       a.href         = getCardUrl(item);
@@ -294,7 +460,6 @@ function renderCards(sections) {
       a.dataset.desc = item['data-desc'] ?? item.desc ?? '';
       a.rel          = 'noopener noreferrer';
       if (item.intranet) { a.dataset.url = item.url; a.dataset.intranet = item.intranet; }
-
       const img = document.createElement('img');
       img.className = 'favicon';
       img.loading   = 'lazy';
@@ -306,83 +471,62 @@ function renderCards(sections) {
           this.src = `https://${domain}/favicon.ico`;
         } else { this.src = DEFAULT_ICON; this.onerror = null; }
       };
-
       const info = document.createElement('div');
       info.className = 'card-info';
-
       const titleEl = document.createElement('span');
       titleEl.className   = 'title';
       titleEl.textContent = item.title;
-
       const descEl = document.createElement('div');
       descEl.className   = 'desc';
       descEl.textContent = item.desc ?? '';
-
       info.appendChild(titleEl);
       info.appendChild(descEl);
-
       const popup = document.createElement('div');
       popup.className   = 'info-popup';
       popup.textContent = getDomain(getCardUrl(item)) ?? getCardUrl(item);
-
       a.appendChild(img);
       a.appendChild(info);
       a.appendChild(popup);
       grid.appendChild(a);
     });
-
     sec.appendChild(grid);
     main.appendChild(sec);
   });
   bindTouchTooltip();
 }
 
-/* =============================================
-   main.js 修复④：长按卡片无内容弹出
-   将此函数替换掉原 bindTouchTooltip 整体
-   ============================================= */
-
 function bindTouchTooltip() {
   if (!window.matchMedia('(hover: none)').matches) return;
   let timer = null, activeCard = null;
-
   function clearActive() {
     if (activeCard) { activeCard.classList.remove('touch-active'); activeCard = null; }
     clearTimeout(timer); timer = null;
   }
-
   document.querySelectorAll('.card').forEach(card => {
-    // 先把 info-popup 的初始内容存为域名（供 fallback 用）
     const popup = card.querySelector('.info-popup');
     const domainText = popup ? popup.textContent.trim() : '';
-    if (popup) card.dataset._domain = domainText; // 缓存域名
-
+    if (popup) card.dataset._domain = domainText;
     card.addEventListener('touchstart', () => {
       clearActive();
       timer = setTimeout(() => {
         const popup = card.querySelector('.info-popup');
         if (popup) {
-          // 优先 desc → title → 缓存的域名
           const desc   = (card.dataset.desc  || '').trim();
           const title  = (card.querySelector('.title')?.textContent || '').trim();
           const domain = (card.dataset._domain || '').trim();
           popup.textContent = desc || title || domain || '无描述';
-
-          // 强制重绘（部分安卓 WebView 需要）
           popup.style.display = 'none';
-          void popup.offsetHeight; // trigger reflow
+          void popup.offsetHeight;
           popup.style.display = '';
         }
         card.classList.add('touch-active');
         activeCard = card;
-        setTimeout(clearActive, 2500); // 延长显示时间到 2.5s
+        setTimeout(clearActive, 2500);
       }, 500);
     }, { passive: true });
-
     card.addEventListener('touchend',  () => { if (timer) { clearTimeout(timer); timer = null; } });
     card.addEventListener('touchmove', () => { clearTimeout(timer); timer = null; }, { passive: true });
   });
-
   document.addEventListener('touchstart', e => {
     if (activeCard && !activeCard.contains(e.target)) clearActive();
   }, { passive: true });
@@ -392,8 +536,16 @@ function bindTouchTooltip() {
 document.addEventListener('DOMContentLoaded', async () => {
   localStorage.setItem('navMode', 'nav');
 
+  // 绑定标题点击 → 模式菜单
   const title = document.getElementById('site-title');
-  if (title) title.addEventListener('click', switchMode);
+  if (title) title.addEventListener('click', toggleModeMenu);
+
+  // 点空白关闭
+  document.addEventListener('click', (e) => {
+    if (_modeMenuEl && !_modeMenuEl.contains(e.target)) closeModeMenu();
+  });
+  window.addEventListener('resize', () => { if (_modeMenuOpen) positionModeMenu(); });
+  window.addEventListener('scroll', () => { if (_modeMenuOpen) positionModeMenu(); }, { passive: true });
 
   changeBackground();
   renderSearchTabs();
