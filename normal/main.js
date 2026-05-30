@@ -42,7 +42,7 @@ function buildModeMenu() {
       gap: 8px;
       padding: 10px;
       border-radius: 16px;
-      background: rgba(10, 10, 20, 0.82);
+      background: rgba(20, 20, 40, 0.55);
       backdrop-filter: blur(24px) saturate(160%);
       -webkit-backdrop-filter: blur(24px) saturate(160%);
       border: 1px solid rgba(255,255,255,0.15);
