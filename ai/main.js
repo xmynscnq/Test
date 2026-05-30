@@ -146,32 +146,20 @@ function positionModeMenu() {
   const menu    = _modeMenuEl;
   if (!titleEl || !menu) return;
 
-  const rect   = titleEl.getBoundingClientRect();
-  const mobile = window.innerWidth < 768;
-  const GAP    = 12;
+  const rect = titleEl.getBoundingClientRect();
+  const GAP  = 10;
 
-  menu.classList.toggle('layout-below', mobile);
+  // h1 撑满容器（width≈页面宽），用文字视觉中心定位，PC/手机都从下方弹出
+  menu.classList.add('layout-below');
 
-  if (mobile) {
-    const menuW = Math.min(210, window.innerWidth - 24);
-    let left = rect.left + rect.width / 2 - menuW / 2;
-    left = Math.max(12, Math.min(left, window.innerWidth - menuW - 12));
-    menu.style.top      = (rect.bottom + GAP + window.scrollY) + 'px';
-    menu.style.left     = left + 'px';
-    menu.style.right    = 'auto';
-    menu.style.maxWidth = menuW + 'px';
-  } else {
-    menu.style.top      = (rect.top + window.scrollY + rect.height / 2 - 55) + 'px';
-    menu.style.left     = (rect.right + GAP) + 'px';
-    menu.style.right    = 'auto';
-    menu.style.maxWidth = '380px';
-    requestAnimationFrame(() => {
-      const mw = menu.offsetWidth;
-      if (rect.right + GAP + mw > window.innerWidth - 12) {
-        menu.style.left = Math.max(12, rect.left - GAP - mw) + 'px';
-      }
-    });
-  }
+  const menuW = Math.min(210, window.innerWidth - 24);
+  // 取元素水平中点作为菜单中心
+  let left = (rect.left + rect.right) / 2 - menuW / 2;
+  left = Math.max(12, Math.min(left, window.innerWidth - menuW - 12));
+  menu.style.top      = (rect.bottom + GAP + window.scrollY) + 'px';
+  menu.style.left     = left + 'px';
+  menu.style.right    = 'auto';
+  menu.style.maxWidth = menuW + 'px';
 }
 
 function openModeMenu() {
