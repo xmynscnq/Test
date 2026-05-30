@@ -276,7 +276,6 @@ try {
 
   /* 点击城市名打开弹窗，不再用内联输入框 */
   cityEl.addEventListener('pointerup', e => { e.preventDefault(); showCityEditor(); });
-  cityEl.addEventListener('click', showCityEditor);
 
   /* 隐藏原来的内联输入框，不再用它 */
   if(inputEl) inputEl.style.display = 'none';
