@@ -6,7 +6,7 @@ const WORKER_URL = 'https://ico.xmynscnq.dpdns.org';
 const LINKS_FILE = '../links.json';
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTk5IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yIDEyaDIwIj48L3BhdGg+PHBhdGggZD0iTTEyIDJhMTUuMyAxNS4zIDAgMCAxIDQgMTAgMTUuMyAxNS4zIDAgMCAxLTQgMTAgMTUuMyAxNS4zIDAgMCAxLTQtMTAgMTUuMyAxNS4zIDAgMCAxIDQtMTB6Ij48L3BhdGg+PC9zdmc+';
 
-// ── 模式切换 ──────────────────────────────────────────────
+// ── 模式配置 ──────────────────────────────────────────────
 const MODES = ['normal', 'webstack', 'easy', 'nav', '5iux', 'kim', 'ai'];
 const MODE_PATHS = {
   normal:   '../normal/index.html',
@@ -17,11 +17,223 @@ const MODE_PATHS = {
   kim:      '../kim/index.html',
   ai:       '../ai/index.html',
 };
-function switchMode() {
-  const cur  = 'webstack';
-  const next = MODES[(MODES.indexOf(cur) + 1) % MODES.length];
-  localStorage.setItem('navMode', next);
-  window.location.href = MODE_PATHS[next];
+const MODE_META = {
+  normal:   { label: 'Normal',   desc: '暗黑风格',  icon: '🌙', color: '#00ff88' },
+  webstack: { label: 'WebStack', desc: '侧栏导航',  icon: '📐', color: '#1677ff' },
+  easy:     { label: 'Easy',     desc: '极简搜索',  icon: '🔲', color: '#aaaaaa' },
+  nav:      { label: 'Nav',      desc: '渐变主题',  icon: '🌊', color: '#a78bfa' },
+  '5iux':   { label: '5IUX',    desc: '亮色简洁',  icon: '✨', color: '#667eea' },
+  kim:      { label: 'Kim',      desc: '极彩背景',  icon: '🎨', color: '#f472b6' },
+  ai:       { label: 'AI',       desc: 'AI 助手',   icon: '🤖', color: '#f59e0b' },
+};
+const CURRENT_MODE = 'webstack';
+
+// ── 模式菜单 ──────────────────────────────────────────────
+let _modeMenuOpen = false;
+let _modeMenuEl   = null;
+
+function buildModeMenu() {
+  if (_modeMenuEl) return _modeMenuEl;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #__mode-menu {
+      position: fixed;
+      z-index: 99999;
+      display: none;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px;
+      border-radius: 14px;
+      /* 亮色默认，跟随 WebStack 白色风格 */
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid rgba(0,0,0,0.09);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+      max-width: 380px;
+    }
+    body.dark-mode #__mode-menu {
+      background: rgba(26,34,48,0.95);
+      border-color: rgba(255,255,255,0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #__mode-menu.open { display: flex; }
+    #__mode-menu.layout-below {
+      flex-direction: column;
+      max-width: 210px;
+    }
+    .__mc {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 11px;
+      border-radius: 9px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: background 0.13s, border-color 0.13s;
+      cursor: pointer;
+      min-width: 88px;
+    }
+    /* PC横向：图标在上，label在下的卡片式 */
+    #__mode-menu:not(.layout-below) .__mc {
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 8px 8px;
+      min-width: 68px;
+      max-width: 68px;
+    }
+    .__mc:hover {
+      background: rgba(22,119,255,0.07);
+      border-color: rgba(22,119,255,0.18);
+    }
+    body.dark-mode .__mc:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.15);
+    }
+    .__mc.cur {
+      background: rgba(22,119,255,0.1);
+      border-color: rgba(22,119,255,0.35);
+    }
+    body.dark-mode .__mc.cur {
+      background: rgba(77,166,255,0.15);
+      border-color: rgba(77,166,255,0.4);
+    }
+    .__mc-icon { font-size: 19px; line-height: 1; }
+    .__mc-body { display: flex; flex-direction: column; gap: 1px; }
+    #__mode-menu:not(.layout-below) .__mc-body { align-items: center; }
+    .__mc-label {
+      font-size: 11.5px; font-weight: 700;
+      color: #1a1a2e; line-height: 1;
+    }
+    body.dark-mode .__mc-label { color: #e0e6f0; }
+    .__mc.cur .__mc-label { color: #1677ff; }
+    body.dark-mode .__mc.cur .__mc-label { color: #4da6ff; }
+    .__mc-desc {
+      font-size: 10px;
+      color: #888; line-height: 1;
+    }
+    body.dark-mode .__mc-desc { color: #6a7a8a; }
+    /* 手机纵向时显示右侧对勾 */
+    #__mode-menu.layout-below .__mc-check {
+      margin-left: auto; font-size: 11px; color: #1677ff;
+    }
+    body.dark-mode #__mode-menu.layout-below .__mc-check { color: #4da6ff; }
+    #__mode-menu:not(.layout-below) .__mc-check { display: none; }
+    .__mc-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    #__mode-menu:not(.layout-below) .__mc-dot { display: none; }
+    /* 分割线（PC横排时顶部加个小标题） */
+    #__mode-menu-title {
+      width: 100%; padding: 2px 4px 6px;
+      font-size: 10px; font-weight: 700;
+      color: #aaa; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      margin-bottom: 2px;
+    }
+    body.dark-mode #__mode-menu-title {
+      color: #4a5a6a;
+      border-color: rgba(255,255,255,0.07);
+    }
+    #__mode-menu.layout-below #__mode-menu-title { display: none; }
+  `;
+  document.head.appendChild(style);
+
+  const menu = document.createElement('div');
+  menu.id = '__mode-menu';
+
+  // PC横排时显示标题
+  const titleBar = document.createElement('div');
+  titleBar.id = '__mode-menu-title';
+  titleBar.textContent = '切换模式';
+  menu.appendChild(titleBar);
+
+  MODES.forEach(key => {
+    const m = MODE_META[key];
+    const a = document.createElement('a');
+    a.href      = MODE_PATHS[key];
+    a.className = '__mc' + (key === CURRENT_MODE ? ' cur' : '');
+    a.innerHTML = `
+      <div class="__mc-icon">${m.icon}</div>
+      <div class="__mc-dot" style="background:${m.color}"></div>
+      <div class="__mc-body">
+        <div class="__mc-label">${m.label}</div>
+        <div class="__mc-desc">${m.desc}</div>
+      </div>
+      <div class="__mc-check">${key === CURRENT_MODE ? '✓' : ''}</div>
+    `;
+    menu.appendChild(a);
+  });
+
+  document.body.appendChild(menu);
+  _modeMenuEl = menu;
+  return menu;
+}
+
+function positionModeMenu(anchorEl) {
+  const menu = _modeMenuEl;
+  if (!anchorEl || !menu) return;
+
+  const rect   = anchorEl.getBoundingClientRect();
+  const mobile = window.innerWidth < 768;
+  const GAP    = 10;
+
+  menu.classList.toggle('layout-below', mobile);
+
+  if (mobile) {
+    // 手机：标题正下方，水平居中
+    const menuW = Math.min(210, window.innerWidth - 24);
+    let left = rect.left + rect.width / 2 - menuW / 2;
+    left = Math.max(12, Math.min(left, window.innerWidth - menuW - 12));
+    menu.style.top      = (rect.bottom + GAP + window.scrollY) + 'px';
+    menu.style.left     = left + 'px';
+    menu.style.right    = 'auto';
+    menu.style.maxWidth = menuW + 'px';
+  } else {
+    // PC：锚点右侧，垂直居中对齐
+    menu.style.top      = (rect.top + window.scrollY + rect.height / 2 - 60) + 'px';
+    menu.style.left     = (rect.right + GAP) + 'px';
+    menu.style.right    = 'auto';
+    menu.style.maxWidth = '380px';
+
+    // 右侧放不下则改到左侧
+    requestAnimationFrame(() => {
+      const mw = menu.offsetWidth;
+      if (rect.right + GAP + mw > window.innerWidth - 12) {
+        menu.style.left = Math.max(12, rect.left - GAP - mw) + 'px';
+      }
+    });
+  }
+}
+
+let _modeAnchor = null; // 记录是哪个触发元素
+
+function openModeMenu(anchorEl) {
+  buildModeMenu();
+  _modeAnchor   = anchorEl;
+  _modeMenuOpen = true;
+  positionModeMenu(anchorEl);
+  _modeMenuEl.classList.add('open');
+}
+
+function closeModeMenu() {
+  _modeMenuOpen = false;
+  if (_modeMenuEl) _modeMenuEl.classList.remove('open');
+}
+
+function toggleModeMenu(e) {
+  e.stopPropagation();
+  const anchor = e.currentTarget;
+  if (_modeMenuOpen && _modeAnchor === anchor) {
+    closeModeMenu();
+  } else {
+    openModeMenu(anchor);
+  }
 }
 
 // ── 内外网切换 ────────────────────────────────────────────
@@ -50,7 +262,6 @@ function getSidebar() { return document.getElementById('sidebar'); }
 function getOverlay() { return document.getElementById('mobile-overlay'); }
 function isMobile()   { return window.innerWidth < 768; }
 
-// 移动端侧边栏：强制 display:flex 覆盖外部CSS的 display:none
 function openMobileSidebar() {
   const s = getSidebar();
   s.classList.remove('mini-sidebar');
@@ -59,7 +270,7 @@ function openMobileSidebar() {
   s.style.setProperty('display', 'flex', 'important');
   s.classList.add('mobile-open');
   getOverlay()?.classList.add('show');
-  document.getElementById('mobile-top-bar').style.setProperty('display', 'none', 'important'); // 新增
+  document.getElementById('mobile-top-bar').style.setProperty('display', 'none', 'important');
 }
 
 function closeMobileSidebar() {
@@ -67,7 +278,7 @@ function closeMobileSidebar() {
   s.classList.remove('mobile-open');
   s.style.setProperty('display', 'flex', 'important');
   getOverlay()?.classList.remove('show');
-  document.getElementById('mobile-top-bar').style.setProperty('display', 'flex', 'important'); // 新增
+  document.getElementById('mobile-top-bar').style.setProperty('display', 'flex', 'important');
 }
 
 // ── 侧边栏切换 ────────────────────────────────────────────
@@ -96,7 +307,6 @@ window.addEventListener('resize', () => {
   const wrap     = document.getElementById('content-wrap');
   const topBar   = document.getElementById('top-bar');
   if (!isMobile()) {
-    // 从移动端切回桌面端时，清理移动端状态
     const _s = getSidebar();
     _s.style.removeProperty('transform');
     _s.style.removeProperty('left');
@@ -111,6 +321,8 @@ window.addEventListener('resize', () => {
     wrap.style.marginLeft = '0';
     topBar.style.left     = '0';
   }
+  // 菜单打开时跟随重新定位
+  if (_modeMenuOpen && _modeAnchor) positionModeMenu(_modeAnchor);
 });
 
 // ── 工具函数 ──────────────────────────────────────────────
@@ -381,7 +593,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     wrap.style.marginLeft = expanded ? '180px' : '60px';
     topBar.style.left     = expanded ? '180px' : '60px';
   } else {
-    // 移动端：清除所有桌面端残留内联样式，强制display:flex覆盖外部CSS的display:none
     const ms = getSidebar();
     ms.classList.remove('mini-sidebar');
     ms.style.removeProperty('width');
@@ -389,12 +600,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     ms.style.setProperty('display', 'flex', 'important');
   }
 
-  // 遮罩关闭侧边栏（唯一绑定点，index.html 里不再重复绑定）
+  // 遮罩关闭侧边栏
   getOverlay()?.addEventListener('click', closeMobileSidebar);
 
-  // 标题切换模式
-  document.getElementById('sidebar-logo-text')?.addEventListener('click', switchMode);
-  document.getElementById('mobile-logo-text')?.addEventListener('click', switchMode);
+  // ── 模式切换：桌面侧边栏标题 + 移动端顶部标题都绑定 ──
+  const sidebarTitle = document.getElementById('sidebar-logo-text');
+  const mobileTitle  = document.getElementById('mobile-logo-text');
+  if (sidebarTitle) sidebarTitle.addEventListener('click', toggleModeMenu);
+  if (mobileTitle)  mobileTitle.addEventListener('click',  toggleModeMenu);
+
+  // 点空白关闭菜单
+  document.addEventListener('click', (e) => {
+    if (_modeMenuEl && !_modeMenuEl.contains(e.target)) closeModeMenu();
+  });
+
+  // scroll 时跟随重定位
+  window.addEventListener('scroll', () => {
+    if (_modeMenuOpen && _modeAnchor) positionModeMenu(_modeAnchor);
+  }, { passive: true });
 
   // 内外网
   document.getElementById('net-toggle-sidebar')?.addEventListener('click', toggleNetMode);
