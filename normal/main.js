@@ -2,7 +2,7 @@
    王五导航 · normal/main.js
    =========================== */
 
-// ── 模式配置 ────────────────────────────────────────────────
+// ── 模式切换 ────────────────────────────────────────────────
 const MODES = ['normal', 'webstack', 'easy', 'nav', '5iux', 'kim', 'ai'];
 const MODE_PATHS = {
   normal:   '../normal/index.html',
@@ -13,160 +13,21 @@ const MODE_PATHS = {
   kim:      '../kim/index.html',
   ai:       '../ai/index.html',
 };
-const MODE_META = {
-  normal:   { label: 'Normal',   desc: '暗黑风格',  icon: '🌙', color: '#00ff88' },
-  webstack: { label: 'WebStack', desc: '侧栏导航',  icon: '📐', color: '#60a5fa' },
-  easy:     { label: 'Easy',     desc: '极简搜索',  icon: '🔲', color: '#aaaaaa' },
-  nav:      { label: 'Nav',      desc: '渐变主题',  icon: '🌊', color: '#a78bfa' },
-  '5iux':   { label: '5IUX',    desc: '亮色简洁',  icon: '✨', color: '#667eea' },
-  kim:      { label: 'Kim',      desc: '极彩背景',  icon: '🎨', color: '#f472b6' },
-  ai:       { label: 'AI',       desc: 'AI 助手',   icon: '🤖', color: '#f59e0b' },
-};
-const CURRENT_MODE = 'normal';
 
-// ── 模式菜单 ────────────────────────────────────────────────
-let _modeMenuOpen = false;
-let _modeMenuEl   = null;
-
-function buildModeMenu() {
-  if (_modeMenuEl) return _modeMenuEl;
-
-  const style = document.createElement('style');
-  style.textContent = `
-    #__mode-menu {
-      position: fixed;
-      z-index: 99999;
-      display: none;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 10px;
-      border-radius: 16px;
-      background: rgba(20, 20, 40, 0.55);
-      backdrop-filter: blur(24px) saturate(160%);
-      -webkit-backdrop-filter: blur(24px) saturate(160%);
-      border: 1px solid rgba(255,255,255,0.15);
-      max-width: 360px;
-    }
-    #__mode-menu.open { display: flex; }
-    #__mode-menu.layout-below {
-      flex-direction: column;
-      max-width: 220px;
-    }
-    .__mc {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border-radius: 11px;
-      text-decoration: none;
-      border: 1px solid transparent;
-      transition: background 0.15s;
-      cursor: pointer;
-      min-width: 90px;
-    }
-    #__mode-menu:not(.layout-below) .__mc {
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      padding: 11px 10px;
-      min-width: 72px;
-      max-width: 72px;
-    }
-    .__mc:hover { background: rgba(255,255,255,0.12); }
-    .__mc.cur   { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.28); }
-    .__mc-icon  { font-size: 20px; line-height: 1; }
-    .__mc-body  { display: flex; flex-direction: column; gap: 2px; }
-    #__mode-menu:not(.layout-below) .__mc-body { align-items: center; }
-    .__mc-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.92); line-height: 1; }
-    .__mc-desc  { font-size: 10px; color: rgba(255,255,255,0.48); line-height: 1; }
-    #__mode-menu.layout-below .__mc-check { margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.45); }
-    #__mode-menu:not(.layout-below) .__mc-check { display: none; }
-    .__mc-dot {
-      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
-    }
-    #__mode-menu:not(.layout-below) .__mc-dot { display: none; }
-  `;
-  document.head.appendChild(style);
-
-  const menu = document.createElement('div');
-  menu.id = '__mode-menu';
-
-  MODES.forEach(key => {
-    const m = MODE_META[key];
-    const a = document.createElement('a');
-    a.href      = MODE_PATHS[key];
-    a.className = '__mc' + (key === CURRENT_MODE ? ' cur' : '');
-    a.innerHTML = `
-      <div class="__mc-icon">${m.icon}</div>
-      <div class="__mc-dot" style="background:${m.color}"></div>
-      <div class="__mc-body">
-        <div class="__mc-label">${m.label}</div>
-        <div class="__mc-desc">${m.desc}</div>
-      </div>
-      <div class="__mc-check">${key === CURRENT_MODE ? '✓' : ''}</div>
-    `;
-    menu.appendChild(a);
-  });
-
-  document.body.appendChild(menu);
-  _modeMenuEl = menu;
-  return menu;
+function switchMode() {
+  const cur  = 'normal';
+  const next = MODES[(MODES.indexOf(cur) + 1) % MODES.length];
+  localStorage.setItem('navMode', next);
+  window.location.href = MODE_PATHS[next];
 }
 
-function positionModeMenu() {
-  const titleEl = document.getElementById('site-title');
-  const menu    = _modeMenuEl;
-  if (!titleEl || !menu) return;
-
-  const rect   = titleEl.getBoundingClientRect();
-  const mobile = window.innerWidth < 768;
-  const GAP    = 12;
-
-  menu.classList.toggle('layout-below', mobile);
-
-  if (mobile) {
-    const menuW = Math.min(220, window.innerWidth - 24);
-    let left = rect.left + rect.width / 2 - menuW / 2;
-    left = Math.max(12, Math.min(left, window.innerWidth - menuW - 12));
-    menu.style.top     = (rect.bottom + GAP + window.scrollY) + 'px';
-    menu.style.left    = left + 'px';
-    menu.style.right   = 'auto';
-    menu.style.maxWidth = menuW + 'px';
-  } else {
-    menu.style.top    = (rect.top + window.scrollY + rect.height / 2 - 50) + 'px';
-    menu.style.left   = (rect.right + GAP) + 'px';
-    menu.style.right  = 'auto';
-    menu.style.maxWidth = '360px';
-
-    requestAnimationFrame(() => {
-      const mw = menu.offsetWidth;
-      if (rect.right + GAP + mw > window.innerWidth - 12) {
-        menu.style.left = Math.max(12, rect.left - GAP - mw) + 'px';
-      }
-    });
-  }
-}
-
-function openModeMenu() {
-  buildModeMenu();
-  _modeMenuOpen = true;
-  positionModeMenu();
-  _modeMenuEl.classList.add('open');
-}
-
-function closeModeMenu() {
-  _modeMenuOpen = false;
-  if (_modeMenuEl) _modeMenuEl.classList.remove('open');
-}
-
-function toggleModeMenu(e) {
-  e.stopPropagation();
-  _modeMenuOpen ? closeModeMenu() : openModeMenu();
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const title = document.getElementById('site-title');
+  if (title) title.addEventListener('click', switchMode);
+});
 
 // ── 图标 & 背景 配置 ────────────────────────────────────────
-const WORKER_URL    = 'https://ico.xmynscnq.dpdns.org';
+const WORKER_URL    = '';
 const BG_WORKER_URL = 'https://xin88.xmynscnq.dpdns.org';
 
 function buildFaviconUrl(domain) {
@@ -242,20 +103,20 @@ function makeWeatherLink(text, cityName) {
 
 async function loadWeather(el) {
   const saved = JSON.parse(localStorage.getItem('weather_city') || 'null');
-  let cityName, lat, lon;
-  if (saved) {
-    cityName = saved.name; lat = saved.lat; lon = saved.lon;
-  } else {
-    try {
-      const ipRes  = await fetch('https://ipapi.co/json/');
-      const ipData = await ipRes.json();
-      cityName = ipData.city || '长春';
-      lat      = ipData.latitude  || 43.8868;
-      lon      = ipData.longitude || 125.3245;
-    } catch {
-      cityName = '长春'; lat = 43.8868; lon = 125.3245;
-    }
+let cityName, lat, lon;
+if (saved) {
+  cityName = saved.name; lat = saved.lat; lon = saved.lon;
+} else {
+  try {
+    const ipRes  = await fetch('https://ipapi.co/json/');
+    const ipData = await ipRes.json();
+    cityName = ipData.city || '长春';
+    lat      = ipData.latitude  || 43.8868;
+    lon      = ipData.longitude || 125.3245;
+  } catch {
+    cityName = '长春'; lat = 43.8868; lon = 125.3245;
   }
+}
 
   el.textContent   = `📍 ${cityName}`;
   el.style.opacity = '1';
@@ -645,7 +506,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadHeaderSubtitle();
 
   const video = document.getElementById('bgLayer');
-  let _bgErrorCount = 0, _bgPlayedOnce = false;
+  let _bgErrorCount = 0, _bgSwitchCount = 0, _bgPlayedOnce = false;
 
   if (video) {
     video.addEventListener('timeupdate', () => {
@@ -655,11 +516,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     video.addEventListener('ended', () => { video.currentTime = 0; video.play().catch(() => {}); });
     video.addEventListener('error', () => {
-      _bgErrorCount++;
-      if (_bgErrorCount <= 2) setTimeout(reloadBackground, 1000 * _bgErrorCount);
-      else console.warn(`[BG] 连续失败 ${_bgErrorCount} 次，已放弃加载背景视频`);
-    });
-    video.addEventListener('playing', () => { _bgErrorCount = 0; _bgPlayedOnce = true; clearTimeout(stallTimer); });
+  _bgErrorCount++;
+  if (_bgErrorCount <= 2) {
+    setTimeout(reloadBackground, 1000 * _bgErrorCount);
+  } else {
+    _bgErrorCount = 0;
+    _bgSwitchCount++;
+    if (_bgSwitchCount <= 5) {
+      setTimeout(changeBackground, 1000);
+    } else {
+      _bgSwitchCount = 0;
+      console.warn('[BG] 多次换视频均失败，60秒后重试');
+      setTimeout(changeBackground, 60000);
+    }
+  }
+});
+    video.addEventListener('playing', () => { _bgErrorCount = 0; _bgSwitchCount = 0; _bgPlayedOnce = true; clearTimeout(stallTimer); });
     let stallTimer = null;
     video.addEventListener('waiting', () => {
       stallTimer = setTimeout(() => { if (video.readyState < 2 && _bgErrorCount <= 2) reloadBackground(); }, 5000);
@@ -697,21 +569,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   injectNetToggleBtn();
   updateNetToggleBtn();
 
-  // ── 模式切换：绑定主标题点击 ──
-  const titleEl = document.getElementById('site-title');
-  if (titleEl) {
-    titleEl.addEventListener('click', toggleModeMenu);
-  }
-
-  // 点空白关闭菜单
-  document.addEventListener('click', (e) => {
-    if (_modeMenuEl && !_modeMenuEl.contains(e.target)) closeModeMenu();
-  });
-
-  // 窗口变化时重新定位
-  window.addEventListener('resize', () => { if (_modeMenuOpen) positionModeMenu(); });
-  window.addEventListener('scroll', () => { if (_modeMenuOpen) positionModeMenu(); }, { passive: true });
-
   document.getElementById('engineTrigger').addEventListener('click', toggleEnginePanel);
   document.getElementById('searchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter')  doSearch();
@@ -729,8 +586,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:2rem;">链接数据加载失败，请检查 links.json 文件。</p>';
   }
 });
-
-function showCityEditor() {
+   function showCityEditor() {
   const saved = JSON.parse(localStorage.getItem('weather_city') || 'null');
   const overlay = document.createElement('div');
   overlay.style.cssText = `
@@ -792,17 +648,17 @@ function showCityEditor() {
           font-family:inherit;font-size:0.85rem;transition:background 0.15s;
         `;
         btn.addEventListener('click', () => {
-          selectedCity = { name: city.name, lat: city.latitude, lon: city.longitude };
-          selectedEl.textContent = `已选：${label}（${city.latitude.toFixed(4)}, ${city.longitude.toFixed(4)}）`;
-          saveBtn.disabled = false;
-          saveBtn.style.opacity = '1';
-          resultsEl.querySelectorAll('button').forEach(b => {
-            b.style.background = 'rgba(255,255,255,0.05)';
-            b.style.border = '1px solid rgba(255,255,255,0.1)';
-          });
-          btn.style.background = 'rgba(76,175,80,0.25)';
-          btn.style.border = '1px solid rgba(76,175,80,0.6)';
-        });
+  selectedCity = { name: city.name, lat: city.latitude, lon: city.longitude };
+  selectedEl.textContent = `已选：${label}（${city.latitude.toFixed(4)}, ${city.longitude.toFixed(4)}）`;
+  saveBtn.disabled = false;
+  saveBtn.style.opacity = '1';
+  resultsEl.querySelectorAll('button').forEach(b => {
+    b.style.background = 'rgba(255,255,255,0.05)';
+    b.style.border = '1px solid rgba(255,255,255,0.1)';
+  });
+  btn.style.background = 'rgba(76,175,80,0.25)';
+  btn.style.border = '1px solid rgba(76,175,80,0.6)';
+});
         resultsEl.appendChild(btn);
       });
     } catch {
