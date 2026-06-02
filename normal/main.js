@@ -602,7 +602,10 @@ if (isProtected) {
 
     h2.style.cursor = 'pointer';
 
-    h2.addEventListener('click', async () => {
+    h2.style.cursor = 'pointer';
+
+h2.addEventListener('click', async (e) => {
+    e.stopPropagation();
 
         if (sessionStorage.getItem(section) === 'ok') {
             grid.style.display =
