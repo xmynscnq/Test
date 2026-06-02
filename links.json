@@ -1249,7 +1249,8 @@
     ]
   },
   {
-    "section": "🔒Dark Web",
+    "section": "🔒密码访问",
+    "protected": true,
     "items": [
       {
         "title": "Dread",
