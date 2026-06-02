@@ -589,9 +589,15 @@ function renderCards(sections) {
   sections.forEach(({ section, items, protected: isProtected }) => {
     const sec  = document.createElement('div');
     sec.className = 'section';
-    const h2   = document.createElement('h2');
-    h2.className = 'section-title';
-    h2.textContent = section;
+   
+const h2 = document.createElement('h2');
+h2.className = 'section-title';
+
+const titleText = document.createElement('span');
+titleText.textContent = section;
+
+h2.appendChild(titleText);
+
 sec.appendChild(h2);
 
 const grid = document.createElement('div');
@@ -600,9 +606,9 @@ grid.className = 'link-container';
 if (isProtected) {
     grid.style.display = 'none';
 
-    h2.style.cursor = 'pointer';
+    titleText.style.cursor = 'pointer';
 
-h2.addEventListener('click', async () => {
+    titleText.addEventListener('click', async () => {
 
         if (sessionStorage.getItem(section) === 'ok') {
             grid.style.display =
