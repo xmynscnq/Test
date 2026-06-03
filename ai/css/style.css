@@ -60,9 +60,11 @@ body {
   font-size: 50px; font-weight: 200;
   color: rgba(255,255,255,.95);
   text-shadow: 0 3px 24px rgba(80,130,190,.5);
-  letter-spacing: 8px; margin-top: 60px; cursor: default;
-  position: relative; z-index: 2; pointer-events: none;
+  letter-spacing: 8px; margin-top: 60px; cursor: pointer;
+  position: relative; z-index: 2; pointer-events: auto;
+  transition: opacity .15s; user-select: none;
 }
+#site-title:hover { opacity: .78; }
 
 /* ===== 搜索框 ===== */
 #search-wrap {
