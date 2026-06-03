@@ -29,6 +29,19 @@
     }
     .navbar-brand-text:hover { color: rgba(255,255,255,0.85); }
 
+    const PROTECTED_PASSWORD_HASH =
+  'e5b560baff2258b7f00c54fb2871e3c45a575af15affb7d5b93a9ac3cba1f772';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(str)
+  );
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
     /* ── 模式切换区（navbar 内横排） ── */
     #mode-switcher {
       display: none; /* JS 控制 open 状态 */
@@ -429,13 +442,18 @@ function renderLinks(data) {
   const main = document.getElementById('content');
   if (!main) return;
   main.innerHTML = '';
-  data.forEach(({ section, items }) => {
+  data.forEach(({ section, items, protected: isProtected }) => {
     const ul = document.createElement('ul');
     ul.className = 'mylist row';
     const titleLi = document.createElement('li');
     titleLi.className = 'title';
     titleLi.textContent = section;
     ul.appendChild(titleLi);
+
+    const itemsWrapper = document.createElement('div');
+    itemsWrapper.style.cssText = 'display:contents';
+    if (isProtected) itemsWrapper.style.display = 'none';
+
     items.forEach(item => {
       const url     = getCardUrl(item);
       const iconSrc = item.icon || faviconSrc(url);
@@ -443,8 +461,29 @@ function renderLinks(data) {
       const li = document.createElement('li');
       li.className = 'col-3 col-sm-3 col-md-2 col-lg-1 site-item';
       li.innerHTML = `<a href="${url}" target="_blank"><div class="site-icon-wrap"><img src="${iconSrc}" onerror="this.src='${DEFAULT_ICON}';this.onerror=null;" alt="${title}"></div><span class="site-name">${title}</span></a>`;
-      ul.appendChild(li);
+      itemsWrapper.appendChild(li);
     });
+
+    if (isProtected) {
+      titleLi.style.cursor = 'pointer';
+      titleLi.addEventListener('click', async () => {
+        if (sessionStorage.getItem(section) === 'ok') {
+          itemsWrapper.style.display = itemsWrapper.style.display === 'none' ? 'contents' : 'none';
+          return;
+        }
+        const pwd = prompt('请输入访问密码');
+        if (!pwd) return;
+        const hash = await sha256(pwd);
+        if (hash === PROTECTED_PASSWORD_HASH) {
+          sessionStorage.setItem(section, 'ok');
+          itemsWrapper.style.display = 'contents';
+        } else {
+          alert('密码错误');
+        }
+      });
+    }
+
+    ul.appendChild(itemsWrapper);
     main.appendChild(ul);
   });
 }
