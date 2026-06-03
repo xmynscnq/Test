@@ -2,6 +2,19 @@
    王五导航 · AI检索 · main.js
    =========================== */
 
+const PROTECTED_PASSWORD_HASH =
+  'e5b560baff2258b7f00c54fb2871e3c45a575af15affb7d5b93a9ac3cba1f772';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(str)
+  );
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 const WORKER_URL    = 'https://ico.xmynscnq.dpdns.org';
 const AI_WORKER_URL = 'https://www.scnq.us.ci';
 const LINKS_FILE    = '../links.json';
@@ -242,24 +255,68 @@ window.toggleModel = toggleModel;
 function renderShortcuts(sections) {
   const container = document.getElementById('shortcutGrid');
   if (!container) return;
-  container.innerHTML = sections.map(({ section, items }) => {
-    const cards = items.map(item => {
+  container.innerHTML = '';
+
+  sections.forEach(({ section, items, protected: isProtected }) => {
+    const catEl = document.createElement('div');
+    catEl.className = 'shortcut-category';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'shortcut-category-title';
+
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = section;
+    titleEl.appendChild(titleSpan);
+    catEl.appendChild(titleEl);
+
+    const gridEl = document.createElement('div');
+    gridEl.className = 'shortcut-grid';
+
+    if (isProtected) {
+      gridEl.style.display = 'none';
+      titleSpan.style.cursor = 'pointer';
+      titleSpan.addEventListener('click', async () => {
+        if (sessionStorage.getItem(section) === 'ok') {
+          gridEl.style.display = gridEl.style.display === 'none' ? '' : 'none';
+          return;
+        }
+        const pwd = prompt('请输入访问密码');
+        if (!pwd) return;
+        const hash = await sha256(pwd);
+        if (hash === PROTECTED_PASSWORD_HASH) {
+          sessionStorage.setItem(section, 'ok');
+          gridEl.style.display = '';
+        } else {
+          alert('密码错误');
+        }
+      });
+    }
+
+    items.forEach(item => {
       const url  = getCardUrl(item);
-      const icon = item.icon
-        ? `<img src="${item.icon}" onerror="this.parentElement.textContent='${(item.title||'?').charAt(0).toUpperCase()}';this.onerror=null;">`
-        : `<img src="${faviconSrc(url)}" onerror="this.parentElement.textContent='${(item.title||'?').charAt(0).toUpperCase()}';this.onerror=null;">`;
-      return `
-        <a href="${url}" target="_blank" class="shortcut-card" rel="noopener noreferrer">
-          <div class="shortcut-avatar">${icon}</div>
-          <span class="shortcut-name">${item.title||''}</span>
-        </a>`;
-    }).join('');
-    return `
-      <div class="shortcut-category">
-        <div class="shortcut-category-title">${section}</div>
-        <div class="shortcut-grid">${cards}</div>
-      </div>`;
-  }).join('');
+      const initial = (item.title || '?').charAt(0).toUpperCase();
+      const a = document.createElement('a');
+      a.href      = url;
+      a.target    = '_blank';
+      a.className = 'shortcut-card';
+      a.rel       = 'noopener noreferrer';
+      const avatar = document.createElement('div');
+      avatar.className = 'shortcut-avatar';
+      const img = document.createElement('img');
+      img.src = item.icon ? item.icon : faviconSrc(url);
+      img.onerror = function () { avatar.textContent = initial; this.onerror = null; };
+      avatar.appendChild(img);
+      const name = document.createElement('span');
+      name.className   = 'shortcut-name';
+      name.textContent = item.title || '';
+      a.appendChild(avatar);
+      a.appendChild(name);
+      gridEl.appendChild(a);
+    });
+
+    catEl.appendChild(gridEl);
+    container.appendChild(catEl);
+  });
 }
 
 function handleSearch() {
