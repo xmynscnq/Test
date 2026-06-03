@@ -447,7 +447,9 @@ function renderLinks(data) {
     ul.className = 'mylist row';
     const titleLi = document.createElement('li');
     titleLi.className = 'title';
-    titleLi.textContent = section;
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = section;
+    titleLi.appendChild(titleSpan);
     ul.appendChild(titleLi);
 
     const itemsWrapper = document.createElement('div');
@@ -465,8 +467,8 @@ function renderLinks(data) {
     });
 
     if (isProtected) {
-      titleLi.style.cursor = 'pointer';
-      titleLi.addEventListener('click', async () => {
+      titleSpan.style.cursor = 'pointer';
+      titleSpan.addEventListener('click', async () => {
         if (sessionStorage.getItem(section) === 'ok') {
           itemsWrapper.style.display = itemsWrapper.style.display === 'none' ? 'contents' : 'none';
           return;
