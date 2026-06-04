@@ -120,7 +120,8 @@ Nav._renderLinksContent = function(filter) {
     return `
       <div class="nav-icon" draggable="true"
            data-url="${url}" data-name="${item.title || ''}"
-           data-color="rgba(200,210,230,0.3)" data-letter="${initial}">
+           data-color="rgba(200,210,230,0.3)" data-letter="${initial}"
+           data-favicon="${favicon}">
         <div class="nav-icon-body nav-icon-favicon"
              style="background:rgba(255,255,255,0.85);">${faviconHtml}</div>
         <div class="nav-icon-label">${item.title || ''}</div>
@@ -135,6 +136,7 @@ Nav._renderLinksContent = function(filter) {
       ev.dataTransfer.setData('navIcon', JSON.stringify({
         label: el.dataset.name, color: el.dataset.color,
         letter: el.dataset.letter, url: el.dataset.url,
+        favicon: el.dataset.favicon,
       }));
       window._dragSize = '1x1';
     });
@@ -144,12 +146,29 @@ Nav._renderLinksContent = function(filter) {
       const menu = document.getElementById('ctx-menu');
       menu.innerHTML = '<div class="ctx-item">➕ 添加到桌面</div>';
       menu.querySelector('.ctx-item').onclick = () => {
-        Nav.addToDesktop(el.dataset.name, el.dataset.color, el.dataset.letter, el.dataset.url);
+        Nav.addToDesktop(el.dataset.name, el.dataset.color, el.dataset.letter, el.dataset.url, '1x1', el.dataset.favicon);
         hideCtxMenu && hideCtxMenu();
       };
       menu.style.cssText = `display:block;left:${Math.min(ev.clientX, innerWidth-180)}px;top:${Math.min(ev.clientY, innerHeight-80)}px;`;
     });
   });
+};
+
+/* ── 覆盖 addToDesktop，支持 favicon ── */
+Nav.addToDesktop = function(name, color, letter, url, size, favicon) {
+  size = size || '1x1';
+  const it = {
+    id: 'ni' + Date.now(), type: 'icon', size,
+    label: name, bgClass: '', _customBg: color,
+    emoji: letter.slice(0, 2), url,
+    col: 0, row: 0,
+  };
+  if (favicon) it._favicon = favicon;
+  const result = placeWithShift(App.curPage, it, 0, 0);
+  if (!result) { alert('本页无空间，请新建分页'); return; }
+  it.col = result.col; it.row = result.row;
+  App.pages[App.curPage].push(it);
+  saveData(); renderAll();
 };
 
 /* ── 覆盖 onSearch ── */
