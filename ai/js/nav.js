@@ -44,20 +44,9 @@ const Nav = {
           label:el.dataset.name,color:el.dataset.color,
           letter:el.dataset.letter,url:el.dataset.url}));
         window._dragSize='1x1';
-        /* nav 面板置为不可穿透，让 elementFromPoint 能找到背后的文件夹 grid */
-        const srcOverlay = el.closest('.modal-overlay');
-        if(srcOverlay) {
-          srcOverlay._prevPE = srcOverlay.style.pointerEvents;
-          srcOverlay.style.pointerEvents = 'none';
-          window._dragSrcOverlay = srcOverlay;
-        }
       });
       el.addEventListener('dragend',()=>{
         window._dragSize=null;
-        if(window._dragSrcOverlay) {
-          window._dragSrcOverlay.style.pointerEvents = window._dragSrcOverlay._prevPE || '';
-          window._dragSrcOverlay = null;
-        }
       });
       el.addEventListener('contextmenu',ev=>{
         ev.preventDefault();ev.stopPropagation();
@@ -119,11 +108,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!hideGhost||!showGhost) return;
 
     const sz = window._dragSize || '1x1';
-
-    const _srcOverlay = window._dragSrcOverlay;
-    if(_srcOverlay) _srcOverlay.style.visibility = 'hidden';
     const _realUnder = document.elementFromPoint(e.clientX, e.clientY);
-    if(_srcOverlay) _srcOverlay.style.visibility = '';
 
     const _inFolderGrid = _realUnder?.closest('.folder-grid');
     const _inModalPanel = _realUnder?.closest('.modal-panel');
@@ -185,21 +170,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     const isFolderItem= !!e.dataTransfer.getData('folderItem');
     if(!isNavIcon && !isFolderItem) return;
 
-    /* ---- 落点判断：临时隐藏源面板，让 elementFromPoint 穿透到背后的元素 ---- */
-    const _srcOv = window._dragSrcOverlay;
-    if(_srcOv) _srcOv.style.visibility = 'hidden';
+    /* ---- 落点判断（用坐标）---- */
     const _dropUnder = document.elementFromPoint(e.clientX, e.clientY);
-    if(_srcOv) _srcOv.style.visibility = '';
-
     const targetFolderGrid = _dropUnder?.closest('.folder-grid');
     const targetDeskItem   = !targetFolderGrid && _dropUnder?.closest('.desk-item');
     const inOtherModal     = !targetFolderGrid && !targetDeskItem && _dropUnder?.closest('.modal-panel');
-
-    /* 落点确定后再恢复源面板 pointer-events */
-    if(window._dragSrcOverlay) {
-      window._dragSrcOverlay.style.pointerEvents = window._dragSrcOverlay._prevPE || '';
-      window._dragSrcOverlay = null;
-    }
 
     if(inOtherModal) return; // 落在非文件夹弹窗 → 取消
 
@@ -457,23 +432,11 @@ function _renderFolderGridEl(gridEl, item, pi){
       const it2=item.items[idx];
       ev.dataTransfer.setData('folderItem',JSON.stringify({idx,folderId:item.id,pi}));
       window._dragSize=(it2&&it2.size)||'1x1';
-      /* 拖动时源文件夹 overlay 不拦截鼠标，让目标文件夹能收到 dragover */
-      const srcOverlay = el.closest('.modal-overlay');
-      if(srcOverlay) {
-        srcOverlay._prevPE = srcOverlay.style.pointerEvents;
-        srcOverlay.style.pointerEvents = 'none';
-        window._dragSrcOverlay = srcOverlay;
-      }
     });
     el.addEventListener('dragend',()=>{
       window._dragSize=null;
       hideGhost&&hideGhost();
       _clearNavDragHighlight&&_clearNavDragHighlight();
-      /* 恢复源文件夹 pointer-events */
-      if(window._dragSrcOverlay) {
-        window._dragSrcOverlay.style.pointerEvents = window._dragSrcOverlay._prevPE || '';
-        window._dragSrcOverlay = null;
-      }
     });
   });
 }
