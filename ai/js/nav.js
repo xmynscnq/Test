@@ -166,11 +166,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     const isNavIcon   = !!e.dataTransfer.getData('navIcon');
     const isFolderItem= !!e.dataTransfer.getData('folderItem');
+    console.log('[DROP] isNavIcon=',isNavIcon,'isFolderItem=',isFolderItem,'target=',e.target,'xy=',e.clientX,e.clientY);
     if(!isNavIcon && !isFolderItem) return;
 
     /* ---- 落点判断（用坐标，避免跨弹窗时e.target在源弹窗）---- */
     const _dropUnder = document.elementFromPoint(e.clientX, e.clientY);
     const targetFolderGrid = _dropUnder?.closest('.folder-grid');
+    console.log('[DROP] _dropUnder=',_dropUnder,'targetFolderGrid=',targetFolderGrid);
     const targetDeskItem   = !targetFolderGrid && _dropUnder?.closest('.desk-item');
     const inOtherModal     = !targetFolderGrid && !targetDeskItem && e.target.closest('.modal-panel');
 
