@@ -104,25 +104,20 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     /* 在任何 modal-panel 内（含文件夹弹窗、nav面板等） */
     if(e.target.closest('.modal-panel')) {
-      hideGhost(); _clearNavDragHighlight();
+      _clearNavDragHighlight();
       if(typeof clearShiftPreview==='function') clearShiftPreview();
-      /* 用坐标检测鼠标下方是否有 folder-grid（跨弹窗拖拽关键：e.target在源弹窗） */
+      /* 用坐标检测鼠标下方是否有 folder-grid（跨弹窗拖拽：e.target可能在源弹窗） */
       const _under2 = document.elementFromPoint(e.clientX, e.clientY);
       const _fg = _under2?.closest('.folder-grid');
       if(_fg) {
         e.preventDefault();
-        e.dataTransfer.dropEffect='copy';
-        /* 手动触发目标 folder-grid 所在 overlay 的 dragover，确保浏览器允许 drop */
-        const _destOverlay = _fg.closest('.modal-overlay');
-        if(_destOverlay && _destOverlay !== e.target.closest('.modal-overlay')) {
-          const synth = new DragEvent('dragover', {
-            bubbles: true, cancelable: true,
-            clientX: e.clientX, clientY: e.clientY,
-            dataTransfer: e.dataTransfer,
-          });
-          _fg.dispatchEvent(synth);
-        }
+        e.dataTransfer.dropEffect = 'move';
+        /* Ghost 跟随鼠标，悬浮在目标文件夹 grid 上方 */
+        const sz = window._dragSize || '1x1';
+        const gs = ghostSize(sz);
+        showGhost(e.clientX - gs.w / 2, e.clientY - gs.h / 2, gs.w, gs.h, gs.r);
       } else {
+        hideGhost();
         e.preventDefault();
       }
       return;
@@ -401,8 +396,8 @@ function openFolderModal(item, pi) {
   /* 接受拖拽：整个overlay都preventDefault，让浏览器允许drop */
   overlay.addEventListener('dragover',e=>{
     e.preventDefault();
-    e.stopPropagation(); // 阻止冒泡，避免全局dragover的modal-panel分支干扰
-    e.dataTransfer.dropEffect = e.target.closest('.folder-grid') ? 'copy' : 'none';
+    /* 不 stopPropagation，让全局 dragover 统一处理 Ghost 和 dropEffect */
+    e.dataTransfer.dropEffect = e.target.closest('.folder-grid') ? 'move' : 'none';
   });
 
   Modal.open(existId);
