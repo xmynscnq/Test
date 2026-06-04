@@ -99,12 +99,11 @@ function _clearNavDragHighlight() {
    ================================================================ */
 document.addEventListener('DOMContentLoaded',()=>{
 
-  /* dragover */
+  /* dragover — 无条件 preventDefault，确保任何位置都能触发 drop */
   document.addEventListener('dragover',e=>{
-    // 只处理本应用的拖拽（有 _dragSize 标记）
-    if(!window._dragSize) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
+    if(!window._dragSize) return;
     if(!hideGhost||!showGhost) return;
 
     const sz = window._dragSize || '1x1';
@@ -381,14 +380,6 @@ function openFolderModal(item, pi) {
   document.body.appendChild(overlay);
 
   _refreshFolderOverlay(overlay, item, pi);
-
-  /* 接受拖拽：整个overlay都preventDefault，让浏览器允许drop */
-  overlay.addEventListener('dragover',e=>{
-    e.preventDefault();
-    /* 用坐标判断是否在 folder-grid 上，不用 e.target（跨弹窗时e.target在源面板） */
-    const _under = document.elementFromPoint(e.clientX, e.clientY);
-    e.dataTransfer.dropEffect = _under?.closest('.folder-grid') ? 'move' : 'copy';
-  });
 
   Modal.open(existId);
 }
