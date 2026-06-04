@@ -102,19 +102,16 @@ document.addEventListener('DOMContentLoaded',()=>{
     e.preventDefault();
     if(!hideGhost||!showGhost) return;
 
-    /* 在文件夹grid内 → 允许drop，不显示ghost */
-    if(e.target.closest('.folder-grid')) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect='copy';
-      hideGhost(); _clearNavDragHighlight();
-      if(typeof clearShiftPreview==='function') clearShiftPreview();
-      return;
-    }
-    /* 在非文件夹弹窗内（nav面板、设置等）→ 隐藏ghost，但仍 preventDefault 允许drop到文件夹 */
+    /* 在任何 modal-panel 内（含文件夹弹窗、nav面板等） */
     if(e.target.closest('.modal-panel')) {
       e.preventDefault();
       hideGhost(); _clearNavDragHighlight();
       if(typeof clearShiftPreview==='function') clearShiftPreview();
+      /* 检查鼠标下方是否有 folder-grid（跨弹窗拖拽时 e.target 在源弹窗，需用坐标检测目标） */
+      const _under = document.elementFromPoint(e.clientX, e.clientY);
+      if(_under?.closest('.folder-grid')) {
+        e.dataTransfer.dropEffect='copy';
+      }
       return;
     }
 
@@ -171,10 +168,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     const isFolderItem= !!e.dataTransfer.getData('folderItem');
     if(!isNavIcon && !isFolderItem) return;
 
-    /* ---- 落点判断 ---- */
-    const targetFolderGrid = e.target.closest('.folder-grid');   // 落在某个展开文件夹的grid
-    const targetDeskItem   = !targetFolderGrid && document.elementFromPoint(e.clientX,e.clientY)?.closest('.desk-item');
-    const inOtherModal     = !targetFolderGrid && e.target.closest('.modal-panel'); // 落在其他弹窗里
+    /* ---- 落点判断（用坐标，避免跨弹窗时e.target在源弹窗）---- */
+    const _dropUnder = document.elementFromPoint(e.clientX, e.clientY);
+    const targetFolderGrid = _dropUnder?.closest('.folder-grid');
+    const targetDeskItem   = !targetFolderGrid && _dropUnder?.closest('.desk-item');
+    const inOtherModal     = !targetFolderGrid && !targetDeskItem && e.target.closest('.modal-panel');
 
     if(inOtherModal) return; // 落在非文件夹弹窗 → 取消
 
