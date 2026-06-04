@@ -175,9 +175,11 @@ document.addEventListener('DOMContentLoaded',()=>{
           if(targetFolder) {
             /* 问题5：防止重复添加（用url去重） */
             if(!targetFolder.items.find(i=>i.url===d.url)){
-              targetFolder.items.push({id:'ni'+Date.now(),type:'icon',size:'1x1',
+              const _fi1={id:'ni'+Date.now(),type:'icon',size:'1x1',
                 label:d.label,bgClass:'',_customBg:d.color,
-                emoji:d.letter.slice(0,2),url:d.url,col:0,row:0});
+                emoji:d.letter.slice(0,2),url:d.url,col:0,row:0};
+              if(d.favicon) _fi1._favicon=d.favicon;
+              targetFolder.items.push(_fi1);
             }
             saveData(); renderAll();
             _refreshFolderOverlay(overlayEl, targetFolder, targetPi);
@@ -188,6 +190,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
       const newIt={id:'ni'+Date.now(),type:'icon',size:'1x1',label:d.label,
         bgClass:'',_customBg:d.color,emoji:d.letter.slice(0,2),url:d.url,col:0,row:0};
+      if(d.favicon) newIt._favicon=d.favicon;
 
       /* A2. 落在桌面图标/文件夹上 → 合并 */
       if(targetDeskItem){
