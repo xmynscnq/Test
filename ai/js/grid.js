@@ -705,7 +705,13 @@ function renderDots(){
     }
   }
 }
-function goPage(idx){App.curPage=idx;applyPageTransform(idx,true);renderDots();}
+function goPage(idx){
+  /* 问题4修复：切换分页前关闭所有打开的弹窗（文件夹、设置、导航等） */
+  document.querySelectorAll('.modal-overlay.open').forEach(ov => {
+    Modal.close(ov.id);
+  });
+  App.curPage=idx;applyPageTransform(idx,true);renderDots();
+}
 function deletePage(pi){
   if(App.pageCount<=1){alert('至少保留一页！');return;}
   const pageItems = (App.pages[pi]||[]);
