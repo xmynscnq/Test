@@ -229,13 +229,14 @@
         </div>
       </div>
 
-      <!-- 网络模式 -->
+      <!-- 内外网切换 -->
       <div class="st-section">
         <h3>网络模式</h3>
         <div class="net-row">
-          <div class="net-opt active" data-net="cn"     onclick="Nav.switchNet(this)">🇨🇳 国内</div>
-          <div class="net-opt"        data-net="global" onclick="Nav.switchNet(this)">🌍 国际</div>
+          <div class="net-opt" id="net-opt-internet" onclick="App.setNetMode('internet',this)">🌐 外网</div>
+          <div class="net-opt" id="net-opt-intranet" onclick="App.setNetMode('intranet',this)">🏠 内网</div>
         </div>
+        <p style="font-size:11px;color:#aaa;margin-top:6px;">切换后导航链接将使用对应的内/外网地址</p>
       </div>
 
       <!-- 搜索引擎（新区块，由 JS 动态渲染） -->
