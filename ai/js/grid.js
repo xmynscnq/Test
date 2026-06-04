@@ -203,11 +203,17 @@ function buildItemHTML(item) {
             <div class="item-label">${item.label}</div>`;
   }
   if (item.size==='1x1') {
-    const iconInner = item._favicon
-      ? `<img src="${item._favicon}" alt="" style="width:58%;height:58%;object-fit:contain;border-radius:6px;"
-             onerror="this.parentNode.innerHTML='<div class=\"item-emoji\">${item.emoji||item.label.slice(0,2)}</div>';this.onerror=null;">`
-      : `<div class="item-emoji">${item.emoji||item.label.slice(0,2)}</div>`;
-    return `<div class="item-body" style="${bs}">${shine}${iconInner}</div>
+    if (item._favicon) {
+      const fallbackEmoji = item.emoji || item.label.slice(0,2);
+      return `<div class="item-body favicon-body" style="background:rgba(255,255,255,0.88);">${shine}
+                <img class="item-favicon-img" src="${item._favicon}" alt=""
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="item-emoji" style="display:none;">${fallbackEmoji}</div>
+              </div>
+              <div class="item-label">${item.label}</div>`;
+    }
+    return `<div class="item-body" style="${bs}">${shine}
+              <div class="item-emoji">${item.emoji||item.label.slice(0,2)}</div></div>
             <div class="item-label">${item.label}</div>`;
   }
   if (item.size==='2x1') {
