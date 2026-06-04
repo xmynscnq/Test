@@ -418,6 +418,34 @@ document.addEventListener('mouseup', e => {
   hideGhost();
   if (!drag.moved) { drag=null; return; }
 
+  /* 检查是否落在展开文件夹的 grid 上 */
+  drag.el.style.pointerEvents = 'none';
+  const underEl = document.elementFromPoint(e.clientX, e.clientY);
+  drag.el.style.pointerEvents = '';
+  const targetFolderGrid = underEl?.closest('.folder-grid');
+  if (targetFolderGrid) {
+    const overlayEl = targetFolderGrid.closest('.modal-overlay');
+    if (overlayEl) {
+      const folderId = overlayEl.id.replace('folder-inst-','');
+      let targetFolder=null, targetPi=null;
+      for (let p=0; p<App.pages.length; p++) {
+        const f = App.pages[p]?.find(i=>i.id===folderId);
+        if (f) { targetFolder=f; targetPi=p; break; }
+      }
+      if (targetFolder && drag.item.id !== folderId) {
+        /* 从桌面移入文件夹 */
+        App.pages[drag.pi] = App.pages[drag.pi].filter(i=>i.id!==drag.item.id);
+        if (!targetFolder.items.find(i=>i.id===drag.item.id))
+          targetFolder.items.push(drag.item);
+        finalizeDrag();
+        /* 刷新文件夹弹窗 */
+        if (typeof _refreshFolderOverlay === 'function')
+          _refreshFolderOverlay(overlayEl, targetFolder, targetPi);
+        return;
+      }
+    }
+  }
+
   const pi   = App.curPage;
   const area = getGridArea(pi);
   const ar   = area?.getBoundingClientRect();
