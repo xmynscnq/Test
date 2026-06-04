@@ -112,14 +112,15 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   /* dragover */
   document.addEventListener('dragover',e=>{
+    // 只处理本应用的拖拽（有 _dragSize 标记）
+    if(!window._dragSize) return;
     e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
     if(!hideGhost||!showGhost) return;
 
     const sz = window._dragSize || '1x1';
 
-    /* 用坐标判断鼠标实际所在位置（穿透 pointerEvents:none 的源面板） */
     const _srcOverlay = window._dragSrcOverlay;
-    /* 临时完全隐藏源面板，让 elementFromPoint 看到背后的元素 */
     if(_srcOverlay) _srcOverlay.style.visibility = 'hidden';
     const _realUnder = document.elementFromPoint(e.clientX, e.clientY);
     if(_srcOverlay) _srcOverlay.style.visibility = '';
@@ -131,31 +132,24 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(typeof clearShiftPreview==='function') clearShiftPreview();
 
     if(_inFolderGrid) {
-      /* 鼠标在文件夹 grid 上：Ghost 跟随 */
-      e.dataTransfer.dropEffect = 'move';
       const gs = ghostSize(sz);
       showGhost(e.clientX - gs.w / 2, e.clientY - gs.h / 2, gs.w, gs.h, gs.r);
       return;
     }
 
     if(_inModalPanel) {
-      /* 鼠标在其他弹窗内（非文件夹grid）：隐藏Ghost，不做让位 */
       hideGhost();
       return;
     }
 
-    /* 鼠标在桌面区域 */
     hideGhost();
-    const under = _realUnder;
-    const deskTarget = under?.closest('.desk-item');
-
+    const deskTarget = _realUnder?.closest('.desk-item');
     if(deskTarget) {
       if(_navDragOver !== deskTarget) {
         _clearNavDragHighlight();
         _navDragOver = deskTarget;
         deskTarget.classList.add('merge-target');
       }
-      hideGhost();
     } else {
       _clearNavDragHighlight();
       const area = getGridArea(App.curPage);
@@ -416,8 +410,9 @@ function openFolderModal(item, pi) {
   /* 接受拖拽：整个overlay都preventDefault，让浏览器允许drop */
   overlay.addEventListener('dragover',e=>{
     e.preventDefault();
-    /* 不 stopPropagation，让全局 dragover 统一处理 Ghost 和 dropEffect */
-    e.dataTransfer.dropEffect = e.target.closest('.folder-grid') ? 'move' : 'none';
+    /* 用坐标判断是否在 folder-grid 上，不用 e.target（跨弹窗时e.target在源面板） */
+    const _under = document.elementFromPoint(e.clientX, e.clientY);
+    e.dataTransfer.dropEffect = _under?.closest('.folder-grid') ? 'move' : 'copy';
   });
 
   Modal.open(existId);
