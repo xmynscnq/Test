@@ -184,21 +184,24 @@ document.addEventListener('DOMContentLoaded',()=>{
     hideGhost&&hideGhost();
     _clearNavDragHighlight();
     typeof clearShiftPreview==='function' && clearShiftPreview();
-    /* 恢复源文件夹 pointer-events */
-    if(window._dragSrcOverlay) {
-      window._dragSrcOverlay.style.pointerEvents = window._dragSrcOverlay._prevPE || '';
-      window._dragSrcOverlay = null;
-    }
 
     const isNavIcon   = !!e.dataTransfer.getData('navIcon');
     const isFolderItem= !!e.dataTransfer.getData('folderItem');
     if(!isNavIcon && !isFolderItem) return;
 
-    /* ---- 落点判断（用坐标，避免跨弹窗时e.target在源弹窗）---- */
+    /* ---- 落点判断（用坐标，避免跨弹窗时e.target在源弹窗）----
+       必须在恢复 pointerEvents 之前调用 elementFromPoint，
+       否则源面板已恢复拦截，找不到背后的 folder-grid */
     const _dropUnder = document.elementFromPoint(e.clientX, e.clientY);
     const targetFolderGrid = _dropUnder?.closest('.folder-grid');
     const targetDeskItem   = !targetFolderGrid && _dropUnder?.closest('.desk-item');
     const inOtherModal     = !targetFolderGrid && !targetDeskItem && e.target.closest('.modal-panel');
+
+    /* 落点确定后再恢复源面板 pointer-events */
+    if(window._dragSrcOverlay) {
+      window._dragSrcOverlay.style.pointerEvents = window._dragSrcOverlay._prevPE || '';
+      window._dragSrcOverlay = null;
+    }
 
     if(inOtherModal) return; // 落在非文件夹弹窗 → 取消
 
