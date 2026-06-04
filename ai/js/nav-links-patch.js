@@ -1,29 +1,31 @@
 /* ============================================================
    nav-links-patch.js
-   覆盖 Nav.render / Nav.renderContent，从 links.json 加载数据
-   必须在 nav.js 之后加载
+   覆盖 Nav.render / Nav.renderContent，从 links.json 加载
+   支持密码保护分区、内外网切换、favicon 显示
    ============================================================ */
 
 const LINKS_FILE_PATH = '../links.json';
 const FAVICON_WORKER  = 'https://ico.xmynscnq.dpdns.org';
+const NAV_PWD_HASH    = 'e5b560baff2258b7f00c54fb2871e3c45a575af15affb7d5b93a9ac3cba1f772';
 
-/* links.json 缓存 */
-Nav._linksData   = null;   // 原始数组 [{section, items, protected?}]
-Nav._linksNet    = 'internet'; // 'intranet' | 'internet'，与 LinksNav 共享
+async function navSha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 
-/* 获取域名 */
-Nav._domain = function(url) {
-  try { return new URL(url).hostname; } catch { return null; }
-};
+Nav._linksData = null;
 
-/* favicon URL */
-Nav._favicon = function(item, url) {
+Nav._domain = url => { try { return new URL(url).hostname; } catch { return null; } };
+Nav._favicon = (item, url) => {
   if (item.icon) return item.icon;
   const d = Nav._domain(url);
   return d ? `${FAVICON_WORKER}/?domain=${d}` : '';
 };
+Nav._itemUrl = item => {
+  const intranet = localStorage.getItem('netMode') === 'intranet';
+  return (intranet && item.intranet) ? item.intranet : item.url;
+};
 
-/* 加载 links.json（只加载一次，缓存） */
 Nav._loadLinks = async function() {
   if (Nav._linksData) return Nav._linksData;
   try {
@@ -36,13 +38,7 @@ Nav._loadLinks = async function() {
   return Nav._linksData;
 };
 
-/* 获取当前网络模式下某条目的 URL */
-Nav._itemUrl = function(item) {
-  const intranet = localStorage.getItem('netMode') === 'intranet';
-  return (intranet && item.intranet) ? item.intranet : item.url;
-};
-
-/* ── 覆盖 render：异步加载 links.json，渲染侧边栏 ── */
+/* ── 渲染侧边栏 ── */
 Nav.render = async function() {
   const sidebar = document.getElementById('nav-sidebar');
   const content = document.getElementById('nav-content');
@@ -57,29 +53,43 @@ Nav.render = async function() {
     return;
   }
 
-  // 侧边栏：分类列表
-  if (!Nav.curCat || !data.find(s => s.section === Nav.curCat)) {
+  if (!Nav.curCat || !data.find(s => s.section === Nav.curCat))
     Nav.curCat = data[0].section;
-  }
 
   sidebar.innerHTML = data.map(s => `
     <div class="nav-cat${s.section === Nav.curCat ? ' active' : ''}"
-         onclick="Nav.setCatLinks('${s.section.replace(/'/g, "\\'")}')">${s.section}</div>
+         onclick="Nav.setCatLinks('${s.section.replace(/'/g,"\\'")}')">
+      ${s.protected ? '🔒 ' : ''}${s.section}
+    </div>
   `).join('');
 
-  const inp = document.getElementById('nav-search-input');
-  if (inp) inp.value = '';
+  document.getElementById('nav-search-input')?.value !== undefined &&
+    (document.getElementById('nav-search-input').value = '');
 
   Nav._renderLinksContent('');
 };
 
-/* ── 切换分类 ── */
-Nav.setCatLinks = function(section) {
+/* ── 切换分类（含密码验证） ── */
+Nav.setCatLinks = async function(section) {
+  const data = Nav._linksData || [];
+  const sec  = data.find(s => s.section === section);
+
+  if (sec && sec.protected) {
+    const key = 'nav_pwd_' + section;
+    if (sessionStorage.getItem(key) !== 'ok') {
+      const pwd = prompt(`「${section}」需要密码`);
+      if (!pwd) return;
+      const hash = await navSha256(pwd);
+      if (hash !== NAV_PWD_HASH) { alert('密码错误'); return; }
+      sessionStorage.setItem(key, 'ok');
+    }
+  }
+
   Nav.curCat = section;
   document.querySelectorAll('.nav-cat').forEach(el =>
-    el.classList.toggle('active', el.textContent === section));
-  const inp = document.getElementById('nav-search-input');
-  if (inp) inp.value = '';
+    el.classList.toggle('active', el.textContent.trim().replace(/^🔒\s*/,'') === section));
+  document.getElementById('nav-search-input') &&
+    (document.getElementById('nav-search-input').value = '');
   Nav._renderLinksContent('');
 };
 
@@ -92,16 +102,19 @@ Nav._renderLinksContent = function(filter) {
   let items = [];
 
   if (kw) {
-    // 搜索模式：跨所有分类搜索
     Nav._linksData.forEach(s => {
+      if (s.protected && sessionStorage.getItem('nav_pwd_' + s.section) !== 'ok') return;
       (s.items || []).forEach(item => {
         if (item.title && item.title.toLowerCase().includes(kw)) items.push(item);
       });
     });
   } else {
-    // 分类模式
-    const section = Nav._linksData.find(s => s.section === Nav.curCat);
-    items = section ? (section.items || []) : [];
+    const sec = Nav._linksData.find(s => s.section === Nav.curCat);
+    if (sec && sec.protected && sessionStorage.getItem('nav_pwd_' + sec.section) !== 'ok') {
+      content.innerHTML = '<div class="nav-empty">🔒 该分类受密码保护，请从左侧点击解锁</div>';
+      return;
+    }
+    items = sec ? (sec.items || []) : [];
   }
 
   if (!items.length) {
@@ -134,8 +147,10 @@ Nav._renderLinksContent = function(filter) {
     el.addEventListener('dragstart', ev => {
       ev.dataTransfer.effectAllowed = 'copy';
       ev.dataTransfer.setData('navIcon', JSON.stringify({
-        label: el.dataset.name, color: el.dataset.color,
-        letter: el.dataset.letter, url: el.dataset.url,
+        label:   el.dataset.name,
+        color:   el.dataset.color,
+        letter:  el.dataset.letter,
+        url:     el.dataset.url,
         favicon: el.dataset.favicon,
       }));
       window._dragSize = '1x1';
@@ -149,19 +164,18 @@ Nav._renderLinksContent = function(filter) {
         Nav.addToDesktop(el.dataset.name, el.dataset.color, el.dataset.letter, el.dataset.url, '1x1', el.dataset.favicon);
         hideCtxMenu && hideCtxMenu();
       };
-      menu.style.cssText = `display:block;left:${Math.min(ev.clientX, innerWidth-180)}px;top:${Math.min(ev.clientY, innerHeight-80)}px;`;
+      menu.style.cssText = `display:block;left:${Math.min(ev.clientX,innerWidth-180)}px;top:${Math.min(ev.clientY,innerHeight-80)}px;`;
     });
   });
 };
 
-/* ── 覆盖 addToDesktop，支持 favicon ── */
+/* ── addToDesktop 支持 favicon ── */
 Nav.addToDesktop = function(name, color, letter, url, size, favicon) {
   size = size || '1x1';
   const it = {
     id: 'ni' + Date.now(), type: 'icon', size,
     label: name, bgClass: '', _customBg: color,
-    emoji: letter.slice(0, 2), url,
-    col: 0, row: 0,
+    emoji: letter.slice(0, 2), url, col: 0, row: 0,
   };
   if (favicon) it._favicon = favicon;
   const result = placeWithShift(App.curPage, it, 0, 0);
@@ -171,13 +185,10 @@ Nav.addToDesktop = function(name, color, letter, url, size, favicon) {
   saveData(); renderAll();
 };
 
-/* ── 覆盖 onSearch ── */
-Nav.onSearch = function(val) { Nav._renderLinksContent(val); };
+Nav.onSearch  = val     => Nav._renderLinksContent(val);
+Nav.setCat    = section => Nav.setCatLinks(section);
 
-/* ── 覆盖 setCat（兼容旧调用） ── */
-Nav.setCat = function(section) { Nav.setCatLinks(section); };
-
-/* ── 搜索框 favicon 图标样式补丁 ── */
+/* ── favicon 图标在导航面板内的样式 ── */
 document.addEventListener('DOMContentLoaded', () => {
   const style = document.createElement('style');
   style.textContent = `
@@ -188,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
       font-size: 16px;
       font-weight: 700;
       color: #555;
+      border-radius: 12px !important;
     }
   `;
   document.head.appendChild(style);
