@@ -102,15 +102,20 @@ document.addEventListener('DOMContentLoaded',()=>{
     e.preventDefault();
     if(!hideGhost||!showGhost) return;
 
-    /* 在非文件夹弹窗内 → 隐藏ghost，不高亮 */
-    if(e.target.closest('.modal-panel') && !e.target.closest('.folder-grid')) {
-      hideGhost(); _clearNavDragHighlight(); return;
-    }
-    /* 在文件夹grid内 → 允许drop（必须preventDefault），不显示ghost */
+    /* 在文件夹grid内 → 允许drop，不显示ghost */
     if(e.target.closest('.folder-grid')) {
       e.preventDefault();
-      e.dataTransfer.dropEffect='move';
-      hideGhost(); _clearNavDragHighlight(); return;
+      e.dataTransfer.dropEffect='copy';
+      hideGhost(); _clearNavDragHighlight();
+      if(typeof clearShiftPreview==='function') clearShiftPreview();
+      return;
+    }
+    /* 在非文件夹弹窗内（nav面板、设置等）→ 隐藏ghost，但仍 preventDefault 允许drop到文件夹 */
+    if(e.target.closest('.modal-panel')) {
+      e.preventDefault();
+      hideGhost(); _clearNavDragHighlight();
+      if(typeof clearShiftPreview==='function') clearShiftPreview();
+      return;
     }
 
     let sz='1x1';
@@ -121,24 +126,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     const deskTarget=under&&under.closest('.desk-item');
 
     if(deskTarget) {
+      // 悬停在桌面图标上：高亮合并目标，清除让位预览（避免图标被推开导致elementFromPoint失效）
       if(_navDragOver!==deskTarget) {
         _clearNavDragHighlight();
         _navDragOver=deskTarget;
         deskTarget.classList.add('merge-target');
       }
-      // 悬停在图标上时也做让位预览
-      const area=getGridArea(App.curPage);
-      if(area){
-        const ar=area.getBoundingClientRect();
-        const pageTop=(App.curPage===0)?GRID_TOP:20;
-        const fakeItem={size:sz,id:'__nav_drag__'};
-        const pc=Math.max(0,Math.floor((e.clientX-ar.left)/(CELL+GAP)));
-        const pr=Math.max(0,Math.floor((e.clientY-ar.top-pageTop)/(CELL+GAP)));
-        if(typeof applyShiftPreview==='function') applyShiftPreview(App.curPage,fakeItem,pc,pr);
-      }
-    } else {
-      _clearNavDragHighlight();
       if(typeof clearShiftPreview==='function') clearShiftPreview();
+      hideGhost();
+    } else {
+      // 悬停在空白处：清除合并高亮，做让位预览
+      _clearNavDragHighlight();
       const area=getGridArea(App.curPage);
       if(area){
         const ar=area.getBoundingClientRect();
@@ -150,6 +148,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         const gs=ghostSize(sz);
         showGhost(e.clientX-gs.w/2, e.clientY-gs.h/2, gs.w, gs.h, gs.r);
       } else {
+        if(typeof clearShiftPreview==='function') clearShiftPreview();
         const gs=ghostSize(sz);
         showGhost(e.clientX-gs.w/2, e.clientY-gs.h/2, gs.w, gs.h, gs.r);
       }
