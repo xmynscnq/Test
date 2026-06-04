@@ -110,8 +110,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const _realUnder = document.elementFromPoint(e.clientX, e.clientY);
 
     const _inFolderGrid = _realUnder?.closest('.folder-grid');
-    /* 问题1修复：不再对 modal-panel 提前 return，让 drop 能在所有区域触发 */
-    const _inModalPanel = !_inFolderGrid && _realUnder?.closest('.modal-panel');
+    const _inModalPanel = _realUnder?.closest('.modal-panel');
 
     _clearNavDragHighlight();
     if(typeof clearShiftPreview==='function') clearShiftPreview();
@@ -123,9 +122,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
 
     if(_inModalPanel) {
-      /* 在其他弹窗区域内：隐藏 ghost 但不 return，drop 仍可触发 */
       hideGhost();
-      _clearNavDragHighlight();
       return;
     }
 
@@ -169,30 +166,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     typeof clearShiftPreview==='function' && clearShiftPreview();
 
     const isNavIcon   = !!e.dataTransfer.getData('navIcon');
-    const isFolderItem= !!e.dataTransfer.getData('folderItem');
-    if(!isNavIcon && !isFolderItem) return;
+    /* folderItem 拖拽已改为 mousedown 自定义实现，HTML5 drop 不再处理 */
+    if(!isNavIcon) return;
 
-    /* ================================================================
-       落点判断（用坐标）
-       问题3修复：elementFromPoint 会被 fixed 弹窗遮挡，改用坐标遍历桌面图标
-       ================================================================ */
+    /* ---- 落点判断（用坐标）---- */
     const _dropUnder = document.elementFromPoint(e.clientX, e.clientY);
     const targetFolderGrid = _dropUnder?.closest('.folder-grid');
-
-    /* 坐标命中桌面图标（穿透弹窗遮挡） */
-    function _hitDeskItem(cx, cy) {
-      const items = document.querySelectorAll(
-        `.page[data-page="${App.curPage}"] .desk-item`
-      );
-      for (const el of items) {
-        const r = el.getBoundingClientRect();
-        if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom)
-          return el;
-      }
-      return null;
-    }
-    const targetDeskItem = !targetFolderGrid && _hitDeskItem(e.clientX, e.clientY);
-    const inOtherModal   = !targetFolderGrid && !targetDeskItem && _dropUnder?.closest('.modal-panel');
+    const targetDeskItem   = !targetFolderGrid && _dropUnder?.closest('.desk-item');
+    const inOtherModal     = !targetFolderGrid && !targetDeskItem && _dropUnder?.closest('.modal-panel');
 
     if(inOtherModal) return; // 落在非文件夹弹窗 → 取消
 
@@ -256,84 +237,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       saveData();renderAll();
       return;
     }
-
-    /* ================================================================
-       B. folderItem 拖拽（从展开文件夹拖出）
-       ================================================================ */
-    if(isFolderItem) {
-      e.preventDefault();
-      const fraw=e.dataTransfer.getData('folderItem');
-      const {idx, folderId, pi}=JSON.parse(fraw);
-      const srcFolder=App.pages[pi]?.find(i=>i.id===folderId); if(!srcFolder) return;
-      const it=srcFolder.items[idx]; if(!it) return;
-
-      /* B1. 落在另一个展开文件夹的 grid 里 */
-      if(targetFolderGrid) {
-        const overlayEl=targetFolderGrid.closest('.modal-overlay');
-        if(overlayEl){
-          const destFolderId=overlayEl.id.replace('folder-inst-','');
-          if(destFolderId===folderId) return; // 同一文件夹，忽略
-          let destFolder=null, destPi=null;
-          for(let p2=0;p2<App.pages.length;p2++){
-            const f=App.pages[p2]?.find(i=>i.id===destFolderId);
-            if(f){destFolder=f;destPi=p2;break;}
-          }
-          if(destFolder){
-            /* 问题2修复：先完成所有数据操作，再统一做一次 DOM 更新，避免时序竞争 */
-            srcFolder.items.splice(idx,1);
-            if(!destFolder.items.find(i=>i.id===it.id)) destFolder.items.push(it);
-            /* 处理源文件夹解散逻辑（纯数据，不触发 renderAll） */
-            _dissolveFolderData(srcFolder, pi);
-            saveData();
-            renderAll();
-            /* renderAll 后再刷新两个文件夹弹窗，DOM 已稳定 */
-            const srcOverlay = document.getElementById('folder-inst-' + folderId);
-            if(srcOverlay && srcOverlay.classList.contains('open'))
-              _refreshFolderOverlay(srcOverlay, srcFolder, pi);
-            _refreshFolderOverlay(overlayEl, destFolder, destPi);
-          }
-        }
-        return;
-      }
-
-      /* B2. 落在桌面图标/文件夹上 → 从源文件夹移除（移动），合并到目标 */
-      if(targetDeskItem){
-        const tid=targetDeskItem.dataset.id, tpi2=+targetDeskItem.dataset.pi;
-        const tItem=App.pages[tpi2]?.find(i=>i.id===tid);
-        if(tItem&&tItem.id!==folderId){
-          srcFolder.items.splice(idx,1);
-          it.id=it.id||('ni'+Date.now());
-          /* 问题2修复：先处理数据，doMerge 内会统一 saveData/renderAll */
-          _dissolveFolderData(srcFolder, pi);
-          _refreshOpenFolderOverlay(srcFolder, pi);
-          doMerge(it, tItem, tpi2);
-          return;
-        }
-      }
-
-      /* B3. 落在桌面空白处 → 从源文件夹移除（真正移动），放到桌面 */
-      srcFolder.items.splice(idx,1);
-      it.id=it.id||('ni'+Date.now());
-      const area2=getGridArea(App.curPage);
-      let pc2=0,pr2=0;
-      if(area2){
-        const ar2=area2.getBoundingClientRect();
-        const gs2=ghostSize(it.size||'1x1');
-        pc2=Math.max(0,Math.floor((e.clientX-gs2.w/2-ar2.left)/(CELL+GAP)));
-        pr2=Math.max(0,Math.floor((e.clientY-gs2.h/2-ar2.top-GRID_TOP)/(CELL+GAP)));
-      }
-      const result=placeWithShift(App.curPage,it,pc2,pr2);
-      if(!result){alert('本页无空间，请新建分页');saveData();renderAll();return;}
-      it.col=result.col;it.row=result.row;
-      /* 先把 it 加入桌面，再处理源文件夹解散（避免dissolve重复push） */
-      if(!App.pages[App.curPage].find(i=>i.id===it.id))
-        App.pages[App.curPage].push(it);
-      /* 先保存到桌面，再处理源文件夹（避免dissolve重复push） */
-      dissolveFolderIfNeeded(srcFolder, pi);
-      saveData(); renderAll();
-      /* 刷新源文件夹弹窗（如果还开着），移除残留图标 */
-      _refreshOpenFolderOverlay(srcFolder, pi);
-    }
   });
 
   /* 导航搜索 */
@@ -345,23 +248,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     const f=document.querySelector('#nav-content .nav-icon');if(f)window.open(f.dataset.url,'_blank');
   });
 });
-
-/* ================================================================
-   文件夹解散辅助（纯数据版，不触发 renderAll，供批量操作使用）
-   ================================================================ */
-function _dissolveFolderData(folder, pi) {
-  if (folder.items.length === 1) {
-    const last = folder.items[0];
-    last.col = folder.col; last.row = folder.row;
-    App.pages[pi] = App.pages[pi].filter(i => i.id !== folder.id);
-    App.pages[pi].push(last);
-    _closeFolderInst('folder-inst-' + folder.id);
-  } else if (folder.items.length === 0) {
-    App.pages[pi] = App.pages[pi].filter(i => i.id !== folder.id);
-    _closeFolderInst('folder-inst-' + folder.id);
-  }
-  /* items ≥ 2：保留文件夹，调用方自行刷新弹窗 */
-}
 
 /* ================================================================
    文件夹解散辅助
@@ -445,32 +331,209 @@ function _renderFolderGridEl(gridEl, item, pi){
          <span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:18px;">${it.emoji||it.label.slice(0,2)}</span>`
       : `<span style="font-size:18px;">${it.emoji||it.label.slice(0,2)}</span>`;
     const bg2=it._favicon?'background:rgba(255,255,255,0.88);':bs2;
-    return `<div class="folder-icon-item" data-idx="${idx}" draggable="true">
+    return `<div class="folder-icon-item" data-idx="${idx}">
       <div class="folder-item-body" style="${bg2};display:flex;align-items:center;justify-content:center;overflow:hidden;">
         ${inner}
       </div>
       <div class="folder-item-label">${it.label}</div>
     </div>`;
   }).join('');
+
   gridEl.querySelectorAll('.folder-icon-item').forEach((el,idx)=>{
     add3D&&add3D(el);
-    el.addEventListener('click',()=>{
-      const it=item.items[idx];if(!it)return;
+
+    /* ── 点击打开 ── */
+    el.addEventListener('click', ()=>{
+      if(el.dataset.wasDragged==='1'){ el.dataset.wasDragged='0'; return; }
+      const it=item.items[idx]; if(!it) return;
       if(it.action) handleItemClick(it,pi);
       else if(it.url) window.open(it.url,'_blank');
     });
-    el.addEventListener('dragstart',ev=>{
-      ev.dataTransfer.effectAllowed='move';
-      const it2=item.items[idx];
-      ev.dataTransfer.setData('folderItem',JSON.stringify({idx,folderId:item.id,pi}));
-      window._dragSize=(it2&&it2.size)||'1x1';
-    });
-    el.addEventListener('dragend',()=>{
-      window._dragSize=null;
-      hideGhost&&hideGhost();
-      _clearNavDragHighlight&&_clearNavDragHighlight();
+
+    /* ── 自定义 mousedown 拖拽（与桌面图标同一套） ── */
+    el.addEventListener('mousedown', e=>{
+      if(e.button!==0) return;
+      e.preventDefault();
+      e.stopPropagation(); // 防止触发弹窗拖动
+
+      const folderOverlay = gridEl.closest('.modal-overlay');
+      const it = item.items[idx];
+      if(!it) return;
+
+      const r = el.getBoundingClientRect();
+      // 克隆一个浮动副本跟随鼠标
+      const clone = el.cloneNode(true);
+      clone.style.cssText=`position:fixed;z-index:9999;pointer-events:none;
+        width:${r.width}px;height:${r.height}px;
+        left:${r.left}px;top:${r.top}px;
+        opacity:0.85;transition:none;`;
+      document.body.appendChild(clone);
+
+      // 原图标变暗提示
+      el.style.opacity='0.3';
+
+      const ox=e.clientX-r.left, oy=e.clientY-r.top;
+      let moved=false, released=false;
+
+      /* 判断是否已离开文件夹弹窗范围 */
+      function isOutsideFolder(cx,cy){
+        if(!folderOverlay) return true;
+        const fr=folderOverlay.getBoundingClientRect();
+        return cx<fr.left||cx>fr.right||cy<fr.top||cy>fr.bottom;
+      }
+
+      function onMove(e2){
+        const dx=e2.clientX-e.clientX, dy=e2.clientY-e.clientY;
+        if(!moved && dx*dx+dy*dy<16) return;
+        moved=true;
+        clone.style.left=(e2.clientX-ox)+'px';
+        clone.style.top =(e2.clientY-oy)+'px';
+
+        // 只在离开文件夹后显示桌面 ghost
+        if(isOutsideFolder(e2.clientX,e2.clientY)){
+          clone.style.opacity='0.7';
+          // 用桌面 ghost 系统显示落点预览
+          const area=getGridArea(App.curPage);
+          if(area){
+            const ar=area.getBoundingClientRect();
+            const pageTop=(App.curPage===0)?GRID_TOP:20;
+            const fakeItem={...it, id:'__folder_drag__'};
+            const pc=Math.max(0,Math.floor((e2.clientX-ox+r.width/2-ar.left)/(CELL+GAP)));
+            const pr=Math.max(0,Math.floor((e2.clientY-oy+r.height/2-ar.top-pageTop)/(CELL+GAP)));
+            if(typeof applyShiftPreview==='function') applyShiftPreview(App.curPage,fakeItem,pc,pr);
+            const gs=ghostSize(it.size||'1x1');
+            const simResult=simulatePlacement(App.curPage,fakeItem,pc,pr);
+            if(simResult){
+              showGhost(
+                ar.left+simResult.finalCol*(CELL+GAP)+gs.ox,
+                ar.top+pageTop+simResult.finalRow*(CELL+GAP)+gs.oy,
+                gs.w,gs.h,gs.r
+              );
+            }
+          }
+        } else {
+          // 还在文件夹内：清除桌面预览
+          if(typeof clearShiftPreview==='function') clearShiftPreview();
+          hideGhost&&hideGhost();
+        }
+      }
+
+      function onUp(e2){
+        if(released) return;
+        released=true;
+        document.removeEventListener('mousemove',onMove);
+        document.removeEventListener('mouseup',onUp);
+        clone.remove();
+        el.style.opacity='';
+        if(typeof clearShiftPreview==='function') clearShiftPreview();
+        hideGhost&&hideGhost();
+
+        if(!moved || !isOutsideFolder(e2.clientX,e2.clientY)){
+          // 未移动或在文件夹内松手：不做任何事
+          return;
+        }
+
+        // 已拖出文件夹，执行放置
+        el.dataset.wasDragged='1';
+
+        /* ── 落点判断 ── */
+
+        // 1. 落在另一个展开文件夹的 grid 里（问题2）
+        const underEl=document.elementFromPoint(e2.clientX,e2.clientY);
+        const targetFolderGrid=underEl?.closest('.folder-grid');
+        if(targetFolderGrid){
+          const targetOverlay=targetFolderGrid.closest('.modal-overlay');
+          if(targetOverlay){
+            const destFolderId=targetOverlay.id.replace('folder-inst-','');
+            if(destFolderId!==item.id){
+              let destFolder=null,destPi=null;
+              for(let p=0;p<App.pages.length;p++){
+                const f=App.pages[p]?.find(i=>i.id===destFolderId);
+                if(f){destFolder=f;destPi=p;break;}
+              }
+              if(destFolder){
+                item.items.splice(idx,1);
+                it.id=it.id||('ni'+Date.now());
+                if(!destFolder.items.find(i=>i.id===it.id)) destFolder.items.push(it);
+                _dissolveFolderIfNeeded(item,pi);
+                saveData(); renderAll();
+                _refreshFolderOverlay(targetOverlay,destFolder,destPi);
+                const srcOverlay=document.getElementById('folder-inst-'+item.id);
+                if(srcOverlay&&srcOverlay.classList.contains('open'))
+                  _refreshFolderOverlay(srcOverlay,item,pi);
+                return;
+              }
+            }
+          }
+          return; // 落在同一文件夹，忽略
+        }
+
+        // 2. 落在未展开的桌面文件夹/图标上（问题3）：坐标遍历穿透弹窗
+        const pageItems=document.querySelectorAll(`.page[data-page="${App.curPage}"] .desk-item`);
+        let hitDeskItem=null;
+        for(const d of pageItems){
+          const dr=d.getBoundingClientRect();
+          if(e2.clientX>=dr.left&&e2.clientX<=dr.right&&e2.clientY>=dr.top&&e2.clientY<=dr.bottom){
+            hitDeskItem=d; break;
+          }
+        }
+        if(hitDeskItem){
+          const tid=hitDeskItem.dataset.id;
+          const tpi2=+hitDeskItem.dataset.pi;
+          const tItem=App.pages[tpi2]?.find(i=>i.id===tid);
+          if(tItem&&tItem.id!==item.id){
+            item.items.splice(idx,1);
+            it.id=it.id||('ni'+Date.now());
+            _dissolveFolderIfNeeded(item,pi);
+            doMerge(it,tItem,tpi2);
+            const srcOverlay=document.getElementById('folder-inst-'+item.id);
+            if(srcOverlay&&srcOverlay.classList.contains('open'))
+              _refreshFolderOverlay(srcOverlay,item,pi);
+            return;
+          }
+        }
+
+        // 3. 落在桌面空白处（问题1）
+        item.items.splice(idx,1);
+        it.id=it.id||('ni'+Date.now());
+        const area=getGridArea(App.curPage);
+        let pc2=0,pr2=0;
+        if(area){
+          const ar=area.getBoundingClientRect();
+          const pageTop=(App.curPage===0)?GRID_TOP:20;
+          pc2=Math.max(0,Math.floor((e2.clientX-ox+r.width/2-ar.left)/(CELL+GAP)));
+          pr2=Math.max(0,Math.floor((e2.clientY-oy+r.height/2-ar.top-pageTop)/(CELL+GAP)));
+        }
+        const result=placeWithShift(App.curPage,it,pc2,pr2);
+        if(!result){alert('本页无空间，请新建分页');item.items.splice(idx,0,it);saveData();renderAll();return;}
+        it.col=result.col; it.row=result.row;
+        if(!App.pages[App.curPage].find(i=>i.id===it.id))
+          App.pages[App.curPage].push(it);
+        _dissolveFolderIfNeeded(item,pi);
+        saveData(); renderAll();
+        const srcOverlay=document.getElementById('folder-inst-'+item.id);
+        if(srcOverlay&&srcOverlay.classList.contains('open'))
+          _refreshFolderOverlay(srcOverlay,item,pi);
+      }
+
+      document.addEventListener('mousemove',onMove);
+      document.addEventListener('mouseup',onUp);
     });
   });
+}
+
+/* 文件夹解散辅助（纯数据+关闭弹窗，不触发 renderAll） */
+function _dissolveFolderIfNeeded(folder,pi){
+  if(folder.items.length===1){
+    const last=folder.items[0];
+    last.col=folder.col; last.row=folder.row;
+    App.pages[pi]=App.pages[pi].filter(i=>i.id!==folder.id);
+    App.pages[pi].push(last);
+    _closeFolderInst('folder-inst-'+folder.id);
+  } else if(folder.items.length===0){
+    App.pages[pi]=App.pages[pi].filter(i=>i.id!==folder.id);
+    _closeFolderInst('folder-inst-'+folder.id);
+  }
 }
 
 function _closeFolderInst(id){
