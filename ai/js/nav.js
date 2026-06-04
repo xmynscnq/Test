@@ -44,8 +44,21 @@ const Nav = {
           label:el.dataset.name,color:el.dataset.color,
           letter:el.dataset.letter,url:el.dataset.url}));
         window._dragSize='1x1';
+        /* nav 面板置为不可穿透，让 elementFromPoint 能找到背后的文件夹 grid */
+        const srcOverlay = el.closest('.modal-overlay');
+        if(srcOverlay) {
+          srcOverlay._prevPE = srcOverlay.style.pointerEvents;
+          srcOverlay.style.pointerEvents = 'none';
+          window._dragSrcOverlay = srcOverlay;
+        }
       });
-      el.addEventListener('dragend',()=>{ window._dragSize=null; });
+      el.addEventListener('dragend',()=>{
+        window._dragSize=null;
+        if(window._dragSrcOverlay) {
+          window._dragSrcOverlay.style.pointerEvents = window._dragSrcOverlay._prevPE || '';
+          window._dragSrcOverlay = null;
+        }
+      });
       el.addEventListener('contextmenu',ev=>{
         ev.preventDefault();ev.stopPropagation();
         const menu=document.getElementById('ctx-menu');
